@@ -4,12 +4,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quantum Minesweeper</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./client.css">
+    <script src="./client.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h2>Howdy</h2>
+    <div class="container-fluid" style="height: 11%; background-color: rgb(38, 46, 83); color: white;">
+        <h1 style="margin-left: 5%;">Quantum Minesweeper</h1>
+    </div>
+    <div class="container-fluid" id="login" style="width: 80%; align-items: center; text-align: center;">
+        <div class="row">
+            <div class="col-sm-2">
+                <p>Log in to play!</p>
+            </div>
+            <div class="col-sm-3">
+                <label>Username:</label>
+                <input id="usernameBox" type="text" placeholder="Enter username here...">
+            </div>
+            <div class="col-sm-3">
+                <label>Password:</label>
+                <input id="passwordBox" type="password"  placeholder="Enter password here...">
+            </div>
+            <div class="col-sm-2">
+                <button id="regButt" class="btn-primary">Register</button>
+            </div>
+            <div class="col-sm-2">
+                <button id="logButt" class="btn-primary">Log in</button>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="newgame" style="width: 60%; display: none;">
+        <div class="row">
+            <div class="col-sm-4">
+                <p>Start a new game of Quantum Minesweeper!</p>
+            </div>
+            <div class="col-sm-4">
+                <button id="startGameButt" class="btn" onclick="startGame()">Start</button>
+            </div>
+        </div>
     </div>
 </body>
 </html>
