@@ -61,15 +61,14 @@ const authenticate = (req, res, next) => {
 app.post('/api/newUser/', (req, res, next) => {
     let username = req.body.username;
     let password = req.body.password;
-
     users.get(username)
         .then(() => {
             res.status(400).send(`User ${username} already exists.`)
         })
         .catch(err => {
             if (err.reason == 'missing') {
-                users.insert({ _id: username, password: password, preferences: { pace: 'No preference', length: 'No preference', time: 'No preference', sort: 'Most Recent'}})
-                    .then(doc => res.status(200).send("Registered successfully. Welcome to Social Runner!"))
+                users.insert({ _id: username, password: password })
+                    .then(doc => res.status(200).send("Registered successfully. Welcome to Quantum Minesweeper!"))
                     .catch(err => res.status(500).send("Error processing request. Refresh the page and try again."))
             }
             else {

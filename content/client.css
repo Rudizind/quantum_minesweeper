@@ -1,3 +1,50 @@
 #login {
     margin-top: 2%;
 }
+
+body {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(194, 201, 202);
+}
+
+button {
+    transition-duration: 300ms;
+    transition-property: all;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: rgb(146, 163, 241); 
+    transition-duration: 300ms;
+    transition-property: all;
+}
+
+button:focus {
+    background-color: rgb(146, 163, 241); 
+    transition-duration: 300ms;
+    transition-property: all;
+}
+
+#boardTable {
+    width: 100%;
+    height: 100%;
+}
+
+td {
+    text-align: center;
+    padding: 3px;
+    width: 25px;
+    height: 25px;
+    border: 1px solid black;
+    border-collapse: collapse;
+    transition-duration: 300ms;
+    transition-property: all;
+}
+
+td:hover {
+    background-color: lightcoral;
+    transition-duration: 300ms;
+    transition-property: all;
+    cursor: pointer;
+}
