@@ -4,6 +4,9 @@ let currentUser = {
     password: ""
 }
 
+// Variable to be used when a game is active, for tracking gameboard etc.
+let currentGame = {};
+
 // Register a new user by taking their details and sending them to the server to be added to the database using an HTTP POST request.
 const registerUser = () => {
     let username = document.getElementById("usernameBox").value
@@ -79,6 +82,16 @@ const startGame = () => {
     // Adjust display
     document.getElementById("newgame").setAttribute("class", "hidden")
     document.getElementById("gameboard").setAttribute("class", "container-fluid align-middle")
+    document.getElementById("hotbar").setAttribute("class", "container-fluid align-middle")
+
+    // Set the starting board parameters (in global scope)
+    currentGame = {
+        startMines: 99,
+        flagsPlaced: 0,
+        displayedMines: this.startMines - this.flagsPlaced,
+        boardSize: 'xl',
+        turn: 0
+    }
 
     // Call the makeBoard function from ./board.js
     makeBoard()
