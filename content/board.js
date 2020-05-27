@@ -52,8 +52,10 @@ const makeBoard = () => {
             cellCount++
 
             // Assign the cell's x and y values (for doing adjacency checks)
-            newCell.x = j + 1
-            newCell.y = i + 1
+            // x is left to right
+            // y is top to bottom
+            newCell.setAttribute("x", j + 1)
+            newCell.setAttribute("y", i + 1)
 
             // Assign the default 'revealed' boolean to false for the cell. 
             newCell.revealed = false;
@@ -89,24 +91,26 @@ const squareChoice = e => {
 
     if (square.getAttribute("class") == "mineSquare") {
         if (square.revealed == true) {
+            console.log("bleh")
             return;
         }
         else {
             // If either a mine or flag is present (or both)
-            if (square.childNodes.length != 0) {
+            if (square.childNodes.length > 0) {
                 // If left click
                 if (click == "left") {
                     // If there's a flag in the square, do nothing.
-                    if (square.childNodes.length == 2 || square.childNodes[0].getAttribute("class") == "flag") {
+                    if (square.childNodes.length == 2) {
                         return;
                     }
                     // Otherwise, they've made a mistake and lost the game. The board is revealed with all mines.
                     else {
                         let mineNodes = document.querySelectorAll(".mine")
                         mineNodes.forEach(node => {
-                            node.style.display = "block"
+                            node.style.display = "inline"
                             node.parentElement.style.backgroundColor = "red"
                         })
+                        // some code to show which mines were correctly guessed, which were incorrectly guessed, and which went under the radar. 
                     }
                 }
                 // If right click
@@ -151,27 +155,73 @@ const squareChoice = e => {
                 // If empty, and left click, run the adjacency checks until an endpoint is reached. 
                 else if (click == "left") {
                     // Make the chosen square 'safe'
-                    square.style = "background-color: rgba(0, 0, 255, 0.5);"
-                    /*
+                    square.style = "background-color: rgba(0, 0, 255, 0.3);"
+                    square.revealed = true;
 
+                    console.log(square)
 
+                    // Check if any mines around the chosen square
+                    // Nest for loops to test all 8 squares around
+                    let mineCount = 0
 
+                    // Once 8 have been found, stop searching. - this doesn't work because of edge squares. 
+                    let periSquaresFound = 0;
 
+                    // For consistency with above, i will cover y and j will cover x
+                    console.log(mineCount)
 
-                    CODE FOR DOING ADJACENT SQUARES AND NUMBERS
+                    // ignore the current cell
+                    let table = document.getElementById("boardTable")
+                    table.childNodes.forEach(row => {
+                        row.childNodes.forEach(cell => {
+                            if (
+                                // -1 / -1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) || 
+                                // -1 / 0
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                                // -1 / 1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                                // 0 / -1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                                // 0 / +1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                                // +1 / -1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                                // +1 / 0
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                                // +1 / +1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) 
+                            ) {
+                                periSquaresFound++
+                                console.log(cell)
+                                if (cell.childNodes.length != 0) {
+                                    console.log(cell.childNodes)
+                                    if (cell.textContent == "") {
+                                        if (cell.childNodes[0].getAttribute("class") == "mine") {
+                                            mineCount++
+                                            console.log("hey ho")
+                                        }
+                                    }
+                                }
+                            }
+                            else if ((Number(cell.getAttribute("y")) - 1) > square.getAttribute("y")) {
+                                return;
+                            }
+                        })
+                    })
+                    // *
+                    // *
+                    // *
+                    // *
+                    // this doesn't log anything yet
+                    console.log(mineCount)
 
-
-
-
-
-                    */
+                    square.innerHTML = `${mineCount}`
+                    
                 }
             }
         }
     }
-
-    // Handle the click event for mines and so on down below here
-    console.log(click)
 }
 
 // Function to end a game and show the user the entire board as well as some kind of 'game over' screen.
