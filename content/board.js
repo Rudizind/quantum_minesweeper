@@ -89,6 +89,10 @@ const squareChoice = e => {
 
     console.log(square)
 
+    mineTest(square, click)
+}
+
+const mineTest = (square, click) => {
     if (square.getAttribute("class") == "mineSquare") {
         if (square.revealed == true) {
             console.log("bleh")
@@ -164,11 +168,11 @@ const squareChoice = e => {
                     // Nest for loops to test all 8 squares around
                     let mineCount = 0
 
-                    // Once 8 have been found, stop searching. - this doesn't work because of edge squares. 
-                    let periSquaresFound = 0;
-
                     // For consistency with above, i will cover y and j will cover x
                     console.log(mineCount)
+
+                    // array for storing chosen square's up to 8 neighbour squares
+                    let squareNeighbours = [];
 
                     // ignore the current cell
                     let table = document.getElementById("boardTable")
@@ -192,8 +196,8 @@ const squareChoice = e => {
                                 // +1 / +1
                                 (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) 
                             ) {
-                                periSquaresFound++
                                 console.log(cell)
+                                squareNeighbours.push(cell)
                                 if (cell.childNodes.length != 0) {
                                     console.log(cell.childNodes)
                                     if (cell.textContent == "") {
@@ -209,14 +213,15 @@ const squareChoice = e => {
                             }
                         })
                     })
-                    // *
-                    // *
-                    // *
-                    // *
-                    // this doesn't log anything yet
-                    console.log(mineCount)
-
-                    square.innerHTML = `${mineCount}`
+                    if (mineCount == 0) {
+                        console.log(squareNeighbours)
+                        squareNeighbours.forEach(node => {
+                            mineTest(node, "left")
+                        })
+                    }
+                    else {
+                        square.innerHTML = `${mineCount}`
+                    }
                     
                 }
             }
