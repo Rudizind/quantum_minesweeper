@@ -86,13 +86,68 @@ const startGame = () => {
 
     // Set the starting board parameters (in global scope)
     currentGame = {
+        active: true,
         startMines: 99,
         flagsPlaced: 0,
-        displayedMines: this.startMines - this.flagsPlaced,
         boardSize: 'xl',
-        turn: 0
+        timerCount: 0,
+        timerStart: () => {
+            this.timerCount = setInterval(tickUp, 1000)
+        },
+        timerStop: () => {
+            window.clearInterval(this.timerCount)
+        }
     }
+
+    document.getElementById("scoreDisplay").innerHTML = "Mines left: " + currentGame.startMines
 
     // Call the makeBoard function from ./board.js
     makeBoard()
+
+    // Display the backHome() button
+    document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
+
+    // Start the timer
+    currentGame.timerStart()
+}
+
+// the callback function for the setInterval used above in currentGame.timerStart()
+const tickUp = () => {
+    currentGame.timerCount++
+    document.getElementById("gameTimer").innerHTML = "Time Elapsed: " + currentGame.timerCount
+}
+
+// Send the user back to the home page which has startGame button. 
+const backHome = () => {
+    // By default, confirmed will be true. If a game is ended by a user leaving early, then they'll be asked to confirm first that they wish to do so.
+    // If a game is over, because of the default value, the user isn't asked to confirm.
+    let confirmed = true;
+    if (currentGame.active) {
+        confirmed = confirm("Are you sure you'd like to leave the game? This will be counted as a loss.")
+    }
+    if (confirmed) {
+
+        // Hide all UI for the gameboard and HUD.
+        document.getElementById("hotbar").setAttribute("class", "hidden")
+        document.getElementById("gameboard").setAttribute("class", "hidden")
+        document.getElementById("homeButt").setAttribute("class", "hidden")
+
+        // Remove all the table rows so it can be repopulated for a next game.
+        document.querySelectorAll("tr").forEach(node => {
+            console.log(node)
+            node.parentElement.removeChild(node)
+        })
+
+        // Stop the timer
+        currentGame.timerStop()
+
+        // Reset the timer to 0 for the next game
+        document.getElementById("gameTimer").innerHTML = "Time Elapsed: 0"
+
+        // Show the newgame div, containing the startGame button.
+        document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
+    }
+
+    // Reset the localized currentGame object.
+    currentGame = {};
 }

@@ -1,71 +1,74 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Minesweeper</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./client.css">
-    <script src="./board.js"></script>
-    <script src="./client.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
-<body>
-    <div class="container-fluid" style="height: 11%; background-color: rgb(38, 46, 83); color: white; margin-bottom: 5%;">
-        <h1 style="margin-left: 5%;">Quantum Minesweeper</h1>
-    </div>
-    <div class="container-fluid align-middle" id="login" style="width: 80%; height: 20%; vertical-align: middle; text-align: center;">
-        <div class="row">
-            <div style="height: 100%;" class="col-sm-2">
-                <p>Log in to play!</p>
-            </div>
-            <div style="height: 100%;" class="col-sm-3">
-                <label>Username:</label>
-                <input id="usernameBox" type="text" placeholder="Enter username here...">
-            </div>
-            <div style="height: 100%;" class="col-sm-3">
-                <label>Password:</label>
-                <input  id="passwordBox" type="password"  placeholder="Enter password here...">
-            </div>
-            <div style="height: 100%;" class="col-sm-2">
-                <button id="regButt" class="btn" onclick="registerUser()">Register</button>
-            </div>
-            <div style="height: 100%;" class="col-sm-2">
-                <button id="logButt" class="btn" onclick="loginUser()">Log in</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quantum Minesweeper</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./client.css">
+        <script src="./board.js"></script>
+        <script src="./client.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container-fluid" style="height: 11%; background-color: rgb(38, 46, 83); color: white; margin-bottom: 5%;">
+            <h1 style="margin-left: 5%;">Quantum Minesweeper</h1>
+        </div>
+        <div class="container-fluid align-middle" id="login" style="width: 80%; height: 20%; vertical-align: middle; text-align: center;">
+            <div class="row">
+                <div style="height: 100%;" class="col-sm-2">
+                    <p>Log in to play!</p>
+                </div>
+                <div style="height: 100%;" class="col-sm-3">
+                    <label>Username:</label>
+                    <input id="usernameBox" type="text" placeholder="Enter username here...">
+                </div>
+                <div style="height: 100%;" class="col-sm-3">
+                    <label>Password:</label>
+                    <input  id="passwordBox" type="password"  placeholder="Enter password here...">
+                </div>
+                <div style="height: 100%;" class="col-sm-2">
+                    <button id="regButt" class="btn" onclick="registerUser()">Register</button>
+                </div>
+                <div style="height: 100%;" class="col-sm-2">
+                    <button id="logButt" class="btn" onclick="loginUser()">Log in</button>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="hidden" id="newgame" style="width: 80%; text-align: center;">
-        <div class="row align-middle">
-            <div class="col-sm-3"></div>
-            <div class="col-sm-3">
-                <p>Start a new game of Quantum Minesweeper!</p>
+        <div class="hidden" id="newgame" style="width: 80%; text-align: center;">
+            <div class="row align-middle">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-3">
+                    <p>Start a new game of Quantum Minesweeper!</p>
+                </div>
+                <div class="col-sm-3">
+                    <button id="startGameButt" class="btn" onclick="startGame()">Start</button>
+                </div>
+                <div class="col-sm-3"></div>
             </div>
-            <div class="col-sm-3">
-                <button id="startGameButt" class="btn" onclick="startGame()">Start</button>
-            </div>
-            <div class="col-sm-3"></div>
         </div>
-    </div>
-    <div class="hidden" id="hotbar">
-        <div class="row">
-            <div class="col-sm-3"></div>
-            <div class="col-sm-2" style="text-align: center;">
-                <p id="scoreDisplay">Mines left: 99</script></p>
+        <div class="hidden" id="hotbar">
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-2" style="text-align: center;">
+                    <p id="scoreDisplay">Mines left: 0</script></p>
+                </div>
+                <div class="col-sm-2" style="text-align: center;">
+                    <p id="aciveGame">Active Game</p>
+                </div>
+                <div class="col-sm-2" style="text-align: center;">
+                    <p id="gameTimer">Time Elapsed: 0</p>
+                </div>
+                <div class="col-sm-3"></div>
             </div>
-            <div class="col-sm-2" style="text-align: center;">
-                <p id="aciveGame">Active Game</p>
-            </div>
-            <div class="col-sm-2" style="text-align: center;">
-                <p id="turnNum">Turn: 0</p>
-            </div>
-            <div class="col-sm-3"></div>
         </div>
-    </div>
-    <div class="hidden" id="gameboard" style="width: 70%; text-align: center; height: 70%;">
-        <table id="boardTable">
-            <!--Content of the table will be created manipulated using client.js file-->
-        </table>
-    </div>
-</body>
+        <div class="hidden" id="gameboard" style="width: 70%; text-align: center; height: 60%; margin-bottom: 2.5%;">
+            <table id="boardTable">
+                <!--Content of the table will be created manipulated using client.js file-->
+            </table>
+        </div>
+        <div class="hidden" id="homeButt" style="text-align: center; height: 5%; margin-bottom: 2.5%;">
+            <button class="btn" onclick="backHome()">Return to Menu</button>
+        </div>
+    </body>
 </html>
