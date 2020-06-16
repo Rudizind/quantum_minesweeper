@@ -7,7 +7,6 @@ const makeBoard = () => {
     for (m=1;m<=currentGame.startMines;m++) {
         const chooseNum = () => {
             let newChoice = Math.ceil(Math.random() * 480)
-            console.log(newChoice)
             mineSquares.includes(newChoice) ? chooseNum() : mineSquares.push(newChoice)
         }
         chooseNum()
@@ -97,7 +96,6 @@ const squareChoice = e => {
 // Called from the click event handler squareChoice()
 const mineTest = (square, click) => {
     if (square.revealed == true) {
-        console.log("bleh")
         return;
     }
     else {
@@ -109,58 +107,12 @@ const mineTest = (square, click) => {
                 if (square.childNodes.length == 2) {
                     return;
                 }
-                // Otherwise, they've made a mistake and lost the game. The board is revealed with all mines.
+                // Otherwise, they've made a mistake and might have lost the game. 
+                // The solver from solver.js will run, and find out whether this error could have been avoided without guessing. 
+                // If it could have been avoided, the user loses. If it was completely impossible to know without guessing, the board will change.
+                // It will change to a board state such that the chosen square does NOT contain a mine. 
                 else if (square.childNodes[0].getAttribute("class") == "mine") {
-                    // Make mines visible and colour their squares appropriately
-                    let mineNodes = document.querySelectorAll(".mine")
-                    mineNodes.forEach(node => {
-                        // Display all mines
-                        node.style.display = "inline"
-                        // if there was a mine and the user had marked it, the mine is shown with orange (i.e. deactivated).
-                        if (node.parentElement.childNodes.length == 2) {
-                            node.parentElement.style.backgroundColor = "orange"
-                        }
-                        // otherwise it is shown with red to show it was not flagged.
-                        else {
-                            node.parentElement.style.backgroundColor = "red"
-                        }
-
-                        // Remove the event listener from mines
-                        node.removeEventListener("mouseup", squareChoice)
-                    })
-
-                    // Remove flags and replace them with crosses if they were wrong guesses at mines
-                    let flagNodes = document.querySelectorAll(".flag")
-                    flagNodes.forEach(node => {
-                        let parent = node.parentElement
-
-                        // If a flag was NOT correctly placed:
-                        if (parent.childNodes.length != 2) {
-                            let cross = document.createElement("img")
-                            cross.setAttribute("class", "cross")
-                            cross.src = "./img/x.png"
-                            cross.style = "height: 100%; width: auto;"
-                            parent.appendChild(cross);
-                        } // otherwise it's handled above
-                        
-                        parent.removeChild(node)
-                        parent.style.backgroundColor = "orange"
-                    })
-
-                    // Remove the click event listener from all squares.
-                    let allSquares = document.querySelectorAll(".mineSquare")
-                    allSquares.forEach(node => {
-                        node.removeEventListener("mouseup", squareChoice)
-                    })
-
-                    // Remove the mine count
-                    document.getElementById("scoreDisplay").innerHTML = "Mines left: :("
-
-                    // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
-                    currentGame.active = false;
-                    
-                    // Stop the timer
-                    currentGame.timerStop()
+                    solver.test(square)
                 }
             }
             // If right click
@@ -191,6 +143,40 @@ const mineTest = (square, click) => {
                     flag.setAttribute("class", "flag")
                     flag.style = "height: 100%; width: auto;"
                     square.append(flag)
+
+                    // end game test
+                    if (currentGame.flagsPlaced == currentGame.startMines) {
+                        let allFlags = document.querySelectorAll(".flag")
+                        let winner = true;
+                        allFlags.forEach(flag => {
+                            if (flag.parentElement.childNodes.length == 1) {
+                                winner = false;
+                            }
+                            else {
+                                return;
+                            }
+                        })
+
+                        if (winner) {
+                            alert("Congratulations, you found all the mines!")
+                            
+                            // Remove the click event listener from all squares.
+                            let allSquares = document.querySelectorAll(".mineSquare")
+                            allSquares.forEach(node => {
+                                node.removeEventListener("mouseup", squareChoice)
+                                node.style.backgroundColor = "rgba(0, 255, 0, 0.3)"
+                            })
+
+                            // Remove the mine count
+                            document.getElementById("scoreDisplay").innerHTML = "Mines left: 0"
+
+                            // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
+                            currentGame.active = false;
+                            
+                            // Stop the timer
+                            currentGame.timerStop()
+                        }
+                    }
                 }
 
                 // Set remaining mines in UI
@@ -261,7 +247,6 @@ const mineTest = (square, click) => {
                                 if (cell.textContent == "") {
                                     if (cell.childNodes[0].getAttribute("class") == "mine") {
                                         mineCount++
-                                        console.log("hey ho")
                                     }
                                 }
                             }
@@ -285,7 +270,3 @@ const mineTest = (square, click) => {
         }
     }
 }
-
-// end game:
-//       - mine count is NaN
-        // - interval is not being removed properly.

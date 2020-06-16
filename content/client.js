@@ -121,9 +121,14 @@ const tickUp = () => {
 const backHome = () => {
     // By default, confirmed will be true. If a game is ended by a user leaving early, then they'll be asked to confirm first that they wish to do so.
     // If a game is over, because of the default value, the user isn't asked to confirm.
-    let confirmed = true;
+    let confirmed = false;
     if (currentGame.active) {
-        confirmed = confirm("Are you sure you'd like to leave the game? This will be counted as a loss.")
+        if (confirm("Are you sure you'd like to leave the game? This will be counted as a loss.")) {
+            confirmed = true;
+        }
+    }
+    else {
+        confirmed = true;
     }
     if (confirmed) {
 
@@ -146,8 +151,63 @@ const backHome = () => {
 
         // Show the newgame div, containing the startGame button.
         document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
+        
+        // Reset the localized currentGame object.
+        currentGame = {};
     }
+}
 
-    // Reset the localized currentGame object.
-    currentGame = {};
+
+// If the solver finds that the player could've discovered that the current square was a mine, they lose.
+const endGame = () => {
+    // Make mines visible and colour their squares appropriately
+    let mineNodes = document.querySelectorAll(".mine")
+    mineNodes.forEach(node => {
+        // Display all mines
+        node.style.display = "inline"
+        // if there was a mine and the user had marked it, the mine is shown with orange (i.e. deactivated).
+        if (node.parentElement.childNodes.length == 2) {
+            node.parentElement.style.backgroundColor = "orange"
+        }
+        // otherwise it is shown with red to show it was not flagged.
+        else {
+            node.parentElement.style.backgroundColor = "red"
+        }
+
+        // Remove the event listener from mines
+        node.removeEventListener("mouseup", squareChoice)
+    })
+
+    // Remove flags and replace them with crosses if they were wrong guesses at mines
+    let flagNodes = document.querySelectorAll(".flag")
+    flagNodes.forEach(node => {
+        let parent = node.parentElement
+
+        // If a flag was NOT correctly placed:
+        if (parent.childNodes.length != 2) {
+            let cross = document.createElement("img")
+            cross.setAttribute("class", "cross")
+            cross.src = "./img/x.png"
+            cross.style = "height: 100%; width: auto;"
+            parent.appendChild(cross);
+        } // otherwise it's handled above
+        
+        parent.removeChild(node)
+        parent.style.backgroundColor = "orange"
+    })
+
+    // Remove the click event listener from all squares.
+    let allSquares = document.querySelectorAll(".mineSquare")
+    allSquares.forEach(node => {
+        node.removeEventListener("mouseup", squareChoice)
+    })
+
+    // Remove the mine count
+    document.getElementById("scoreDisplay").innerHTML = "Mines left: :("
+
+    // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
+    currentGame.active = false;
+
+    // Stop the timer
+    currentGame.timerStop()
 }
