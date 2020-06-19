@@ -139,7 +139,6 @@ const backHome = () => {
 
         // Remove all the table rows so it can be repopulated for a next game.
         document.querySelectorAll("tr").forEach(node => {
-            console.log(node)
             node.parentElement.removeChild(node)
         })
 
@@ -210,4 +209,38 @@ const endGame = () => {
 
     // Stop the timer
     currentGame.timerStop()
+}
+
+
+const winGame = () => {
+    let allFlags = document.querySelectorAll(".flag")
+    let winner = true;
+    allFlags.forEach(flag => {
+        if (flag.parentElement.childNodes.length == 1) {
+            winner = false;
+        }
+        else {
+            return;
+        }
+    })
+
+    if (winner) {
+        alert("Congratulations, you found all the mines!")
+        
+        // Remove the click event listener from all squares.
+        let allSquares = document.querySelectorAll(".mineSquare")
+        allSquares.forEach(node => {
+            node.removeEventListener("mouseup", squareChoice)
+            node.style.backgroundColor = "rgba(0, 255, 0, 0.3)"
+        })
+
+        // Remove the mine count
+        document.getElementById("scoreDisplay").innerHTML = "Mines left: 0"
+
+        // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
+        currentGame.active = false;
+        
+        // Stop the timer
+        currentGame.timerStop()
+    }
 }

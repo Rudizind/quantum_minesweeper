@@ -13,7 +13,6 @@ const makeBoard = () => {
     }
 
     mineSquares.sort((a, b) => a-b)
-    console.log(mineSquares)
 
     // Initialise the cell count (for matching chosen numbers in mineSquares array above)
     cellCount = 1;
@@ -29,8 +28,6 @@ const makeBoard = () => {
                       currentGame.boardSize == 'm' ? 9 :
                       currentGame.boardSize == 's' ? 7 :
                       currentGame.boardSize == 'xs' ? 5 : console.log("no board size provided")
-
-    console.log(boardwidth, ", ", boardheight)
 
     // Populate the board
     // For now the board will be the size of a standard expert level board (30L x 16H / 480 squares / 99 mines)
@@ -112,7 +109,7 @@ const mineTest = (square, click) => {
                 // If it could have been avoided, the user loses. If it was completely impossible to know without guessing, the board will change.
                 // It will change to a board state such that the chosen square does NOT contain a mine. 
                 else if (square.childNodes[0].getAttribute("class") == "mine") {
-                    solver.test(square)
+                    solver.test(square, "easy")
                 }
             }
             // If right click
@@ -146,36 +143,7 @@ const mineTest = (square, click) => {
 
                     // end game test
                     if (currentGame.flagsPlaced == currentGame.startMines) {
-                        let allFlags = document.querySelectorAll(".flag")
-                        let winner = true;
-                        allFlags.forEach(flag => {
-                            if (flag.parentElement.childNodes.length == 1) {
-                                winner = false;
-                            }
-                            else {
-                                return;
-                            }
-                        })
-
-                        if (winner) {
-                            alert("Congratulations, you found all the mines!")
-                            
-                            // Remove the click event listener from all squares.
-                            let allSquares = document.querySelectorAll(".mineSquare")
-                            allSquares.forEach(node => {
-                                node.removeEventListener("mouseup", squareChoice)
-                                node.style.backgroundColor = "rgba(0, 255, 0, 0.3)"
-                            })
-
-                            // Remove the mine count
-                            document.getElementById("scoreDisplay").innerHTML = "Mines left: 0"
-
-                            // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
-                            currentGame.active = false;
-                            
-                            // Stop the timer
-                            currentGame.timerStop()
-                        }
+                        winGame()
                     }
                 }
 
@@ -206,14 +174,11 @@ const mineTest = (square, click) => {
                 square.style = "background-color: rgba(0, 0, 255, 0.3);"
                 square.revealed = true;
 
-                console.log(square)
-
                 // Check if any mines around the chosen square
                 // Nest for loops to test all 8 squares around
                 let mineCount = 0
 
                 // For consistency with above, i will cover y and j will cover x
-                console.log(mineCount)
 
                 // array for storing chosen square's up to 8 neighbour squares
                 let squareNeighbours = [];
@@ -240,10 +205,8 @@ const mineTest = (square, click) => {
                             // +1 / +1
                             (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) 
                         ) {
-                            console.log(cell)
                             squareNeighbours.push(cell)
                             if (cell.childNodes.length != 0) {
-                                console.log(cell.childNodes)
                                 if (cell.textContent == "") {
                                     if (cell.childNodes[0].getAttribute("class") == "mine") {
                                         mineCount++
@@ -257,7 +220,6 @@ const mineTest = (square, click) => {
                     })
                 })
                 if (mineCount == 0) {
-                    console.log(squareNeighbours)
                     squareNeighbours.forEach(node => {
                         mineTest(node, "left")
                     })
