@@ -86,6 +86,7 @@ const squareChoice = e => {
 
     // Only pass the event choices through the mineTest if they're a valid choice.
     if (square.getAttribute("class") == "mineSquare") {
+        console.log("fail")
         mineTest(square, click)
     }
 }
@@ -109,7 +110,8 @@ const mineTest = (square, click) => {
                 // If it could have been avoided, the user loses. If it was completely impossible to know without guessing, the board will change.
                 // It will change to a board state such that the chosen square does NOT contain a mine. 
                 else if (square.childNodes[0].getAttribute("class") == "mine") {
-                    solver.test(square, "easy")
+                    console.log("this is successful calling of solver")
+                    solver.test(square)
                 }
             }
             // If right click
@@ -171,6 +173,7 @@ const mineTest = (square, click) => {
             // If empty, and left click, run the adjacency checks until an endpoint is reached. 
             else if (click == "left") {
                 // Make the chosen square 'safe'
+                console.log("this is to mark a square as safe")
                 square.style = "background-color: rgba(0, 0, 255, 0.3);"
                 square.revealed = true;
 
@@ -221,6 +224,7 @@ const mineTest = (square, click) => {
                 })
                 if (mineCount == 0) {
                     squareNeighbours.forEach(node => {
+                        square.revealed = true;
                         mineTest(node, "left")
                     })
                 }
