@@ -317,10 +317,20 @@ let solver = {
             }
         }
         let result = getAllConfigs([])
-        console.log(result)
-
-        // so... it is setting a guessmine and guessnot mine into the guesses. which means there is something wrong with the recursion.
-
+        potentialMines.forEach(tile => {
+            let mine = 0
+            let notMine = 0
+            result.forEach(array => {
+                let match = array.find(element => element.x == tile.x && element.y == tile.y)
+                match.guessMine == true ? mine++ : notMine++
+            })
+            if (mine == result.length) {
+                //tile == mine
+            }
+            else if (notMine == result.length) {
+                //tile == notMine
+            }
+        })
     },
     change: () => {
         // changes gameboard if appropriate from this.test()
