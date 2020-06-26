@@ -1,6 +1,6 @@
 let solver = {
     // will return with Boolean - if true, means square can be resolved; if false, means square cannot be resolved, therefore change() is called. 
-    test: (square) => {
+    test: (targetTile) => {
 
         let boardwidth = currentGame.boardSize == 'xl' ? 30 : 
                 currentGame.boardSize == 'l' ? 20 :
@@ -286,17 +286,22 @@ let solver = {
                 }
             })
 
-            console.log(changeBool)
-
-            if (changeBool == true) {
-                console.log("hello there yes")
-                testTiles = []
-                easySolve()
+            // if the solver has discovered that the chosen tile should be flagged using the easy solver,
+            // then the player has failed and they lose
+            if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged == true) {
+                endGame()
             }
             else {
-                console.log("hello there NOT")
-                testTiles = []
-                solveBoardProbs()
+                if (changeBool == true) {
+                    console.log("hello there yes")
+                    testTiles = []
+                    easySolve()
+                }
+                else {
+                    console.log("hello there NOT")
+                    testTiles = []
+                    solveBoardProbs()
+                }
             }
         }
 
@@ -519,15 +524,22 @@ let solver = {
                 })
                 // must combine the potential mines entry with the newboard.
 
-                if (changedTile == true) {
-                    testTiles = []
-                    easySolve()
+                // if the solver has discovered that the chosen tile should be flagged using the complex solver,
+                // then the player has failed and they lose
+                if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged == true) {
+                    endGame()
                 }
                 else {
-                    // no possible changes can be made
-                    console.log(newBoard);
-                    console.log("solver found nothing new that could be solved")
-                    return;
+                    if (changedTile == true) {
+                        testTiles = []
+                        easySolve()
+                    }
+                    else {
+                        // no possible changes can be made
+                        console.log(newBoard);
+                        console.log("solver found nothing new that could be solved")
+                        return;
+                    }
                 }
             }
             else {
@@ -536,6 +548,11 @@ let solver = {
                 // handle failure
                 console.log("end of the solver, can't solve anything else")
             }
+        }
+
+        // We need a function that handles when the chosen tile has been revealed
+        const solverBreakpoint = () => {
+
         }
         
         // Finally, call everything
