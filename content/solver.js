@@ -157,6 +157,149 @@ let solver = {
             return newArray;
         }
 
+        const easySolve = () => {
+            // if the solver has found something using the heuristics, it will have new information and should run the easy solver again
+            let changeBool = false;
+
+            // initialise the test tiles
+            let emptyTiles = getTestTiles()
+            
+            // get the current tile's neighbour tiles for each of the border revealed tiles
+            testTiles.forEach(tile => {
+                
+                // collect info on safe, flagged, and unknown neighbours
+                let safeNeighbours = []
+                let flagNeighbours = []
+                let unknownNeighbours = []
+
+                // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
+                let neighbourTiles = 
+                    // if the tile is in the top left corner [3 TILES]
+                    tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
+                    // if the tile is in the top right corner [3 TILES]
+                    tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
+                    // if the tile is in the bottom left corner [3 TILES]
+                    tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
+                    // if the tile is in the bottom right corner [3 TILES]
+                    tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
+                    // if the tile is on the top border [5 TILES]
+                    (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
+                        newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
+                    // if the tile is on the right border [5 TILES]
+                    tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
+                        newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
+                    // if the tile is on the bottom border [5 TILES]
+                    (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
+                        newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
+                    // if the tile is on the left border [5 TILES]
+                    tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
+                        newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
+                    // all tiles surrounded by 8 other tiles [8 TILES]
+                    [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
+                        newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
+
+                neighbourTiles.forEach(neighbour => {
+                    // if tile is already revealed 
+                    if (testTiles.includes(neighbour)) {
+                        safeNeighbours.push(neighbour)
+                    }
+                    // if not:
+                    else {
+                        // if tile contains neither a flag nor a mine
+                        if (neighbour.isMine == false && neighbour.isFlagged == false) {
+                            unknownNeighbours.push(neighbour)
+                        }
+                        // if tile contains both a mine and a flag
+                        else if (neighbour.isMine == true && neighbour.isFlagged == true) {
+                            flagNeighbours.push(neighbour)
+                        }
+                        // if tile contains a mine OR a flag
+                        else if (neighbour.isMine == true || neighbour.isFlagged == true) {
+                        // if a tile contains a mine and no flag
+                            if (neighbour.isMine == true) {
+                                unknownNeighbours.push(neighbour)
+                            }
+                            // if a tile contains a flag and no mine
+                            else if (neighbour.isFlagged == true) {
+                                flagNeighbours.push(neighbour)
+                            }
+                        }
+                    }
+                })
+
+                // a catch all for when a tile is completely safe:
+                if (unknownNeighbours.length == 0) {
+                    console.log("all tiles are safe")
+                }
+                else {
+                    // heuristic one - if no. of hidden spaces around revealed tile is equal to the number in its text minues the flags around it,
+                    // then all remaining spaces must be mines. 
+                    if ((tile.mineCount - flagNeighbours.length) == unknownNeighbours.length) {
+                        // Display a flag in the tile
+                        console.log("hello there one " + tile.x + " " + tile.y)
+                        unknownNeighbours.forEach(square => newBoard[square.y-1][square.x-1].isFlagged = true)
+
+                        changeBool = true;
+                    }
+                    // heuristic two - if no. of flagged spaces around revealed tile is equal to the number in its text,
+                    // then all remaining spaces must be safe.
+                    else if (tile.mineCount == flagNeighbours.length && unknownNeighbours.length > 0) {
+                        console.log("hello there two " + tile.x + " " + tile.y)
+
+                        unknownNeighbours.forEach(cell => {
+                            // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
+                            let neighbours = 
+                                // if the tile is in the top left corner [3 TILES]
+                                cell.x == 1 && cell.y == 1 ? [newBoard[cell.y-1][cell.x], newBoard[cell.y][cell.x-1], newBoard[cell.y][cell.x]] :
+                                // if the cell is in the top right corner [3 cellS]
+                                cell.x == boardwidth && cell.y == 1 ? [newBoard[cell.y-1][cell.x-2], newBoard[cell.y][cell.x-2], newBoard[cell.y][cell.x-1]] :
+                                // if the cell is in the bottom left corner [3 cellS]
+                                cell.x == 1 && cell.y == boardheight ? [newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x], newBoard[cell.y-1][cell.x]] :
+                                // if the cell is in the bottom right corner [3 cellS]
+                                cell.x == boardwidth && cell.y == boardheight ? [newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x-2], newBoard[cell.y-1][cell.x-2]] :
+                                // if the cell is on the top border [5 cellS]
+                                (cell.x > 1 && cell.x < boardwidth) && cell.y == 1 ? [newBoard[cell.y-1][cell.x-2], newBoard[cell.y][cell.x-2], newBoard[cell.y][cell.x-1], 
+                                    newBoard[cell.y][cell.x], newBoard[cell.y-1][cell.x]] :
+                                // if the cell is on the right border [5 cellS]
+                                cell.x == boardwidth && (cell.y > 1 && cell.y < boardheight) ? [newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x-2], newBoard[cell.y-1][cell.x-2], 
+                                    newBoard[cell.y][cell.x-2], newBoard[cell.y][cell.x-1]] :
+                                // if the cell is on the bottom border [5 cellS]
+                                (cell.x > 1 && cell.x < boardwidth) && cell.y == boardheight ? [newBoard[cell.y-1][cell.x-2], newBoard[cell.y-2][cell.x-2], newBoard[cell.y-2][cell.x-1], 
+                                    newBoard[cell.y-2][cell.x], newBoard[cell.y-1][cell.x]] :
+                                // if the cell is on the left border [5 cellS]
+                                cell.x == 1 && (cell.y > 1 && cell.y < boardwidth) ? [newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x], newBoard[cell.y-1][cell.x], 
+                                    newBoard[cell.y][cell.x], newBoard[cell.y][cell.x-1]] :
+                                // all cells surrounded by 8 other cells [8 cellS]
+                                [newBoard[cell.y-2][cell.x-2], newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x], newBoard[cell.y-1][cell.x-2], 
+                                    newBoard[cell.y-1][cell.x], newBoard[cell.y][cell.x-2], newBoard[cell.y][cell.x-1], newBoard[cell.y][cell.x]]
+
+                                
+                            // have to add a mineCount to the square now that it is revealed
+                            let mineNeighbours = 0;
+                            neighbours.forEach(neighbour => {if (neighbour.isMine == true) {mineNeighbours++}})
+                            newBoard[cell.y-1][cell.x-1].mineCount = mineNeighbours;
+                            newBoard[cell.y-1][cell.x-1].revealed = true
+                        })
+
+                        changeBool = true;
+                    }
+                }
+            })
+
+            console.log(changeBool)
+
+            if (changeBool == true) {
+                console.log("hello there yes")
+                testTiles = []
+                easySolve()
+            }
+            else {
+                console.log("hello there NOT")
+                testTiles = []
+                solveBoardProbs()
+            }
+        }
+
         const isOkState = (guesses) => {
             // combine the current board state with the guesses so we can see if they work
 
@@ -197,8 +340,8 @@ let solver = {
                         newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
 
                 neighbourTiles.forEach(neighbour => {
-                    // if tile is already revealed we can leave it out here
-                    // if not:
+                    // if tile is already revealed it doesn't need to be handled here
+                    // else
                     if (!testTiles.includes(neighbour)) {
                         // if tile contains neither a flag nor a mine
                         if (neighbour.isMine == false && neighbour.isFlagged == false) {
@@ -256,8 +399,6 @@ let solver = {
                 }
             })
             return isOk;
-
-            // THIS IS THE PROBLEM - WE HAVE TO CHANGE THE BOOLEANS AND IT ISN'T WORKING !!!!!!
         }
 
         const getAllConfigs = (guesses) => {
@@ -305,10 +446,8 @@ let solver = {
                 return combo;
             }
         }
-        // iterCount will count the number of iterations of solveBoard, and ensure that only three maximum occur.
-        let iterCount = 1;
 
-        const solveBoard = () => {
+        const solveBoardProbs = () => {
             let result = getAllConfigs([])
             if (result.length > 0) {
                 // Boolean to detect whether any decisions can be made
@@ -381,27 +520,26 @@ let solver = {
                 // must combine the potential mines entry with the newboard.
 
                 if (changedTile == true) {
-                    console.log(newBoard)
-                    if(iterCount <= 3) {
-                        testTiles = []
-                        iterCount++
-                        solveBoard()
-                    }
-                    else {
-                        return;
-                    }
+                    testTiles = []
+                    easySolve()
                 }
                 else {
                     // no possible changes can be made
                     console.log(newBoard);
+                    console.log("solver found nothing new that could be solved")
+                    return;
                 }
             }
             else {
                 console.log(newBoard)
                 // fail there's no possible board state that could work here.
+                // handle failure
+                console.log("end of the solver, can't solve anything else")
             }
         }
-        solveBoard()
+        
+        // Finally, call everything
+        easySolve()
         
     },
     change: () => {
