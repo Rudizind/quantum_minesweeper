@@ -2,6 +2,12 @@ let solver = {
     // will return with Boolean - if true, means square can be resolved; if false, means square cannot be resolved, therefore change() is called. 
     test: (targetTile) => {
 
+        // these are the tiles that need to be changed when the solver has concluded
+        let tilesToChange = []
+
+        // this keeps track of which tiles have already been uncovered. This will be used to place a mine somewhere else if necessary. 
+        let uncoveredTiles = []
+
         let boardwidth = currentGame.boardSize == 'xl' ? 30 : 
                 currentGame.boardSize == 'l' ? 20 :
                 currentGame.boardSize == 'm' ? 13 :
@@ -237,7 +243,18 @@ let solver = {
                     if ((tile.mineCount - flagNeighbours.length) == unknownNeighbours.length) {
                         // Display a flag in the tile
                         console.log("hello there one " + tile.x + " " + tile.y)
-                        unknownNeighbours.forEach(square => newBoard[square.y-1][square.x-1].isFlagged = true)
+                        unknownNeighbours.forEach(square => {
+                            newBoard[square.y-1][square.x-1].isFlagged = true
+
+                            // here is the check for if an unknown neighbour doesn't actually contain a mine yet,
+                            // as a result of the changes from below
+                            if (newBoard[square.y-1][square.x-1].isMine == false) {
+                                newBoard[square.y-1][square.x-1].isMine = true
+                                newBoard[square.y-1][square.x-1].mineCount = null
+                                tilesToChange.push(newBoard[square.y-1][square.x-1])
+                                console.log(newBoard[square.y-1][square.x-1])
+                            }
+                        })
 
                         changeBool = true;
                     }
@@ -538,7 +555,50 @@ let solver = {
                         // no possible changes can be made
                         console.log(newBoard);
                         console.log("solver found nothing new that could be solved")
-                        return;
+                        
+                        // make the tile safe, and now when the easy solver runs on the user's next click, it will attempt to find a square that should contain a mine but doesn't. 
+                        // there is a catch when the easy solver finds a new tile that must contain a mine but doesn't,
+                        // so that it adds a new one in to even out the mineCount.
+                        if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isMine == true) {
+                            newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isMine = false 
+                            newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].revealed = true
+                            if (!tilesToChange.includes(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])) {
+                                tilesToChange.push(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
+                            }
+                            console.log(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
+
+                            // run the solver to find if there are any tiles that must be mines given the new changes
+                            easySolve()
+
+                            if (tilesToChange.length % 2 != 0) {
+                                // new mine tile
+                                let newMine;
+
+                                // tiles the solver is currently looking at and should be avoided
+                                let avoidTiles = getTestTiles()
+
+                                newBoard.forEach(row => {
+                                    row.forEach(cell => {
+                                        if (cell.isMine == false && cell.revealed == false && !avoidTiles.includes(cell)) {
+                                            newMine = cell;
+                                            newMine.isMine = true;
+                                            return;
+                                        }
+                                    })
+                                    if (newMine != undefined) {
+                                        return;
+                                    }
+                                })
+
+                                console.log(newMine)
+                                
+                                if (newMine != undefined) {
+                                    // if there is a safe tile that hasn't been uncovered by the solver yet, then it will be given the relocated mine
+                                    tilesToChange.push(newMine)
+                                }
+                            }
+                            
+                        }
                     }
                 }
             }
@@ -549,15 +609,12 @@ let solver = {
                 console.log("end of the solver, can't solve anything else")
             }
         }
-
-        // We need a function that handles when the chosen tile has been revealed
-        const solverBreakpoint = () => {
-
-        }
         
         // Finally, call everything
         easySolve()
         
+        console.log(tilesToChange)
+        return tilesToChange;
     },
     change: () => {
         // changes gameboard if appropriate from this.test()

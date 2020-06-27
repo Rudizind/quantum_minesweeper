@@ -44,6 +44,7 @@ const makeBoard = () => {
                 mine.style = "height: 100%; width: auto; display: none;"
                 mine.addEventListener("mouseup", squareChoice)
                 newCell.append(mine);
+                newCell.style.backgroundColor = "rgba(120, 120, 0, 0.3)"
             }
             cellCount++
 
