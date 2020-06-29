@@ -112,7 +112,7 @@ const mineTest = (square, click) => {
                 // It will change to a board state such that the chosen square does NOT contain a mine. 
                 else if (square.childNodes[0].getAttribute("class") == "mine") {
                     console.log("this is successful calling of solver")
-                    solver.test(square)
+                    resolveBoard(square)
                 }
             }
             // If right click
@@ -236,4 +236,34 @@ const mineTest = (square, click) => {
             }
         }
     }
+}
+
+const resolveBoard = square => {
+    let changeTiles = solver.test(square)
+    let board = document.querySelectorAll(".mineSquare")
+    console.log(board)
+    changeTiles.forEach(tile => {
+        let match
+        board.forEach(element => {
+            if (element.getAttribute("x") == tile.x && element.getAttribute("y") == tile.y) {
+                match = element;
+                return;
+            }
+        });
+        if (tile.isMine == true) {
+            let mine = document.createElement("img")
+            mine.setAttribute("class", "mine")
+            mine.src = "./img/mine.png"
+            mine.style = "height: 100%; width: auto; display: none;"
+            mine.addEventListener("mouseup", squareChoice)
+            match.style.backgroundColor = "rgba(120, 120, 0, 0.3)"
+            match.append(mine)
+        }
+        else {
+            let mineRemove = match.childNodes[0]
+            console.log(mineRemove)
+            match.removeChild(mineRemove)
+            match.style.backgroundColor = ""
+        }
+    })
 }
