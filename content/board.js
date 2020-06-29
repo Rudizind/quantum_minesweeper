@@ -266,4 +266,62 @@ const resolveBoard = square => {
             match.style.backgroundColor = ""
         }
     })
+
+    square.style = "background-color: rgba(0, 0, 255, 0.3);"
+    square.revealed = true;
+
+    // Check if any mines around the chosen square
+    // Nest for loops to test all 8 squares around
+    let mineCount = 0
+
+    // For consistency with above, i will cover y and j will cover x
+
+    // array for storing chosen square's up to 8 neighbour squares
+    let squareNeighbours = [];
+
+    // ignore the current cell
+    let table = document.getElementById("boardTable")
+    table.childNodes.forEach(row => {
+        row.childNodes.forEach(cell => {
+            if (
+                // -1 / -1
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) || 
+                // -1 / 0
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                // -1 / 1
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                // 0 / -1
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                // 0 / +1
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                // +1 / -1
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                // +1 / 0
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                // +1 / +1
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) 
+            ) {
+                squareNeighbours.push(cell)
+                if (cell.childNodes.length != 0) {
+                    if (cell.textContent == "") {
+                        if (cell.childNodes[0].getAttribute("class") == "mine") {
+                            mineCount++
+                        }
+                    }
+                }
+            }
+            else if ((Number(cell.getAttribute("y")) - 1) > square.getAttribute("y")) {
+                return;
+            }
+        })
+    })
+    if (mineCount == 0) {
+        squareNeighbours.forEach(node => {
+            square.revealed = true;
+            mineTest(node, "left")
+        })
+    }
+    else {
+        square.innerHTML = `${mineCount}`
+    }
 }

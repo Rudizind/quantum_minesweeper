@@ -232,14 +232,13 @@ let solver = {
 
                 // a catch all for when a tile is completely safe:
                 if (unknownNeighbours.length == 0) {
-                    console.log("all tiles are safe")
+                    // do nothing
                 }
                 else {
                     // heuristic one - if no. of hidden spaces around revealed tile is equal to the number in its text minues the flags around it,
                     // then all remaining spaces must be mines. 
                     if ((tile.mineCount - flagNeighbours.length) == unknownNeighbours.length) {
                         // Display a flag in the tile
-                        console.log("hello there one " + tile.x + " " + tile.y)
                         unknownNeighbours.forEach(square => {
                             newBoard[square.y-1][square.x-1].isFlagged = true
 
@@ -252,13 +251,11 @@ let solver = {
                                 console.log(newBoard[square.y-1][square.x-1])
                             }
                         })
-
                         changeBool = true;
                     }
                     // heuristic two - if no. of flagged spaces around revealed tile is equal to the number in its text,
                     // then all remaining spaces must be safe.
                     else if (tile.mineCount == flagNeighbours.length && unknownNeighbours.length > 0) {
-                        console.log("hello there two " + tile.x + " " + tile.y)
 
                         unknownNeighbours.forEach(cell => {
                             // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
@@ -301,7 +298,6 @@ let solver = {
                                 console.log(newBoard[cell.y-1][cell.x-1])
                             }
                         })
-
                         changeBool = true;
                     }
                 }
@@ -314,13 +310,10 @@ let solver = {
             }
             else {
                 if (changeBool == true) {
-                    console.log("hello there yes")
                     testTiles = []
-                    findNewMine()
                     easySolve()
                 }
                 else {
-                    console.log("hello there NOT")
                     testTiles = []
                     solveBoardProbs()
                 }
@@ -372,7 +365,7 @@ let solver = {
                 neighbourTiles.forEach(neighbour => {
                     // if tile is already revealed it doesn't need to be handled here
                     // else
-                    if (neighbour.revealed == true) {
+                    if (neighbour.revealed == false) {
                         // if tile contains neither a flag nor a mine
                         if (neighbour.isMine == false && neighbour.isFlagged == false) {
                             unknownNeighbours.push(neighbour)
@@ -478,9 +471,10 @@ let solver = {
             }
         }
 
-        // tiles the solver is currently looking at and should be avoided
+        // tiles to avoid for the testing
+        let avoidTiles = getTestTiles()
+
         const findNewMine = () => {
-            let avoidTiles = getTestTiles()
 
             let newMine;
 
@@ -489,10 +483,10 @@ let solver = {
             let addCount = 0
             tilesToChange.forEach(item => item.isMine == false ? removeCount++ : addCount++)
 
-            newBoard.forEach(row => {
-                row.forEach(cell => {
-                    if (cell.isMine == false && cell.revealed == false && !avoidTiles.includes(cell)) {
-                        if (tilesToChange.length > 0) {
+            if (tilesToChange.length > 0) {
+                newBoard.forEach(row => {
+                    row.forEach(cell => {
+                        if (cell.isMine == false && cell.revealed == false && !avoidTiles.includes(cell)) {
                             if (addCount < removeCount) {
                                 addCount++
                                 newMine = cell;
@@ -500,22 +494,20 @@ let solver = {
                                 return;
                             }
                         }
-                    }
-                    else if (cell.isMine == true && cell.revealed == false && !avoidTiles.includes(cell)) {
-                        if (tilesToChange.length > 0) {
+                        else if (cell.isMine == true && cell.revealed == false && !avoidTiles.includes(cell)) {
                             if (removeCount < addCount) {
                                 removeCount++
                                 newMine = cell;
                                 newMine.isMine = false;
                                 return;
                             }
-                        }                        
+                        }
+                    })
+                    if (newMine != undefined) {
+                        return;
                     }
                 })
-                if (newMine != undefined) {
-                    return;
-                }
-            })
+            }
 
             console.log(newMine)
             
@@ -528,6 +520,17 @@ let solver = {
                 findNewMine()
             }
         }
+
+
+
+        // fix check on whether a tile must be placed next to other neighbouring tiles
+        // make clicked tile revealed after the new mines have been placed
+
+        // getallconfigs returns array of possible combinations
+        // if at least one of them has chosen square being not a mine
+        // return that array and make it the new configuration of the gameboard
+
+
 
         const solveBoardProbs = () => {
             let result = getAllConfigs([])
@@ -595,8 +598,9 @@ let solver = {
                         newBoard[tile.y-1][tile.x-1].mineCount = mineNeighbours;
 
                     }
+                    // if the tile is only a mine in some but not all configurations
                     else {
-                        // tile == possibly mine, possibly not
+
                     }
                 })
                 // must combine the potential mines entry with the newboard.
@@ -620,19 +624,36 @@ let solver = {
                         // there is a catch when the easy solver finds a new tile that must contain a mine but doesn't,
                         // so that it adds a new one in to even out the mineCount.
                         if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isMine == true) {
-                            newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isMine = false 
-                            newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].revealed = true
 
+                            let updateArray = 
+                                result.find(array => {
+                                    let item = array.find(cell => cell.x == targetTile.getAttribute("x") && cell.y == targetTile.getAttribute("y"))
+                                    item.guessNotMine == true ? true : false
+                                })
+
+                            updateArray.forEach(item => {
+                                item.guessMine == true ? item.isMine = true : item.isMine = false 
+
+
+
+
+                                // this all needs fixed
+
+
+
+
+                                tilesToChange.push(item)
+                            })
+
+                            // if the list of tiles to be updated in the DOM doesn't contain the target tile, add it. 
+                            // also check if any new tiles need to be updated
                             if (!tilesToChange.includes(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])) {
                                 tilesToChange.push(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
+                                // run the solver to find if there are any tiles that must be mines given the new changes
+                                restul
                             }
                             console.log(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
 
-                            // run the solver to find if there are any tiles that must be mines given the new changes
-                            easySolve()
-
-                            // see if we need to find a new mine
-                            findNewMine()
                         }
                     }
                 }
@@ -648,6 +669,10 @@ let solver = {
         // Finally, call everything
         easySolve()
 
+        
+        if (tile.x == targetTile.x && tile.y == targetTile.y) {
+                            
+        }
         
         console.log(tilesToChange)
         return tilesToChange;
