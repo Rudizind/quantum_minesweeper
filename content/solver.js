@@ -2,9 +2,6 @@ let solver = {
     // will return with Boolean - if true, means square can be resolved; if false, means square cannot be resolved, therefore change() is called. 
     test: (targetTile) => {
 
-        // these are the tiles that need to be changed when the solver has concluded
-        let tilesToChange = []
-
         let boardwidth = currentGame.boardSize == 'xl' ? 30 : 
                 currentGame.boardSize == 'l' ? 20 :
                 currentGame.boardSize == 'm' ? 13 :
@@ -127,7 +124,7 @@ let solver = {
                 // if tile is safe, it doesn't need to be dealt with here.
                 // if it isn't safe, then:
                 neighbourTiles.forEach(neighbour => {
-                    if (neighbour.revealed == false) {
+                    if (!testTiles.includes(neighbour)) {
                         // if tile contains neither a flag nor a mine
                         if (neighbour.isMine == false && neighbour.isFlagged == false) {
                             unknownNeighbours.push(neighbour)
@@ -203,7 +200,7 @@ let solver = {
 
                 neighbourTiles.forEach(neighbour => {
                     // if tile is already revealed 
-                    if (neighbour.revealed == true) {
+                    if (testTiles.includes(neighbour)) {
                         safeNeighbours.push(neighbour)
                     }
                     // if not:
@@ -232,30 +229,22 @@ let solver = {
 
                 // a catch all for when a tile is completely safe:
                 if (unknownNeighbours.length == 0) {
-                    // do nothing
+                    console.log("all tiles are safe")
                 }
                 else {
                     // heuristic one - if no. of hidden spaces around revealed tile is equal to the number in its text minues the flags around it,
                     // then all remaining spaces must be mines. 
                     if ((tile.mineCount - flagNeighbours.length) == unknownNeighbours.length) {
                         // Display a flag in the tile
-                        unknownNeighbours.forEach(square => {
-                            newBoard[square.y-1][square.x-1].isFlagged = true
+                        console.log("hello there one " + tile.x + " " + tile.y)
+                        unknownNeighbours.forEach(square => newBoard[square.y-1][square.x-1].isFlagged = true)
 
-                            // here is the check for if an unknown neighbour doesn't actually contain a mine yet,
-                            // as a result of the changes from below
-                            if (newBoard[square.y-1][square.x-1].isMine == false) {
-                                newBoard[square.y-1][square.x-1].isMine = true
-                                newBoard[square.y-1][square.x-1].mineCount = null
-                                tilesToChange.push(newBoard[square.y-1][square.x-1])
-                                console.log(newBoard[square.y-1][square.x-1])
-                            }
-                        })
                         changeBool = true;
                     }
                     // heuristic two - if no. of flagged spaces around revealed tile is equal to the number in its text,
                     // then all remaining spaces must be safe.
                     else if (tile.mineCount == flagNeighbours.length && unknownNeighbours.length > 0) {
+                        console.log("hello there two " + tile.x + " " + tile.y)
 
                         unknownNeighbours.forEach(cell => {
                             // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
@@ -290,14 +279,8 @@ let solver = {
                             neighbours.forEach(neighbour => {if (neighbour.isMine == true) {mineNeighbours++}})
                             newBoard[cell.y-1][cell.x-1].mineCount = mineNeighbours;
                             newBoard[cell.y-1][cell.x-1].revealed = true
-
-                            // here is the check for if a safe tile had a mine in it before (side effect of safety feature)
-                            if (newBoard[cell.y-1][cell.x-1].isMine == true) {
-                                newBoard[cell.y-1][cell.x-1].isMine = false
-                                tilesToChange.push(newBoard[cell.y-1][cell.x-1])
-                                console.log(newBoard[cell.y-1][cell.x-1])
-                            }
                         })
+
                         changeBool = true;
                     }
                 }
@@ -310,10 +293,12 @@ let solver = {
             }
             else {
                 if (changeBool == true) {
+                    console.log("hello there yes")
                     testTiles = []
                     easySolve()
                 }
                 else {
+                    console.log("hello there NOT")
                     testTiles = []
                     solveBoardProbs()
                 }
@@ -328,13 +313,10 @@ let solver = {
 
             // get all neighbours of border tiles, check them along with the guesses to see if they are compatible
             testTiles.forEach(tile => {
-                if (isOk == false) {
-                    return;
-                }
                 let flagNeighbours = []
                 let unknownNeighbours = []
-                let guessMines = 0
-                let guessNotMines = 0
+                let guessMines = []
+                let guessNotMines = []
 
                 // note here, that confusingly the indices will be -1 to what you'd expect. This is because of the array numbering vs the numbering I've used elsewhere. 
                 let neighbourTiles = 
@@ -365,7 +347,7 @@ let solver = {
                 neighbourTiles.forEach(neighbour => {
                     // if tile is already revealed it doesn't need to be handled here
                     // else
-                    if (neighbour.revealed == false) {
+                    if (!testTiles.includes(neighbour)) {
                         // if tile contains neither a flag nor a mine
                         if (neighbour.isMine == false && neighbour.isFlagged == false) {
                             unknownNeighbours.push(neighbour)
@@ -389,10 +371,10 @@ let solver = {
                         guesses.forEach(guess => {
                             if (guess.x == neighbour.x && guess.y == neighbour.y) {
                                 if (guess.guessMine == true) {
-                                    guessMines++
+                                    guessMines.push(guess)
                                 }
                                 else if (guess.guessNotMine == true) {
-                                    guessNotMines++
+                                    guessNotMines.push(guess)
                                 }
                             }
                         })
@@ -402,14 +384,14 @@ let solver = {
                 let unknownMines = tile.mineCount - flagNeighbours.length
 
                 // if guesses for mines added to flag neighbours equals the minecount, and the guesses are equal to the unknown neighbours, then all is good :)
-                if (guessMines + guessNotMines == unknownNeighbours.length && guessMines == unknownMines) {
+                if (guessMines.length + guessNotMines.length == unknownNeighbours.length && guessMines.length == unknownMines) {
                     // do nothing
                     ;
                 }
                 // if there are fewer guesses than there are unknown neighbours
-                else if (guessMines + guessNotMines < unknownNeighbours.length) {
+                else if (guessMines.length + guessNotMines.length < unknownNeighbours.length) {
                     // if the mines guessed is less than the potential total, and the safe spaces guessed are less than the number of spaces minus the potential total.
-                    if (guessMines <= unknownMines && guessNotMines <= unknownNeighbours.length - unknownMines) {
+                    if (guessMines.length <= unknownMines && guessNotMines.length <= unknownNeighbours.length - unknownMines) {
                         // do nothing
                         ;
                     }
@@ -417,7 +399,6 @@ let solver = {
                         return isOk = false;
                     }
                 }
-                // if the guesses for mines and notMines is equal to the unknownNeighbours, but the number of mines guessed is not correct:
                 else {
                     return isOk = false;
                 }
@@ -470,67 +451,6 @@ let solver = {
                 return combo;
             }
         }
-
-        // tiles to avoid for the testing
-        let avoidTiles = getTestTiles()
-
-        const findNewMine = () => {
-
-            let newMine;
-
-            // find how many tilesToChange are adding or removing mines
-            let removeCount = 0
-            let addCount = 0
-            tilesToChange.forEach(item => item.isMine == false ? removeCount++ : addCount++)
-
-            if (tilesToChange.length > 0) {
-                newBoard.forEach(row => {
-                    row.forEach(cell => {
-                        if (cell.isMine == false && cell.revealed == false && !avoidTiles.includes(cell)) {
-                            if (addCount < removeCount) {
-                                addCount++
-                                newMine = cell;
-                                newMine.isMine = true;
-                                return;
-                            }
-                        }
-                        else if (cell.isMine == true && cell.revealed == false && !avoidTiles.includes(cell)) {
-                            if (removeCount < addCount) {
-                                removeCount++
-                                newMine = cell;
-                                newMine.isMine = false;
-                                return;
-                            }
-                        }
-                    })
-                    if (newMine != undefined) {
-                        return;
-                    }
-                })
-            }
-
-            console.log(newMine)
-            
-            if (newMine != undefined) {
-                // if there is a safe tile that hasn't been uncovered by the solver yet, then it will be given the relocated mine
-                tilesToChange.push(newMine)
-            }
-
-            if (addCount < removeCount || removeCount < addCount) {
-                findNewMine()
-            }
-        }
-
-
-
-        // fix check on whether a tile must be placed next to other neighbouring tiles
-        // make clicked tile revealed after the new mines have been placed
-
-        // getallconfigs returns array of possible combinations
-        // if at least one of them has chosen square being not a mine
-        // return that array and make it the new configuration of the gameboard
-
-
 
         const solveBoardProbs = () => {
             let result = getAllConfigs([])
@@ -598,9 +518,8 @@ let solver = {
                         newBoard[tile.y-1][tile.x-1].mineCount = mineNeighbours;
 
                     }
-                    // if the tile is only a mine in some but not all configurations
                     else {
-
+                        // tile == possibly mine, possibly not
                     }
                 })
                 // must combine the potential mines entry with the newboard.
@@ -619,42 +538,7 @@ let solver = {
                         // no possible changes can be made
                         console.log(newBoard);
                         console.log("solver found nothing new that could be solved")
-                        
-                        // make the tile safe, and now when the easy solver runs on the user's next click, it will attempt to find a square that should contain a mine but doesn't. 
-                        // there is a catch when the easy solver finds a new tile that must contain a mine but doesn't,
-                        // so that it adds a new one in to even out the mineCount.
-                        if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isMine == true) {
-
-                            let updateArray = 
-                                result.find(array => {
-                                    let item = array.find(cell => cell.x == targetTile.getAttribute("x") && cell.y == targetTile.getAttribute("y"))
-                                    item.guessNotMine == true ? true : false
-                                })
-
-                            updateArray.forEach(item => {
-                                item.guessMine == true ? item.isMine = true : item.isMine = false 
-
-
-
-
-                                // this all needs fixed
-
-
-
-
-                                tilesToChange.push(item)
-                            })
-
-                            // if the list of tiles to be updated in the DOM doesn't contain the target tile, add it. 
-                            // also check if any new tiles need to be updated
-                            if (!tilesToChange.includes(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])) {
-                                tilesToChange.push(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
-                                // run the solver to find if there are any tiles that must be mines given the new changes
-                                restul
-                            }
-                            console.log(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
-
-                        }
+                        return;
                     }
                 }
             }
@@ -668,14 +552,7 @@ let solver = {
         
         // Finally, call everything
         easySolve()
-
         
-        if (tile.x == targetTile.x && tile.y == targetTile.y) {
-                            
-        }
-        
-        console.log(tilesToChange)
-        return tilesToChange;
     },
     change: () => {
         // changes gameboard if appropriate from this.test()
