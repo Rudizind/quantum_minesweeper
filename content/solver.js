@@ -5,9 +5,6 @@ let solver = {
         // these are the tiles that need to be changed when the solver has concluded
         let tilesToChange = []
 
-        // this keeps track of which tiles have already been uncovered. This will be used to place a mine somewhere else if necessary. 
-        let uncoveredTiles = []
-
         let boardwidth = currentGame.boardSize == 'xl' ? 30 : 
                 currentGame.boardSize == 'l' ? 20 :
                 currentGame.boardSize == 'm' ? 13 :
@@ -296,6 +293,13 @@ let solver = {
                             neighbours.forEach(neighbour => {if (neighbour.isMine == true) {mineNeighbours++}})
                             newBoard[cell.y-1][cell.x-1].mineCount = mineNeighbours;
                             newBoard[cell.y-1][cell.x-1].revealed = true
+
+                            // here is the check for if a safe tile had a mine in it before (side effect of safety feature)
+                            if (newBoard[cell.y-1][cell.x-1].isMine == true) {
+                                newBoard[cell.y-1][cell.x-1].isMine = false
+                                tilesToChange.push(newBoard[cell.y-1][cell.x-1])
+                                console.log(newBoard[cell.y-1][cell.x-1])
+                            }
                         })
 
                         changeBool = true;
@@ -562,6 +566,7 @@ let solver = {
                         if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isMine == true) {
                             newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isMine = false 
                             newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].revealed = true
+
                             if (!tilesToChange.includes(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])) {
                                 tilesToChange.push(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
                             }
@@ -570,19 +575,27 @@ let solver = {
                             // run the solver to find if there are any tiles that must be mines given the new changes
                             easySolve()
 
-                            if (tilesToChange.length % 2 != 0) {
-                                // new mine tile
-                                let newMine;
-
-                                // tiles the solver is currently looking at and should be avoided
+                            // tiles the solver is currently looking at and should be avoided
+                            const findNewMine = () => {
                                 let avoidTiles = getTestTiles()
+
+                                let newMine;
 
                                 newBoard.forEach(row => {
                                     row.forEach(cell => {
                                         if (cell.isMine == false && cell.revealed == false && !avoidTiles.includes(cell)) {
-                                            newMine = cell;
-                                            newMine.isMine = true;
-                                            return;
+                                            if (tilesToChange.length > 0) {
+                                                if (tilesToChange[tilesToChange.length-1].isMine == false) {
+                                                    newMine = cell;
+                                                    newMine.isMine = true;
+                                                    return;
+                                                }
+                                            }
+                                            else {
+                                                newMine = cell;
+                                                newMine.isMine = true;
+                                                return;
+                                            }
                                         }
                                     })
                                     if (newMine != undefined) {
@@ -597,7 +610,7 @@ let solver = {
                                     tilesToChange.push(newMine)
                                 }
                             }
-                            
+                            findNewMine()
                         }
                     }
                 }
@@ -612,6 +625,7 @@ let solver = {
         
         // Finally, call everything
         easySolve()
+
         
         console.log(tilesToChange)
         return tilesToChange;
