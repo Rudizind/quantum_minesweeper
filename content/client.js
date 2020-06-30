@@ -72,6 +72,7 @@ const loginUser = () => {
         currentUser.username = userData._id
         currentUser.password = userData.password
         document.getElementById("login").setAttribute("class", "hidden")
+        document.getElementById("mineVisionCheck").checked = false;
         document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
     })
     .catch(err => alert(err))
@@ -91,6 +92,7 @@ const startGame = () => {
         flagsPlaced: 0,
         boardSize: 'xl',
         timerCount: 0,
+        mineVision: document.getElementById("mineVisionCheck").checked ? true : false,
         timerStart: () => {
             this.timerCount = setInterval(tickUp, 1000)
         },
