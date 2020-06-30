@@ -240,9 +240,11 @@ const mineTest = (square, click) => {
 
 const resolveBoard = square => {
     let changeTiles = solver.test(square)
+    if (changeTiles == undefined) {
+        return;
+    }
     console.log(changeTiles)
     let board = document.querySelectorAll(".mineSquare")
-    console.log(board)
     board.forEach(element => {
         let match = changeTiles.find(item => item.x == element.getAttribute("x") && item.y == element.getAttribute("y"))
         if (match != undefined) {

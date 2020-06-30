@@ -575,7 +575,6 @@ let solver = {
                             
                             result.forEach(array => {
                                 let match = array.find(item => item.x == targetTile.getAttribute("x") && item.y == targetTile.getAttribute("y")) 
-                                console.log(match)
                                 if (match.guessNotMine == true) {
                                     chosenConfig = array
 
