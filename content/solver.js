@@ -1,6 +1,9 @@
 let solver = {
     // will return with Boolean - if true, means square can be resolved; if false, means square cannot be resolved, therefore change() is called. 
     test: (targetTile) => {
+        
+        // chosenConfig will be what is returned at the end of the function
+        let chosenConfig
 
         let boardwidth = currentGame.boardSize == 'xl' ? 30 : 
                 currentGame.boardSize == 'l' ? 20 :
@@ -236,7 +239,8 @@ let solver = {
                     // then all remaining spaces must be mines. 
                     if ((tile.mineCount - flagNeighbours.length) == unknownNeighbours.length) {
                         // Display a flag in the tile
-                        console.log("hello there one " + tile.x + " " + tile.y)
+                        unknownNeighbours.forEach(square => console.log(newBoard[square.y-1][square.x-1]))
+                        console.log(`simple found that the above tiles contain a mine`)
                         unknownNeighbours.forEach(square => newBoard[square.y-1][square.x-1].isFlagged = true)
 
                         changeBool = true;
@@ -244,7 +248,8 @@ let solver = {
                     // heuristic two - if no. of flagged spaces around revealed tile is equal to the number in its text,
                     // then all remaining spaces must be safe.
                     else if (tile.mineCount == flagNeighbours.length && unknownNeighbours.length > 0) {
-                        console.log("hello there two " + tile.x + " " + tile.y)
+                        unknownNeighbours.forEach(square => console.log(newBoard[square.y-1][square.x-1]))
+                        console.log(`simple found that the above tiles contain no mine`)
 
                         unknownNeighbours.forEach(cell => {
                             // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
@@ -313,6 +318,9 @@ let solver = {
 
             // get all neighbours of border tiles, check them along with the guesses to see if they are compatible
             testTiles.forEach(tile => {
+                if (isOk == false) {
+                    return;
+                }
                 let flagNeighbours = []
                 let unknownNeighbours = []
                 let guessMines = []
@@ -406,10 +414,7 @@ let solver = {
             return isOk;
         }
 
-        const getAllConfigs = (guesses) => {
-
-            // This array will contain all border tiles to be tested.
-            potentialMines = getTestTiles()
+        const getAllConfigs = (potentialMines, guesses) => {
 
             if (!isOkState(guesses)) {
                 return [];
@@ -444,8 +449,8 @@ let solver = {
                     }
                 }
                 
-                let config1 = getAllConfigs(guessesCopy1)
-                let config2 = getAllConfigs(guessesCopy2)
+                let config1 = getAllConfigs(potentialMines, guessesCopy1)
+                let config2 = getAllConfigs(potentialMines, guessesCopy2)
 
                 let combo = Array.prototype.concat(config1, config2)
                 return combo;
@@ -453,10 +458,24 @@ let solver = {
         }
 
         const solveBoardProbs = () => {
-            let result = getAllConfigs([])
+            
+            // This array will contain all border tiles to be tested.
+            let potentialMines = getTestTiles()
+
+            let result = getAllConfigs(potentialMines, [])
+            console.log(result)
             if (result.length > 0) {
+                
+                console.log("poop")
+                
+                // otherwise, it can't be only safe (otherwise it wouldn't contain a mine in the first place)
+                // so it is set to not a mine, and then the solver will output a new array of bordering unrevealed tiles with guesses,
+                // then make it true in the board. There's no need to check any further. 
+                // last check will be 'if the total mines on board is less than the start total, add one more randomly in a non-revealed tile'
+                
                 // Boolean to detect whether any decisions can be made
                 let changedTile = false;
+
                 potentialMines.forEach(tile => {
                     let mine = 0
                     let notMine = 0
@@ -465,57 +484,68 @@ let solver = {
                         match.guessMine == true ? mine++ : notMine++
                     })
                     if (mine == result.length || notMine == result.length) {
-                        // set changedTile to true so the function knows that it has been able to determine a new tile
-                        changedTile = true;
-
-                        // if the tile must be a mine
-                        if (mine == result.length) {
-                            newBoard[tile.y-1][tile.x-1].isFlagged = true;
-                            console.log(newBoard[tile.y-1][tile.x-1])
+                        // if tile must contain a mine, and it's the chosen tile, the user loses
+                        if (tile.x == targetTile.getAttribute("x") && tile.y == targetTile.getAttribute("y") && mine == result.length) {
+                            endGame()
+                            return;
                         }
-                        // if the tile must be not a mine
-                        else if (notMine == result.length) {
-                            newBoard[tile.y-1][tile.x-1].revealed = true;
-                            console.log(newBoard[tile.y-1][tile.x-1])
+                        else {
+
+                            // set changedTile to true so the function knows that it has been able to determine a new tile
+                            changedTile = true;
+
+                            // if the tile must be a mine
+                            if (mine == result.length) {
+                                newBoard[tile.y-1][tile.x-1].isFlagged = true;
+                                console.log(newBoard[tile.y-1][tile.x-1])
+                                console.log(`complex found that this tile was a mine`)
+                            }
+                            // if the tile must be not a mine
+                            else if (notMine == result.length) {
+                                newBoard[tile.y-1][tile.x-1].revealed = true;
+                                console.log(newBoard[tile.y-1][tile.x-1])
+                                console.log(`complex found that this tile was not a mine`)
+                            }
+
+                            // This will determine the number to be assigned to mineCount.
+                            let mineNeighbours = 0;
+
+                            // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
+                            let neighbourTiles = 
+                                // if the tile is in the top left corner [3 TILES]
+                                tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
+                                // if the tile is in the top right corner [3 TILES]
+                                tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
+                                // if the tile is in the bottom left corner [3 TILES]
+                                tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
+                                // if the tile is in the bottom right corner [3 TILES]
+                                tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
+                                // if the tile is on the top border [5 TILES]
+                                (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
+                                    newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
+                                // if the tile is on the right border [5 TILES]
+                                tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
+                                    newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
+                                // if the tile is on the bottom border [5 TILES]
+                                (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
+                                    newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
+                                // if the tile is on the left border [5 TILES]
+                                tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
+                                    newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
+                                // all tiles surrounded by 8 other tiles [8 TILES]
+                                [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
+                                    newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
+
+                            // if tile is safe, it doesn't need to be dealt with here.
+                            // if it isn't safe, then:
+                            neighbourTiles.forEach(neighbour => {
+                                if (neighbour.isMine == true) {mineNeighbours++}
+                            })
+
+                            // finally, assign the mineCount to the tile
+                            newBoard[tile.y-1][tile.x-1].mineCount = mineNeighbours;
                         }
-
-                        // This will determine the number to be assigned to mineCount.
-                        let mineNeighbours = 0;
-
-                        // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
-                        let neighbourTiles = 
-                            // if the tile is in the top left corner [3 TILES]
-                            tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
-                            // if the tile is in the top right corner [3 TILES]
-                            tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                            // if the tile is in the bottom left corner [3 TILES]
-                            tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                            // if the tile is in the bottom right corner [3 TILES]
-                            tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
-                            // if the tile is on the top border [5 TILES]
-                            (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
-                                newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
-                            // if the tile is on the right border [5 TILES]
-                            tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
-                                newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                            // if the tile is on the bottom border [5 TILES]
-                            (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
-                                newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                            // if the tile is on the left border [5 TILES]
-                            tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
-                                newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
-                            // all tiles surrounded by 8 other tiles [8 TILES]
-                            [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
-                                newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
-
-                        // if tile is safe, it doesn't need to be dealt with here.
-                        // if it isn't safe, then:
-                        neighbourTiles.forEach(neighbour => {
-                            if (neighbour.isMine == true) {mineNeighbours++}
-                        })
-
-                        // finally, assign the mineCount to the tile
-                        newBoard[tile.y-1][tile.x-1].mineCount = mineNeighbours;
+                        
 
                     }
                     else {
@@ -536,22 +566,101 @@ let solver = {
                     }
                     else {
                         // no possible changes can be made
+                        // if the solver gets this far, it means that the chosen tile can't be discerned knowing current information.
+
+                        // so:  if the tile is a part of the bordering unrevealed tiles, take a possible combination of configurations
+                            // where the chosen tile is not a mine.
+                        if (potentialMines.some(item => item.x == targetTile.getAttribute("x") && item.y == targetTile.getAttribute("y"))) {
+                            console.log("it worked")
+                            
+                            result.forEach(array => {
+                                let match = array.find(item => item.x == targetTile.getAttribute("x") && item.y == targetTile.getAttribute("y")) 
+                                console.log(match)
+                                if (match.guessNotMine == true) {
+                                    chosenConfig = array
+
+                                    // configure the items according to the guesses
+                                    chosenConfig.forEach(item => {
+                                        if (item.isMine == false && item.guessMine == true) {
+                                            item.isMine = true
+                                        }
+                                        else if (item.isMine == true && item.guessNotMine == true) {
+                                            if (item == match) {
+                                                item.revealed = true
+                                            }
+                                            item.isMine = false
+                                        }
+                                    })
+
+                                    return chosenConfig;
+                                }
+                            })
+
+                            // take chosenConfig and change the current board state's mines to match it
+
+
+                        }
+                        // otherwise, if it's not in the bordering unrevealed tiles, take the chosen mine and remove it,
+                            // and put it in a random unrevealed tile.
+                        else {
+                            // the new array which will be used to edit the DOM board
+                            chosenConfig = []
+                            console.log("it also worked here")
+                            // get the chosen tile and change it to not a mine
+                            let matchTarget = newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1]
+                            matchTarget.revealed = true
+                            matchTarget.isMine = false
+                            chosenConfig.push(matchTarget)
+
+                            // get a random tile that is neither revealed to the player nor neighbours any of those tiles
+                            // need to refresh the ararys now that the target tile is revealed
+                            potentialMines = getTestTiles()
+
+                            // array to hold all potential new mines (we want to assign them randomly)
+                            let newMineAssign = []
+
+                            // get all appropriate tiles and push them
+                            newBoard.forEach(row => {
+                                row.forEach(tile => {
+                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == false) {
+                                        newMineAssign.push(tile)
+                                    }
+                                })
+                            })
+
+                            // get a random tile from those chosen and make it a mine, then push it
+                            let index = Math.floor(Math.random() * newMineAssign.length)
+                            let chosenMine = newMineAssign[index]
+                            chosenMine.isMine = true
+                            chosenConfig.push(chosenMine)
+                            console.log(chosenConfig)
+                        }
+                        
                         console.log(newBoard);
-                        console.log("solver found nothing new that could be solved")
+                        console.log("nothing new to solve")
                         return;
                     }
                 }
             }
             else {
                 console.log(newBoard)
+
                 // fail there's no possible board state that could work here.
                 // handle failure
+                endGame()
                 console.log("end of the solver, can't solve anything else")
             }
         }
         
         // Finally, call everything
         easySolve()
+
+        if (chosenConfig != undefined) {
+            return chosenConfig
+        }
+        else {
+            endGame()
+        }
         
     },
     change: () => {

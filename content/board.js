@@ -240,32 +240,30 @@ const mineTest = (square, click) => {
 
 const resolveBoard = square => {
     let changeTiles = solver.test(square)
+    console.log(changeTiles)
     let board = document.querySelectorAll(".mineSquare")
     console.log(board)
-    changeTiles.forEach(tile => {
-        let match
-        board.forEach(element => {
-            if (element.getAttribute("x") == tile.x && element.getAttribute("y") == tile.y) {
-                match = element;
-                return;
+    board.forEach(element => {
+        let match = changeTiles.find(item => item.x == element.getAttribute("x") && item.y == element.getAttribute("y"))
+        if (match != undefined) {
+            if (match.isMine == true && element.childNodes.length == 0) {
+                let mine = document.createElement("img")
+                mine.setAttribute("class", "mine")
+                mine.src = "./img/mine.png"
+                mine.style = "height: 100%; width: auto; display: none;"
+                mine.addEventListener("mouseup", squareChoice)
+                element.style.backgroundColor = "rgba(120, 120, 0, 0.3)"
+                element.append(mine)
             }
-        });
-        if (tile.isMine == true) {
-            let mine = document.createElement("img")
-            mine.setAttribute("class", "mine")
-            mine.src = "./img/mine.png"
-            mine.style = "height: 100%; width: auto; display: none;"
-            mine.addEventListener("mouseup", squareChoice)
-            match.style.backgroundColor = "rgba(120, 120, 0, 0.3)"
-            match.append(mine)
+            else if (match.isMine == false && element.childNodes.length == 1) {
+                let mineRemove = element.childNodes[0]
+                console.log(mineRemove)
+                element.removeChild(mineRemove)
+                element.style.backgroundColor = ""
+            }
         }
-        else {
-            let mineRemove = match.childNodes[0]
-            console.log(mineRemove)
-            match.removeChild(mineRemove)
-            match.style.backgroundColor = ""
-        }
-    })
+        return;
+    });
 
     square.style = "background-color: rgba(0, 0, 255, 0.3);"
     square.revealed = true;
