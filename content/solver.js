@@ -97,6 +97,9 @@ let solver = {
             // newArray will hold all the unique tiles to be tested for mines below in getAllConfigs()
             newArray = []
             testTiles.forEach(tile => {
+                if (currentGame.active == false) {
+                    return;
+                }
                 // safeNeighbours is not necessary here
                 let flagNeighbours = []
                 let unknownNeighbours = []
@@ -516,6 +519,7 @@ let solver = {
                                     chosenConfig.forEach(item => {
                                         if (item.isMine == false && item.guessMine == true) {
                                             item.isMine = true
+                                            console.log(item)
                                         }
                                         else if (item.isMine == true && item.guessNotMine == true) {
                                             if (item == match) {
@@ -524,6 +528,20 @@ let solver = {
                                             item.isMine = false
                                         }
                                     })
+
+
+
+
+
+
+
+                                    // problem is this: already revealed tiles can be chosen to set isMine to true on. 
+                                    // this results in a reduction of the mineCount and it fucks everything up.
+
+
+
+
+
 
                                     let newMines = chosenConfig.filter(item => item.isMine == true)
                                     let oldMines = array.filter(item => item.isMine == true)
@@ -540,7 +558,7 @@ let solver = {
                                             // get all appropriate tiles and push them
                                             newBoard.forEach(row => {
                                                 row.forEach(tile => {
-                                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == false) {
+                                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == false && tile.revealed == false) {
                                                         newMineAssign.push(tile)
                                                     }
                                                 })
@@ -561,7 +579,7 @@ let solver = {
                                             // get all appropriate tiles and push them
                                             newBoard.forEach(row => {
                                                 row.forEach(tile => {
-                                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == true) {
+                                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == true && tile.revealed == false) {
                                                         newMineAssign.push(tile)
                                                     }
                                                 })
@@ -610,7 +628,7 @@ let solver = {
                             // get all appropriate tiles and push them
                             newBoard.forEach(row => {
                                 row.forEach(tile => {
-                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == false) {
+                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == false && tile.revealed == false) {
                                         newMineAssign.push(tile)
                                     }
                                 })
