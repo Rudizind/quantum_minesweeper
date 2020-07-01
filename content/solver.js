@@ -77,6 +77,9 @@ let solver = {
             newBoard.push(newRow)
         }
 
+        if (allMineNeighbours.length == 0) {
+            setNeighbours(newBoard)
+        }
 
         // this is the array of testTiles, which is every revealed tile
         let testTiles = []
@@ -98,36 +101,19 @@ let solver = {
                 let flagNeighbours = []
                 let unknownNeighbours = []
 
-                // note here, that confusingly the indices will be -1 to what you'd expect. This is because of the array numbering vs the numbering I've used elsewhere. 
-                let neighbourTiles = 
-                    // if the tile is in the top left corner [3 TILES]
-                    tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
-                    // if the tile is in the top right corner [3 TILES]
-                    tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                    // if the tile is in the bottom left corner [3 TILES]
-                    tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is in the bottom right corner [3 TILES]
-                    tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
-                    // if the tile is on the top border [5 TILES]
-                    (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
-                        newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is on the right border [5 TILES]
-                    tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
-                        newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                    // if the tile is on the bottom border [5 TILES]
-                    (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
-                        newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is on the left border [5 TILES]
-                    tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
-                        newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
-                    // all tiles surrounded by 8 other tiles [8 TILES]
-                    [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
-                        newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
+                // using the persistent storage of neighbours in allMineNeighbours for each game, 
+                // we can easily match up the neighbours for each tile
+                let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
+                neighbourTiles = []
+                neighbourMatch.neighbours.forEach(cell => {
+                    let item = newBoard[cell.y-1][cell.x-1]
+                    neighbourTiles.push(item)
+                })
 
                 // if tile is safe, it doesn't need to be dealt with here.
                 // if it isn't safe, then:
                 neighbourTiles.forEach(neighbour => {
-                    if (!testTiles.includes(neighbour)) {
+                    if (neighbour.revealed == false) {
                         // if tile contains neither a flag nor a mine
                         if (neighbour.isMine == false && neighbour.isFlagged == false) {
                             unknownNeighbours.push(neighbour)
@@ -169,41 +155,27 @@ let solver = {
             
             // get the current tile's neighbour tiles for each of the border revealed tiles
             testTiles.forEach(tile => {
+                if (currentGame.active == false) {
+                    return;
+                }
                 
                 // collect info on safe, flagged, and unknown neighbours
                 let safeNeighbours = []
                 let flagNeighbours = []
                 let unknownNeighbours = []
 
-                // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
-                let neighbourTiles = 
-                    // if the tile is in the top left corner [3 TILES]
-                    tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
-                    // if the tile is in the top right corner [3 TILES]
-                    tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                    // if the tile is in the bottom left corner [3 TILES]
-                    tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is in the bottom right corner [3 TILES]
-                    tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
-                    // if the tile is on the top border [5 TILES]
-                    (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
-                        newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is on the right border [5 TILES]
-                    tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
-                        newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                    // if the tile is on the bottom border [5 TILES]
-                    (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
-                        newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is on the left border [5 TILES]
-                    tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
-                        newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
-                    // all tiles surrounded by 8 other tiles [8 TILES]
-                    [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
-                        newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
+                // using the persistent storage of neighbours in allMineNeighbours for each game, 
+                // we can easily match up the neighbours for each tile
+                let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
+                neighbourTiles = []
+                neighbourMatch.neighbours.forEach(cell => {
+                    let item = newBoard[cell.y-1][cell.x-1]
+                    neighbourTiles.push(item)
+                })
 
                 neighbourTiles.forEach(neighbour => {
                     // if tile is already revealed 
-                    if (testTiles.includes(neighbour)) {
+                    if (neighbour.revealed == true) {
                         safeNeighbours.push(neighbour)
                     }
                     // if not:
@@ -253,31 +225,14 @@ let solver = {
 
                         unknownNeighbours.forEach(cell => {
                             // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
-                            let neighbours = 
-                                // if the tile is in the top left corner [3 TILES]
-                                cell.x == 1 && cell.y == 1 ? [newBoard[cell.y-1][cell.x], newBoard[cell.y][cell.x-1], newBoard[cell.y][cell.x]] :
-                                // if the cell is in the top right corner [3 cellS]
-                                cell.x == boardwidth && cell.y == 1 ? [newBoard[cell.y-1][cell.x-2], newBoard[cell.y][cell.x-2], newBoard[cell.y][cell.x-1]] :
-                                // if the cell is in the bottom left corner [3 cellS]
-                                cell.x == 1 && cell.y == boardheight ? [newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x], newBoard[cell.y-1][cell.x]] :
-                                // if the cell is in the bottom right corner [3 cellS]
-                                cell.x == boardwidth && cell.y == boardheight ? [newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x-2], newBoard[cell.y-1][cell.x-2]] :
-                                // if the cell is on the top border [5 cellS]
-                                (cell.x > 1 && cell.x < boardwidth) && cell.y == 1 ? [newBoard[cell.y-1][cell.x-2], newBoard[cell.y][cell.x-2], newBoard[cell.y][cell.x-1], 
-                                    newBoard[cell.y][cell.x], newBoard[cell.y-1][cell.x]] :
-                                // if the cell is on the right border [5 cellS]
-                                cell.x == boardwidth && (cell.y > 1 && cell.y < boardheight) ? [newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x-2], newBoard[cell.y-1][cell.x-2], 
-                                    newBoard[cell.y][cell.x-2], newBoard[cell.y][cell.x-1]] :
-                                // if the cell is on the bottom border [5 cellS]
-                                (cell.x > 1 && cell.x < boardwidth) && cell.y == boardheight ? [newBoard[cell.y-1][cell.x-2], newBoard[cell.y-2][cell.x-2], newBoard[cell.y-2][cell.x-1], 
-                                    newBoard[cell.y-2][cell.x], newBoard[cell.y-1][cell.x]] :
-                                // if the cell is on the left border [5 cellS]
-                                cell.x == 1 && (cell.y > 1 && cell.y < boardwidth) ? [newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x], newBoard[cell.y-1][cell.x], 
-                                    newBoard[cell.y][cell.x], newBoard[cell.y][cell.x-1]] :
-                                // all cells surrounded by 8 other cells [8 cellS]
-                                [newBoard[cell.y-2][cell.x-2], newBoard[cell.y-2][cell.x-1], newBoard[cell.y-2][cell.x], newBoard[cell.y-1][cell.x-2], 
-                                    newBoard[cell.y-1][cell.x], newBoard[cell.y][cell.x-2], newBoard[cell.y][cell.x-1], newBoard[cell.y][cell.x]]
-
+                            // using the persistent storage of neighbours in allMineNeighbours for each game, 
+                            // we can easily match up the neighbours for each tile
+                            let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
+                            neighbours = []
+                            neighbourMatch.neighbours.forEach(cell => {
+                                let item = newBoard[cell.y-1][cell.x-1]
+                                neighbours.push(item)
+                            })
                                 
                             // have to add a mineCount to the square now that it is revealed
                             let mineNeighbours = 0;
@@ -294,16 +249,16 @@ let solver = {
             // if the solver has discovered that the chosen tile should be flagged using the easy solver,
             // then the player has failed and they lose
             if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged == true) {
+                console.log("lost here")
                 endGame()
+                return;
             }
             else {
                 if (changeBool == true) {
-                    console.log("hello there yes")
                     testTiles = []
                     easySolve()
                 }
                 else {
-                    console.log("hello there NOT")
                     testTiles = []
                     solveBoardProbs()
                 }
@@ -326,36 +281,20 @@ let solver = {
                 let guessMines = []
                 let guessNotMines = []
 
-                // note here, that confusingly the indices will be -1 to what you'd expect. This is because of the array numbering vs the numbering I've used elsewhere. 
-                let neighbourTiles = 
-                    // if the tile is in the top left corner [3 TILES]
-                    tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
-                    // if the tile is in the top right corner [3 TILES]
-                    tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                    // if the tile is in the bottom left corner [3 TILES]
-                    tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is in the bottom right corner [3 TILES]
-                    tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
-                    // if the tile is on the top border [5 TILES]
-                    (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
-                        newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is on the right border [5 TILES]
-                    tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
-                        newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                    // if the tile is on the bottom border [5 TILES]
-                    (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
-                        newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                    // if the tile is on the left border [5 TILES]
-                    tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
-                        newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
-                    // all tiles surrounded by 8 other tiles [8 TILES]
-                    [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
-                        newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
+                // using the persistent storage of neighbours in allMineNeighbours for each game, 
+                // we can easily match up the neighbours for each tile
+                let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
+                neighbourTiles = []
+                neighbourMatch.neighbours.forEach(cell => {
+                    let item = newBoard[cell.y-1][cell.x-1]
+                    neighbourTiles.push(item)
+                })
+
 
                 neighbourTiles.forEach(neighbour => {
                     // if tile is already revealed it doesn't need to be handled here
                     // else
-                    if (!testTiles.includes(neighbour)) {
+                    if (neighbour.revealed == false) {
                         // if tile contains neither a flag nor a mine
                         if (neighbour.isMine == false && neighbour.isFlagged == false) {
                             unknownNeighbours.push(neighbour)
@@ -465,9 +404,6 @@ let solver = {
             let result = getAllConfigs(potentialMines, [])
             console.log(result)
             if (result.length > 0) {
-                
-                console.log("poop")
-                
                 // otherwise, it can't be only safe (otherwise it wouldn't contain a mine in the first place)
                 // so it is set to not a mine, and then the solver will output a new array of bordering unrevealed tiles with guesses,
                 // then make it true in the board. There's no need to check any further. 
@@ -477,6 +413,9 @@ let solver = {
                 let changedTile = false;
 
                 potentialMines.forEach(tile => {
+                    if (currentGame.active == false) {
+                        return;
+                    }
                     let mine = 0
                     let notMine = 0
                     result.forEach(array => {
@@ -486,6 +425,7 @@ let solver = {
                     if (mine == result.length || notMine == result.length) {
                         // if tile must contain a mine, and it's the chosen tile, the user loses
                         if (tile.x == targetTile.getAttribute("x") && tile.y == targetTile.getAttribute("y") && mine == result.length) {
+                            console.log("lost here")
                             endGame()
                             return;
                         }
@@ -511,30 +451,14 @@ let solver = {
                             let mineNeighbours = 0;
 
                             // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
-                            let neighbourTiles = 
-                                // if the tile is in the top left corner [3 TILES]
-                                tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
-                                // if the tile is in the top right corner [3 TILES]
-                                tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                                // if the tile is in the bottom left corner [3 TILES]
-                                tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                                // if the tile is in the bottom right corner [3 TILES]
-                                tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
-                                // if the tile is on the top border [5 TILES]
-                                (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
-                                    newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
-                                // if the tile is on the right border [5 TILES]
-                                tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
-                                    newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                                // if the tile is on the bottom border [5 TILES]
-                                (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
-                                    newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                                // if the tile is on the left border [5 TILES]
-                                tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
-                                    newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
-                                // all tiles surrounded by 8 other tiles [8 TILES]
-                                [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
-                                    newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
+                            // using the persistent storage of neighbours in allMineNeighbours for each game, 
+                            // we can easily match up the neighbours for each tile
+                            let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
+                            neighbourTiles = []
+                            neighbourMatch.neighbours.forEach(cell => {
+                                let item = newBoard[cell.y-1][cell.x-1]
+                                neighbourTiles.push(item)
+                            })
 
                             // if tile is safe, it doesn't need to be dealt with here.
                             // if it isn't safe, then:
@@ -557,7 +481,9 @@ let solver = {
                 // if the solver has discovered that the chosen tile should be flagged using the complex solver,
                 // then the player has failed and they lose
                 if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged == true) {
+                    console.log("lost here")
                     endGame()
+                    return;
                 }
                 else {
                     if (changedTile == true) {
@@ -598,8 +524,6 @@ let solver = {
                                             item.isMine = false
                                         }
                                     })
-                                    console.log(chosenConfig)
-                                    console.log(array)
 
                                     let newMines = chosenConfig.filter(item => item.isMine == true)
                                     let oldMines = array.filter(item => item.isMine == true)
@@ -670,7 +594,6 @@ let solver = {
                         else {
                             // the new array which will be used to edit the DOM board
                             chosenConfig = []
-                            console.log("it also worked here")
                             // get the chosen tile and change it to not a mine
                             let matchTarget = newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1]
                             matchTarget.revealed = true
@@ -712,8 +635,12 @@ let solver = {
 
                 // fail there's no possible board state that could work here.
                 // handle failure
+                if (currentGame.active == false) {
+                    return;
+                }
                 endGame()
                 console.log("end of the solver, can't solve anything else")
+                return;
             }
         }
         
@@ -724,7 +651,12 @@ let solver = {
             return chosenConfig
         }
         else {
+            console.log("lost here")
+            if (currentGame.active == false) {
+                return;
+            }
             endGame()
+            return;
         }
         
     },

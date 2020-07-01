@@ -7,6 +7,9 @@ let currentUser = {
 // Variable to be used when a game is active, for tracking gameboard etc.
 let currentGame = {};
 
+// Persistent storage of mineTile neighbours for a game
+let allMineNeighbours = []
+
 // Register a new user by taking their details and sending them to the server to be added to the database using an HTTP POST request.
 const registerUser = () => {
     let username = document.getElementById("usernameBox").value
@@ -206,6 +209,9 @@ const endGame = () => {
     // Remove the mine count
     document.getElementById("scoreDisplay").innerHTML = "Mines left: :("
 
+    // reset the mineNeighbours for the next game
+    allMineNeighbours = []
+
     // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
     currentGame.active = false;
 
@@ -238,6 +244,9 @@ const winGame = () => {
 
         // Remove the mine count
         document.getElementById("scoreDisplay").innerHTML = "Mines left: 0"
+
+        // reset the mineNeighbours for the next game
+        allMineNeighbours = []
 
         // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
         currentGame.active = false;

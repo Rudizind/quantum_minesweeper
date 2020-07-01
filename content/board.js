@@ -75,6 +75,58 @@ const makeBoard = () => {
     }
 }
 
+const setNeighbours = (newBoard) => {
+    let boardwidth = currentGame.boardSize == 'xl' ? 30 : 
+                currentGame.boardSize == 'l' ? 20 :
+                currentGame.boardSize == 'm' ? 13 :
+                currentGame.boardSize == 's' ? 8 :
+                currentGame.boardSize == 'xs' ? 5 : console.log("no board size provided")
+        let boardheight = currentGame.boardSize == 'xl' ? 16 :
+                currentGame.boardSize == 'l' ? 12 :
+                currentGame.boardSize == 'm' ? 9 :
+                currentGame.boardSize == 's' ? 7 :
+                currentGame.boardSize == 'xs' ? 5 : console.log("no board size provided")
+                
+    newBoard.forEach(row => {
+        row.forEach(tile => {
+            let neighbours = 
+                // if the tile is in the top left corner [3 TILES]
+                tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
+                // if the tile is in the top right corner [3 TILES]
+                tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
+                // if the tile is in the bottom left corner [3 TILES]
+                tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
+                // if the tile is in the bottom right corner [3 TILES]
+                tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
+                // if the tile is on the top border [5 TILES]
+                (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
+                    newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
+                // if the tile is on the right border [5 TILES]
+                tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
+                    newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
+                // if the tile is on the bottom border [5 TILES]
+                (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
+                    newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
+                // if the tile is on the left border [5 TILES]
+                tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
+                    newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
+                // all tiles surrounded by 8 other tiles [8 TILES]
+                [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
+                    newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
+
+            let newObj = {
+                x: tile.x,
+                y: tile.y,
+                neighbours: neighbours
+            }
+
+            allMineNeighbours.push(newObj)
+        })
+        
+    })
+    console.log(allMineNeighbours)
+}
+
 // click event handler - checks which mouse button was clicked as well as which mineSquare was chosen.
 const squareChoice = e => {
     let click;
@@ -89,7 +141,6 @@ const squareChoice = e => {
 
     // Only pass the event choices through the mineTest if they're a valid choice.
     if (square.getAttribute("class") == "mineSquare") {
-        console.log("fail")
         mineTest(square, click)
     }
 }
@@ -176,7 +227,6 @@ const mineTest = (square, click) => {
             // If empty, and left click, run the adjacency checks until an endpoint is reached. 
             else if (click == "left") {
                 // Make the chosen square 'safe'
-                console.log("this is to mark a square as safe")
                 square.style = "background-color: rgba(0, 0, 255, 0.3);"
                 square.revealed = true;
 
@@ -263,7 +313,6 @@ const resolveBoard = square => {
             }
             else if (match.isMine == false && element.childNodes.length == 1) {
                 let mineRemove = element.childNodes[0]
-                console.log(mineRemove)
                 element.removeChild(mineRemove)
                 element.style.backgroundColor = ""
             }
