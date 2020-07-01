@@ -571,12 +571,20 @@ let solver = {
                         // so:  if the tile is a part of the bordering unrevealed tiles, take a possible combination of configurations
                             // where the chosen tile is not a mine.
                         if (potentialMines.some(item => item.x == targetTile.getAttribute("x") && item.y == targetTile.getAttribute("y"))) {
-                            console.log("it worked")
                             
+                            let stopLoop = false;
                             result.forEach(array => {
+                                if (stopLoop) {
+                                    return;
+                                }
                                 let match = array.find(item => item.x == targetTile.getAttribute("x") && item.y == targetTile.getAttribute("y")) 
                                 if (match.guessNotMine == true) {
-                                    chosenConfig = array
+                                    // instead of just assigning the values, we have to clone each object so we can change it and compare it to the original.
+                                    chosenConfig = []
+                                    array.forEach(item => {
+                                        let clone = Object.assign({}, item)
+                                        chosenConfig.push(clone)
+                                    })
 
                                     // configure the items according to the guesses
                                     chosenConfig.forEach(item => {
@@ -590,7 +598,65 @@ let solver = {
                                             item.isMine = false
                                         }
                                     })
+                                    console.log(chosenConfig)
+                                    console.log(array)
 
+                                    let newMines = chosenConfig.filter(item => item.isMine == true)
+                                    let oldMines = array.filter(item => item.isMine == true)
+                                    if (newMines.length < oldMines.length || oldMines.length < newMines.length) {
+                                        // get a random tile that is neither revealed to the player nor neighbours any of those tiles
+                                        // need to refresh the ararys now that the target tile is revealed
+                                        potentialMines = getTestTiles()
+
+                                        // array to hold all potential new mines (we want to assign them randomly)
+                                        let newMineAssign = []
+
+                                        // if there aren't enough mines in the new configuration, we need to add more to make up the difference
+                                        if (newMines.length < oldMines.length) {
+                                            // get all appropriate tiles and push them
+                                            newBoard.forEach(row => {
+                                                row.forEach(tile => {
+                                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == false) {
+                                                        newMineAssign.push(tile)
+                                                    }
+                                                })
+                                            })
+                                            for (i=0;i<oldMines.length-newMines.length;i++) {
+                                                // get a random tile from those chosen and make it a mine, then push it
+                                                let index = Math.floor(Math.random() * newMineAssign.length)
+                                                let chosenMine = newMineAssign[index]
+                                                chosenMine.isMine = true
+                                                chosenConfig.push(chosenMine)
+                                                console.log(chosenMine)
+
+                                                // reset the possible spaces to only include tiles other than the one just added
+                                                newMineAssign = newMineAssign.filter(item => item.isMine == false)
+                                            }
+                                        }
+                                        else {
+                                            // get all appropriate tiles and push them
+                                            newBoard.forEach(row => {
+                                                row.forEach(tile => {
+                                                    if ((!potentialMines.includes(tile) || !testTiles.includes(tile)) && tile.isMine == true) {
+                                                        newMineAssign.push(tile)
+                                                    }
+                                                })
+                                            })
+                                            for (i=0;i<newMines.length-oldMines.length;i++) {
+                                                // get a random tile from those chosen and make it a mine, then push it
+                                                let index = Math.floor(Math.random() * newMineAssign.length)
+                                                let chosenSafe = newMineAssign[index]
+                                                chosenSafe.isMine = false
+                                                chosenConfig.push(chosenSafe)
+                                                console.log(chosenSafe)
+                                                
+                                                // reset the possible spaces to only include tiles other than the one just added
+                                                newMineAssign = newMineAssign.filter(item => item.isMine == true)
+                                            }
+                                        }
+                                    }
+
+                                    stopLoop = true;
                                     return chosenConfig;
                                 }
                             })
