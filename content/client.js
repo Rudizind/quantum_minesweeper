@@ -10,22 +10,51 @@ let currentGame = {};
 // Persistent storage of mineTile neighbours for a game
 let allMineNeighbours = []
 
-// Register a new user by taking their details and sending them to the server to be added to the database using an HTTP POST request.
+// Register a new user by taking their details and sending them to the server 
+// to be added to the database using an HTTP POST request.
 const registerUser = () => {
     let username = document.getElementById("usernameBox").value
     let password = document.getElementById("passwordBox").value
 
     // Authenticate user input for username and password, and alert errors if they aren't ok. Otherwise, proceed.
-    username.length < 8 ? alert("Your username must be at least 8 characters.") : 
-    username.length > 24 ? alert("Your username must be at most 24 characters.") :
-    password.length < 8 ? alert("Your password must be at least 8 characters.") :
-    password.length > 24 ? alert("Your username must be at most 24 characters.") :
-    password == username ? alert("Your username and password must not be the same.") : (() => {
-        let userDetails = {
-            username: username,
-            password: password
-        }
-        fetch('/api/newUser/', {
+    username.length < 8 ? alert("Your username must be at least 8 characters.") :
+        username.length > 24 ? alert("Your username must be at most 24 characters.") :
+        password.length < 8 ? alert("Your password must be at least 8 characters.") :
+        password.length > 24 ? alert("Your username must be at most 24 characters.") :
+        password == username ? alert("Your username and password must not be the same.") : (() => {
+            let userDetails = {
+                username: username,
+                password: password
+            }
+            fetch('/api/newUser/', {
+                    method: 'POST',
+                    headers: {
+                        "accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(userDetails)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.status + " " + response.statusText)
+                    } else {
+                        alert(`Registered successfully. You may now log in.`)
+                    }
+                })
+                .catch(err => alert(err))
+        })()
+}
+
+// Log in a user by taking their input credentials and checking them 
+// against the database using a post HTTP request.
+const loginUser = () => {
+    let username = document.getElementById("usernameBox").value
+    let password = document.getElementById("passwordBox").value
+    let userDetails = {
+        username: username,
+        password: password
+    }
+    fetch('/api/loginUser/', {
             method: 'POST',
             headers: {
                 "accept": "application/json",
@@ -35,50 +64,21 @@ const registerUser = () => {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error (response.status + " " + response.statusText)
-            }
-            else {
-                alert(`Registered successfully. You may now log in.`)
+                throw new Error(response.status + " " + response.statusText)
+            } else {
+                alert(`Logged in successfully.`)
+                return response.json()
             }
         })
+        .then(data => {
+            let userData = data;
+            currentUser.username = userData._id
+            currentUser.password = userData.password
+            document.getElementById("login").setAttribute("class", "hidden")
+            document.getElementById("mineVisionCheck").checked = false;
+            document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
+        })
         .catch(err => alert(err))
-    })()
-}
-
-// Log in a user by taking their input credentials and checking them against the database using a post HTTP request.
-const loginUser = () => {
-    let username = document.getElementById("usernameBox").value
-    let password = document.getElementById("passwordBox").value
-    let userDetails = {
-        username: username,
-        password: password
-    }
-    fetch('/api/loginUser/', {
-        method: 'POST',
-        headers: {
-            "accept": "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(userDetails)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error (response.status + " " + response.statusText)
-        }
-        else {
-            alert(`Logged in successfully.`)
-            return response.json()
-        }
-    })
-    .then(data => {
-        let userData = data;
-        currentUser.username = userData._id
-        currentUser.password = userData.password
-        document.getElementById("login").setAttribute("class", "hidden")
-        document.getElementById("mineVisionCheck").checked = false;
-        document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
-    })
-    .catch(err => alert(err))
 }
 
 // Start the game board and initialise the game.
@@ -124,15 +124,15 @@ const tickUp = () => {
 
 // Send the user back to the home page which has startGame button. 
 const backHome = () => {
-    // By default, confirmed will be true. If a game is ended by a user leaving early, then they'll be asked to confirm first that they wish to do so.
+    // By default, confirmed will be true. If a game is ended by a user leaving early, 
+    // then they'll be asked to confirm first that they wish to do so.
     // If a game is over, because of the default value, the user isn't asked to confirm.
     let confirmed = false;
     if (currentGame.active) {
         if (confirm("Are you sure you'd like to leave the game? This will be counted as a loss.")) {
             confirmed = true;
         }
-    }
-    else {
+    } else {
         confirmed = true;
     }
     if (confirmed) {
@@ -155,12 +155,11 @@ const backHome = () => {
 
         // Show the newgame div, containing the startGame button.
         document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
-        
+
         // Reset the localized currentGame object.
         currentGame = {};
     }
 }
-
 
 // If the solver finds that the player could've discovered that the current square was a mine, they lose.
 const endGame = () => {
@@ -195,7 +194,7 @@ const endGame = () => {
             cross.style = "height: 100%; width: auto;"
             parent.appendChild(cross);
         } // otherwise it's handled above
-        
+
         parent.removeChild(node)
         parent.style.backgroundColor = "orange"
     })
@@ -219,22 +218,20 @@ const endGame = () => {
     currentGame.timerStop()
 }
 
-
 const winGame = () => {
     let allFlags = document.querySelectorAll(".flag")
     let winner = true;
     allFlags.forEach(flag => {
         if (flag.parentElement.childNodes.length == 1) {
             winner = false;
-        }
-        else {
+        } else {
             return;
         }
     })
 
     if (winner) {
         alert("Congratulations, you found all the mines!")
-        
+
         // Remove the click event listener from all squares.
         let allSquares = document.querySelectorAll(".mineSquare")
         allSquares.forEach(node => {
@@ -250,7 +247,7 @@ const winGame = () => {
 
         // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
         currentGame.active = false;
-        
+
         // Stop the timer
         currentGame.timerStop()
     }

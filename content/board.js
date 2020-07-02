@@ -1,10 +1,10 @@
 const makeBoard = () => {
     // Get table
     let table = document.getElementById("boardTable")
-    
+
     // Set the squares that are going to be mines.
     let mineSquares = []
-    for (m=1;m<=currentGame.startMines;m++) {
+    for (let m = 1; m <= currentGame.startMines; m++) {
         const chooseNum = () => {
             let newChoice = Math.ceil(Math.random() * 480)
             mineSquares.includes(newChoice) ? chooseNum() : mineSquares.push(newChoice)
@@ -12,30 +12,31 @@ const makeBoard = () => {
         chooseNum()
     }
 
-    mineSquares.sort((a, b) => a-b)
+    mineSquares.sort((a, b) => a - b)
 
     // Initialise the cell count (for matching chosen numbers in mineSquares array above)
-    cellCount = 1;
+    let cellCount = 1;
 
     // Determine the dimensions of the board depending on the boardSize
-    let boardwidth = currentGame.boardSize == 'xl' ? 30 : 
-                     currentGame.boardSize == 'l' ? 20 :
-                     currentGame.boardSize == 'm' ? 13 :
-                     currentGame.boardSize == 's' ? 8 :
-                     currentGame.boardSize == 'xs' ? 5 : console.log("no board size provided")
+    let boardwidth = currentGame.boardSize == 'xl' ? 30 :
+        currentGame.boardSize == 'l' ? 20 :
+        currentGame.boardSize == 'm' ? 13 :
+        currentGame.boardSize == 's' ? 8 :
+        currentGame.boardSize == 'xs' ? 5 : 30
     let boardheight = currentGame.boardSize == 'xl' ? 16 :
-                      currentGame.boardSize == 'l' ? 12 :
-                      currentGame.boardSize == 'm' ? 9 :
-                      currentGame.boardSize == 's' ? 7 :
-                      currentGame.boardSize == 'xs' ? 5 : console.log("no board size provided")
+        currentGame.boardSize == 'l' ? 12 :
+        currentGame.boardSize == 'm' ? 9 :
+        currentGame.boardSize == 's' ? 7 :
+        currentGame.boardSize == 'xs' ? 5 : 16
 
     // Populate the board
-    // For now the board will be the size of a standard expert level board (30L x 16H / 480 squares / 99 mines)
+    // For now the board will be the size of a standard expert level board: 
+    // (30L x 16H / 480 squares / 99 mines)
     // This will be the number for y (rows of the table)
-    for (i=0;i<boardheight;i++) {
+    for (let i = 0; i < boardheight; i++) {
         let newRow = document.createElement("tr")
         // This will be the number for x (columns of the table / cells of a row)
-        for (j=0;j<boardwidth;j++) {
+        for (let j = 0; j < boardwidth; j++) {
             let newCell = document.createElement("td")
             if (mineSquares.includes(cellCount)) {
                 let mine = document.createElement("img")
@@ -63,7 +64,8 @@ const makeBoard = () => {
             newCell.setAttribute("oncontextmenu", "event.preventDefault()")
 
             // Set the mouseevent for detecting which mouse button has been clicked.
-            // It uses mouseup instead of mousedown so that a user can change their mind about a choice by moving their mouse away.
+            // It uses mouseup instead of mousedown so that a user can change their 
+            // mind about a choice by moving their mouse away.
             newCell.addEventListener("mouseup", squareChoice)
 
             // Set ID for CSS styling of the squares
@@ -76,43 +78,32 @@ const makeBoard = () => {
 }
 
 const setNeighbours = (newBoard) => {
-    let boardwidth = currentGame.boardSize == 'xl' ? 30 : 
-                currentGame.boardSize == 'l' ? 20 :
-                currentGame.boardSize == 'm' ? 13 :
-                currentGame.boardSize == 's' ? 8 :
-                currentGame.boardSize == 'xs' ? 5 : console.log("no board size provided")
-        let boardheight = currentGame.boardSize == 'xl' ? 16 :
-                currentGame.boardSize == 'l' ? 12 :
-                currentGame.boardSize == 'm' ? 9 :
-                currentGame.boardSize == 's' ? 7 :
-                currentGame.boardSize == 'xs' ? 5 : console.log("no board size provided")
-                
+    let boardwidth = currentGame.boardSize == 'xl' ? 30 :
+        currentGame.boardSize == 'l' ? 20 :
+        currentGame.boardSize == 'm' ? 13 :
+        currentGame.boardSize == 's' ? 8 :
+        currentGame.boardSize == 'xs' ? 5 : 30
+    let boardheight = currentGame.boardSize == 'xl' ? 16 :
+        currentGame.boardSize == 'l' ? 12 :
+        currentGame.boardSize == 'm' ? 9 :
+        currentGame.boardSize == 's' ? 7 :
+        currentGame.boardSize == 'xs' ? 5 : 16
+
     newBoard.forEach(row => {
         row.forEach(tile => {
-            let neighbours = 
-                // if the tile is in the top left corner [3 TILES]
-                tile.x == 1 && tile.y == 1 ? [newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]] :
-                // if the tile is in the top right corner [3 TILES]
-                tile.x == boardwidth && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                // if the tile is in the bottom left corner [3 TILES]
-                tile.x == 1 && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                // if the tile is in the bottom right corner [3 TILES]
-                tile.x == boardwidth && tile.y == boardheight ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2]] :
-                // if the tile is on the top border [5 TILES]
-                (tile.x > 1 && tile.x < boardwidth) && tile.y == 1 ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], 
-                    newBoard[tile.y][tile.x], newBoard[tile.y-1][tile.x]] :
-                // if the tile is on the right border [5 TILES]
-                tile.x == boardwidth && (tile.y > 1 && tile.y < boardheight) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-1][tile.x-2], 
-                    newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1]] :
-                // if the tile is on the bottom border [5 TILES]
-                (tile.x > 1 && tile.x < boardwidth) && tile.y == boardheight ? [newBoard[tile.y-1][tile.x-2], newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], 
-                    newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x]] :
-                // if the tile is on the left border [5 TILES]
-                tile.x == 1 && (tile.y > 1 && tile.y < boardwidth) ? [newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x], 
-                    newBoard[tile.y][tile.x], newBoard[tile.y][tile.x-1]] :
-                // all tiles surrounded by 8 other tiles [8 TILES]
-                [newBoard[tile.y-2][tile.x-2], newBoard[tile.y-2][tile.x-1], newBoard[tile.y-2][tile.x], newBoard[tile.y-1][tile.x-2], 
-                    newBoard[tile.y-1][tile.x], newBoard[tile.y][tile.x-2], newBoard[tile.y][tile.x-1], newBoard[tile.y][tile.x]]
+            let neighbours = []
+
+            // get the neighbours around the current tile to store in allMineNeighbours
+            // note that corner and border tiles have exceptions in the condition so that
+            // corners only have 3 neighbours, side borders have 5, and every other tile has 8.
+            for (let y = tile.y - 2; y <= tile.y; y++) {
+                for (let x = tile.x - 2; x <= tile.x; x++) {
+                    if (x >= 0 && x < boardwidth && y >= 0 && y < boardheight && tile != newBoard[y]
+                        [x]) {
+                        neighbours.push(newBoard[y][x])
+                    }
+                }
+            }
 
             let newObj = {
                 x: tile.x,
@@ -122,9 +113,8 @@ const setNeighbours = (newBoard) => {
 
             allMineNeighbours.push(newObj)
         })
-        
+
     })
-    console.log(allMineNeighbours)
 }
 
 // click event handler - checks which mouse button was clicked as well as which mineSquare was chosen.
@@ -134,10 +124,12 @@ const squareChoice = e => {
 
     // Assign the mouse button choice to the click variable.
     e.button == 0 ? click = "left" :
-    e.button == 2 ? click = "right" : console.log("invalid click")
-    
-    // If the user has clicked on the invisible mine, then the parent node must be chosen instead of the mine for the following code to work.
-    square = (e.target.getAttribute("class") == "mine" || e.target.getAttribute("class") == "flag") ? e.target.parentElement : e.target
+        e.button == 2 ? click = "right" : false
+
+    // If the user has clicked on the invisible mine, then the parent node 
+    // must be chosen instead of the mine for the following code to work.
+    square = (e.target.getAttribute("class") == "mine" || e.target.getAttribute("class") == "flag") ?
+        e.target.parentElement : e.target
 
     // Only pass the event choices through the mineTest if they're a valid choice.
     if (square.getAttribute("class") == "mineSquare") {
@@ -147,10 +139,9 @@ const squareChoice = e => {
 
 // Called from the click event handler squareChoice()
 const mineTest = (square, click) => {
-    if (square.revealed == true) {
+    if (square.revealed) {
         return;
-    }
-    else {
+    } else {
         // If either a mine or flag is present (or both)
         if (square.childNodes.length > 0) {
             // If left click
@@ -160,11 +151,12 @@ const mineTest = (square, click) => {
                     return;
                 }
                 // Otherwise, they've made a mistake and might have lost the game. 
-                // The solver from solver.js will run, and find out whether this error could have been avoided without guessing. 
-                // If it could have been avoided, the user loses. If it was completely impossible to know without guessing, the board will change.
-                // It will change to a board state such that the chosen square does NOT contain a mine. 
+                // The solver from solver.js will run, and find out whether 
+                // this error could have been avoided without guessing. 
+                // If it could have been avoided, the user loses. 
+                // If it was completely impossible to know without guessing, 
+                // the board will change such that the chosen square does NOT contain a mine. 
                 else if (square.childNodes[0].getAttribute("class") == "mine") {
-                    console.log("this is successful calling of solver")
                     resolveBoard(square)
                 }
             }
@@ -176,7 +168,7 @@ const mineTest = (square, click) => {
                     currentGame.flagsPlaced--
 
                     // remove the flag
-                    square.childNodes[1].parentElement.removeChild(square.childNodes[1])                
+                    square.childNodes[1].parentElement.removeChild(square.childNodes[1])
                 }
                 // If only flag present, remove flag
                 else if (square.childNodes[0].getAttribute("class") == "flag") {
@@ -204,7 +196,8 @@ const mineTest = (square, click) => {
                 }
 
                 // Set remaining mines in UI
-                document.getElementById("scoreDisplay").innerHTML = "Mines left: " + (currentGame.startMines - currentGame.flagsPlaced)
+                document.getElementById("scoreDisplay").innerHTML = "Mines left: " +
+                    (currentGame.startMines - currentGame.flagsPlaced)
             }
         }
         // If no child nodes of chosen square present
@@ -222,7 +215,8 @@ const mineTest = (square, click) => {
                 square.append(flag)
 
                 // Set remaining mines in UI
-                document.getElementById("scoreDisplay").innerHTML = "Mines left: " + (currentGame.startMines - currentGame.flagsPlaced)
+                document.getElementById("scoreDisplay").innerHTML = "Mines left: " +
+                    (currentGame.startMines - currentGame.flagsPlaced)
             }
             // If empty, and left click, run the adjacency checks until an endpoint is reached. 
             else if (click == "left") {
@@ -239,27 +233,38 @@ const mineTest = (square, click) => {
                 // array for storing chosen square's up to 8 neighbour squares
                 let squareNeighbours = [];
 
-                // ignore the current cell
+
                 let table = document.getElementById("boardTable")
                 table.childNodes.forEach(row => {
                     row.childNodes.forEach(cell => {
+                        // The code for this is rather convoluted, but is necessary in this case
+                        // because DOM elements aren't handled as easily as the version in the model,
+                        // which can be done with much simpler loops.
                         if (
                             // -1 / -1
-                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) || 
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
                             // -1 / 0
-                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
                             // -1 / 1
-                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
                             // 0 / -1
-                            (cell.getAttribute("x") == Number(square.getAttribute("x")) && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
                             // 0 / +1
-                            (cell.getAttribute("x") == Number(square.getAttribute("x")) && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
                             // +1 / -1
-                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
                             // +1 / 0
-                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
                             // +1 / +1
-                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) 
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
                         ) {
                             squareNeighbours.push(cell)
                             if (cell.childNodes.length != 0) {
@@ -269,8 +274,8 @@ const mineTest = (square, click) => {
                                     }
                                 }
                             }
-                        }
-                        else if ((Number(cell.getAttribute("y")) - 1) > square.getAttribute("y")) {
+                        } else if ((Number(cell.getAttribute("y")) - 1) > square.getAttribute(
+                            "y")) {
                             return;
                         }
                     })
@@ -280,11 +285,10 @@ const mineTest = (square, click) => {
                         square.revealed = true;
                         mineTest(node, "left")
                     })
-                }
-                else {
+                } else {
                     square.innerHTML = `${mineCount}`
                 }
-                
+
             }
         }
     }
@@ -295,12 +299,12 @@ const resolveBoard = square => {
     if (changeTiles == undefined) {
         return;
     }
-    console.log(changeTiles)
     let board = document.querySelectorAll(".mineSquare")
     board.forEach(element => {
-        let match = changeTiles.find(item => item.x == element.getAttribute("x") && item.y == element.getAttribute("y"))
+        let match = changeTiles.find(item => item.x == element.getAttribute("x") &&
+            item.y == element.getAttribute("y"))
         if (match != undefined) {
-            if (match.isMine == true && element.childNodes.length == 0) {
+            if (match.isMine && element.childNodes.length == 0) {
                 let mine = document.createElement("img")
                 mine.setAttribute("class", "mine")
                 mine.src = "./img/mine.png"
@@ -310,8 +314,7 @@ const resolveBoard = square => {
                     element.style.backgroundColor = "rgba(120, 120, 0, 0.3)"
                 }
                 element.append(mine)
-            }
-            else if (match.isMine == false && element.childNodes.length == 1) {
+            } else if (!match.isMine && element.childNodes.length == 1) {
                 let mineRemove = element.childNodes[0]
                 element.removeChild(mineRemove)
                 element.style.backgroundColor = ""
@@ -338,21 +341,29 @@ const resolveBoard = square => {
         row.childNodes.forEach(cell => {
             if (
                 // -1 / -1
-                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) || 
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
                 // -1 / 0
-                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                    cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
                 // -1 / 1
-                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
                 // 0 / -1
-                (cell.getAttribute("x") == Number(square.getAttribute("x")) && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
                 // 0 / +1
-                (cell.getAttribute("x") == Number(square.getAttribute("x")) && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
                 // +1 / -1
-                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
                 // +1 / 0
-                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                    cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
                 // +1 / +1
-                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 && cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) 
+                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
             ) {
                 squareNeighbours.push(cell)
                 if (cell.childNodes.length != 0) {
@@ -362,8 +373,7 @@ const resolveBoard = square => {
                         }
                     }
                 }
-            }
-            else if ((Number(cell.getAttribute("y")) - 1) > square.getAttribute("y")) {
+            } else if ((Number(cell.getAttribute("y")) - 1) > square.getAttribute("y")) {
                 return;
             }
         })
@@ -373,8 +383,7 @@ const resolveBoard = square => {
             square.revealed = true;
             mineTest(node, "left")
         })
-    }
-    else {
+    } else {
         square.innerHTML = `${mineCount}`
     }
 }

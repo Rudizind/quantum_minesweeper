@@ -20,7 +20,7 @@ let my_nano = nano(`http://${db_info.username}:${db_info.password}@${db_info.url
 
 // Initialise the users database connection. If it doesn't exist, it's created then used. Otherwise it's just used.
 let users;
-(function() {
+(function () {
     const usersCheck = () => {
         my_nano.db.get('sweepers')
             .then(body => users = my_nano.use(db_info.userDatabase), console.log('using users database'))
@@ -29,9 +29,8 @@ let users;
                     console.log('created users database');
                     my_nano.db.create('sweepers')
                     users = my_nano.use(db_info.userDatabase), console.log('using users database')
-                }
-                else {
-                    console.log('error using users database:', err); 
+                } else {
+                    console.log('error using users database:', err);
                 }
             })
     }
@@ -43,8 +42,7 @@ const authenticate = (req, res, next) => {
     let user = basicAuth(req)
     if (!user) {
         res.status(400).send("No Authorization request header provided.")
-    }
-    else {
+    } else {
         users.get(user.name)
             .then(doc => {
                 if (user.name == doc._id && user.pass == doc.password) {
@@ -70,13 +68,12 @@ app.post('/api/newUser/', (req, res, next) => {
                 users.insert({ _id: username, password: password })
                     .then(doc => res.status(200).send("Registered successfully. Welcome to Quantum Minesweeper!"))
                     .catch(err => res.status(500).send("Error processing request. Refresh the page and try again."))
-            }
-            else {
+            } else {
                 console.log(err)
                 res.status(500).send("Error processing request. Refresh the page and try again.")
             }
         })
-    
+
 })
 
 app.post('/api/loginUser/', (req, res, next) => {
@@ -85,10 +82,9 @@ app.post('/api/loginUser/', (req, res, next) => {
 
     users.get(username)
         .then(doc => {
-            if (doc._id == username && doc.password == password){
+            if (doc._id == username && doc.password == password) {
                 res.json(doc)
-            }
-            else {
+            } else {
                 res.status(400).send("Wrong password. Please try again.")
             }
         })
@@ -97,6 +93,5 @@ app.post('/api/loginUser/', (req, res, next) => {
             res.status(404).send("User not found.")
         })
 })
-
 
 app.listen(3000, console.log("server started"))
