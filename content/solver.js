@@ -255,6 +255,7 @@ let solver = {
             // then the player has failed and they lose
             if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged) {
                 endGame()
+                console.log("here")
                 return;
             } else {
                 if (foundNewInfo) {
@@ -268,7 +269,6 @@ let solver = {
         }
 
         const isOkState = (guesses) => {
-            // combine the current board state with the guesses so we can see if they work
 
             // isOk will tell the function if it should stop or not
             let isOk = true;
@@ -355,8 +355,7 @@ let solver = {
         }
 
         const getAllConfigs = (potentialMines, guesses) => {
-
-            if (!isOkState(guesses)) {
+            if (!isOkState(guesses) || !currentGame.active) {
                 return [];
             }
             // all edge squares have a guess in them
@@ -425,6 +424,7 @@ let solver = {
                         if (tile.x == targetTile.getAttribute("x") &&
                             tile.y == targetTile.getAttribute("y") && mine == result.length) {
                             endGame()
+                            console.log("here")
                             return;
                         } else {
 
@@ -471,6 +471,7 @@ let solver = {
 
 
                     } else {
+                        console.log("hello")
                         // tile == possibly mine, possibly not
                     }
                 })
@@ -479,8 +480,10 @@ let solver = {
                 // if the solver has discovered that the chosen tile should be flagged using the complex solver,
                 // then the player has failed and they lose
                 if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged) {
+                    newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1]
                     endGame()
-                    return;
+                    console.log("here")
+                    return false;
                 } else {
                     if (changedTile) {
                         testTiles = []
@@ -496,13 +499,15 @@ let solver = {
                         if (potentialMines.some(item => item.x == targetTile.getAttribute("x") &&
                                 item.y == targetTile.getAttribute("y"))) {
 
+                            console.log("specific tile")
+
                             let stopLoop = false;
                             result.forEach(array => {
                                 if (stopLoop) {
                                     return;
                                 }
                                 let match = array.find(item => item.x == targetTile.getAttribute("x") &&
-                                    item.y == targetTile.getAttribute("y"))
+                                    item.y == targetTile.getAttribute("y"));
                                 if (match.guessNotMine) {
                                     // instead of just assigning the values, we have to clone each object 
                                     // so we can change it and compare it to the original.
@@ -523,13 +528,17 @@ let solver = {
                                             item.isMine = false
                                         }
                                     })
+                                    console.log(chosenConfig)
 
                                     let newMines = chosenConfig.filter(item => item.isMine)
                                     let oldMines = array.filter(item => item.isMine)
+
                                     if (newMines.length < oldMines.length || oldMines.length < newMines.length) {
+
                                         // get a random tile that is neither revealed to the player 
                                         // nor neighbours any of those tiles
                                         // need to refresh the ararys now that the target tile is revealed
+                                        testTiles = []
                                         potentialMines = getTestTiles()
 
                                         // array to hold all potential new mines (we want to assign them randomly)
@@ -559,7 +568,7 @@ let solver = {
                                                 // other than the one just added
                                                 newMineAssign = newMineAssign.filter(item => !item.isMine)
                                             }
-                                        } else {
+                                        } else if (oldMines.length < newMines.length) {
                                             // get all appropriate tiles and push them
                                             newBoard.forEach(row => {
                                                 row.forEach(tile => {
@@ -581,6 +590,8 @@ let solver = {
                                                 // other than the one just added
                                                 newMineAssign = newMineAssign.filter(item => item.isMine)
                                             }
+                                        } else {
+                                            // do nothing
                                         }
                                     }
 
@@ -593,6 +604,7 @@ let solver = {
                         // take the chosen mine and remove it,
                         // and put it in a random unrevealed tile.
                         else {
+                            console.log("random placement")
                             // the new array which will be used to edit the DOM board
                             chosenConfig = []
                             // get the chosen tile and change it to not a mine
@@ -630,9 +642,11 @@ let solver = {
                 }
             } else {
                 // handle failure
+                console.log(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
                 if (!currentGame.active) {
                     return;
                 }
+                currentGame.active = false;
                 endGame()
                 console.log("end solver")
                 return;
@@ -641,6 +655,9 @@ let solver = {
 
         // Finally, call everything
         const findSolution = () => {
+            if (!currentGame.active) {
+                return;
+            }
             let useEasy = easySolve()
             if (useEasy) {
                 findSolution()
@@ -662,6 +679,7 @@ let solver = {
                 return;
             }
             endGame()
+            console.log("here")
             return;
         }
     }

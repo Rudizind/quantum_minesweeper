@@ -299,11 +299,13 @@ const resolveBoard = square => {
     if (changeTiles == undefined) {
         return;
     }
+    console.log(changeTiles)
     let board = document.querySelectorAll(".mineSquare")
     board.forEach(element => {
-        let match = changeTiles.find(item => item.x == element.getAttribute("x") &&
-            item.y == element.getAttribute("y"))
+        let match = changeTiles.find(item => item.x == Number(element.getAttribute("x")) &&
+            item.y == Number(element.getAttribute("y")))
         if (match != undefined) {
+            
             if (match.isMine && element.childNodes.length == 0) {
                 let mine = document.createElement("img")
                 mine.setAttribute("class", "mine")
@@ -319,6 +321,9 @@ const resolveBoard = square => {
                 element.removeChild(mineRemove)
                 element.style.backgroundColor = ""
             }
+        }
+        else {
+            
         }
         return;
     });
