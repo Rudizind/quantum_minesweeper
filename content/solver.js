@@ -134,7 +134,8 @@ let solver = {
                             }
                             // if a tile contains a flag and no mine
                             else if (neighbour.isFlagged) {
-                                flagNeighbours.push(neighbour)
+                                unknownNeighbours.push(neighbour)
+                                // for now we are going to test if this makes the program work
                             }
                         }
                     }
@@ -201,7 +202,7 @@ let solver = {
                             }
                             // if a tile contains a flag and no mine
                             else if (neighbour.isFlagged) {
-                                flagNeighbours.push(neighbour)
+                                unknownNeighbours.push(neighbour)
                             }
                         }
                     }
@@ -255,7 +256,6 @@ let solver = {
             // then the player has failed and they lose
             if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged) {
                 endGame()
-                console.log("here")
                 return;
             } else {
                 if (foundNewInfo) {
@@ -313,7 +313,7 @@ let solver = {
                             }
                             // if a tile contains a flag and no mine
                             else if (neighbour.isFlagged) {
-                                flagNeighbours.push(neighbour)
+                                unknownNeighbours.push(neighbour)
                             }
                         }
                         // for guesses
@@ -424,7 +424,6 @@ let solver = {
                         if (tile.x == targetTile.getAttribute("x") &&
                             tile.y == targetTile.getAttribute("y") && mine == result.length) {
                             endGame()
-                            console.log("here")
                             return;
                         } else {
 
@@ -471,7 +470,6 @@ let solver = {
 
 
                     } else {
-                        console.log("hello")
                         // tile == possibly mine, possibly not
                     }
                 })
@@ -482,7 +480,6 @@ let solver = {
                 if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged) {
                     newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1]
                     endGame()
-                    console.log("here")
                     return false;
                 } else {
                     if (changedTile) {
@@ -498,8 +495,6 @@ let solver = {
                         // where the chosen tile is not a mine.
                         if (potentialMines.some(item => item.x == targetTile.getAttribute("x") &&
                                 item.y == targetTile.getAttribute("y"))) {
-
-                            console.log("specific tile")
 
                             let stopLoop = false;
                             result.forEach(array => {
@@ -528,7 +523,6 @@ let solver = {
                                             item.isMine = false
                                         }
                                     })
-                                    console.log(chosenConfig)
 
                                     let newMines = chosenConfig.filter(item => item.isMine)
                                     let oldMines = array.filter(item => item.isMine)
@@ -604,7 +598,6 @@ let solver = {
                         // take the chosen mine and remove it,
                         // and put it in a random unrevealed tile.
                         else {
-                            console.log("random placement")
                             // the new array which will be used to edit the DOM board
                             chosenConfig = []
                             // get the chosen tile and change it to not a mine
@@ -679,7 +672,6 @@ let solver = {
                 return;
             }
             endGame()
-            console.log("here")
             return;
         }
     }

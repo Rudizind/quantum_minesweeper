@@ -306,16 +306,21 @@ const resolveBoard = square => {
             item.y == Number(element.getAttribute("y")))
         if (match != undefined) {
             
-            if (match.isMine && element.childNodes.length == 0) {
+            if (match.isMine) {
                 let mine = document.createElement("img")
                 mine.setAttribute("class", "mine")
                 mine.src = "./img/mine.png"
                 mine.style = "height: 100%; width: auto; display: none;"
-                mine.addEventListener("mouseup", squareChoice)
                 if (currentGame.mineVision) {
                     element.style.backgroundColor = "rgba(120, 120, 0, 0.3)"
                 }
-                element.append(mine)
+                if (element.childNodes.length == 0) {
+                    mine.addEventListener("mouseup", squareChoice)
+                    element.append(mine)
+                }
+                else if (element.childNodes[0].getAttribute("class") == "flag") {
+                    element.insertBefore(mine, element.childNodes[0]) 
+                }
             } else if (!match.isMine && element.childNodes.length == 1) {
                 let mineRemove = element.childNodes[0]
                 element.removeChild(mineRemove)
