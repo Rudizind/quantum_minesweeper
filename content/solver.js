@@ -504,6 +504,22 @@ let solver = {
                                 let match = array.find(item => item.x == targetTile.getAttribute("x") &&
                                     item.y == targetTile.getAttribute("y"));
                                 if (match.guessNotMine) {
+                                    let flagsOk = true;
+                                    // need to get all flagged tiles without a mine, 
+                                    // and find a config where they all have mines
+                                    // if there is none, then they've probably made a mistake
+                                    // and the program will throw a loss
+                                    array.forEach(item => {
+                                        if (item.isFlagged) {
+                                            if (item.guessNotMine) {
+                                                return flagsOk = false;
+                                            }
+                                        }
+                                    })
+                                    if (!flagsOk) {
+                                        return;
+                                    }
+
                                     // instead of just assigning the values, we have to clone each object 
                                     // so we can change it and compare it to the original.
                                     chosenConfig = []
