@@ -76,6 +76,8 @@ const loginUser = () => {
             currentUser.password = userData.password
             document.getElementById("login").setAttribute("class", "hidden")
             document.getElementById("mineVisionCheck").checked = false;
+            document.getElementById("boardSizeChoice").value = "Medium (13 x 9)"
+            document.getElementById("mineChoice").value = "Normal (1.0x)"
             document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
         })
         .catch(err => alert(err))
@@ -88,12 +90,41 @@ const startGame = () => {
     document.getElementById("gameboard").setAttribute("class", "container-fluid align-middle")
     document.getElementById("hotbar").setAttribute("class", "container-fluid align-middle")
 
+    // adjust the boardSize value according to the user's choice.
+    let boardSize;
+    let boardSizeChoice = document.getElementById("boardSizeChoice").value
+    boardSize = boardSizeChoice == "Extra Small (5 x 5)" ? 'xs' :
+                boardSizeChoice == "Small (8 x 7)" ? 's' :
+                boardSizeChoice == "Medium (13 x 9)" ? 'm' :
+                boardSizeChoice == "Large (20 x 12)" ? 'l' :
+                boardSizeChoice == "Extra Large (30 x 16)" ? 'xl' : 'm'
+
+    // using the board size from above, calculate the number of mines in the board.
+    let totalMines;
+    let mineChoice = document.getElementById("mineChoice").value
+    console.log(mineChoice)
+    // get the normal number of mines
+    totalMines = boardSize == 'xl' ? 99 :
+                 boardSize == 'l' ? 55 :
+                 boardSize == 'm' ? 30 :
+                 boardSize == 's' ? 14 :
+                 boardSize == 'xs' ? 5 : 30
+
+    // then adjust it according to the multiplier given
+    let mineMultiplier = mineChoice == "Minimum (0.7x)" ? 0.7 :
+                         mineChoice == "Normal (1.0x)" ? 1 :
+                         mineChoice == "Maximum (1.3x)" ? 1.3 : 1
+
+    console.log(mineMultiplier)
+    totalMines = Math.round(totalMines * mineMultiplier)
+    console.log(totalMines)
+
     // Set the starting board parameters (in global scope)
     currentGame = {
         active: true,
-        startMines: 99,
+        startMines: totalMines,
         flagsPlaced: 0,
-        boardSize: 'xl',
+        boardSize: boardSize,
         timerCount: 0,
         mineVision: document.getElementById("mineVisionCheck").checked ? true : false,
         timerStart: () => {

@@ -4,9 +4,15 @@ const makeBoard = () => {
 
     // Set the squares that are going to be mines.
     let mineSquares = []
+    let totalTiles = currentGame.boardSize == 'xl' ? 480 :
+                     currentGame.boardSize == 'l' ? 240 :
+                     currentGame.boardSize == 'm' ? 117 :
+                     currentGame.boardSize == 's' ? 56 :
+                     currentGame.boardSize == 'xs' ? 25 : 117
+
     for (let m = 1; m <= currentGame.startMines; m++) {
         const chooseNum = () => {
-            let newChoice = Math.ceil(Math.random() * 480)
+            let newChoice = Math.ceil(Math.random() * totalTiles)
             mineSquares.includes(newChoice) ? chooseNum() : mineSquares.push(newChoice)
         }
         chooseNum()
