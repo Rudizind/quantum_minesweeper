@@ -1,6 +1,4 @@
 let solver = {
-    // will return with Boolean - if true, means square can be resolved; 
-    // if false, means square cannot be resolved, therefore change() is called. 
     test: (targetTile) => {
         // reset the replay array 
         solver.replayArray = []
