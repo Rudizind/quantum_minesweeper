@@ -172,6 +172,7 @@ const backHome = () => {
         document.getElementById("hotbar").setAttribute("class", "hidden")
         document.getElementById("gameboard").setAttribute("class", "hidden")
         document.getElementById("homeButt").setAttribute("class", "hidden")
+        document.getElementById("replayButt").setAttribute("class", "hidden")
 
         // Remove all the table rows so it can be repopulated for a next game.
         document.querySelectorAll("tr").forEach(node => {
@@ -189,6 +190,9 @@ const backHome = () => {
 
         // Reset the localized currentGame object.
         currentGame = {};
+
+        // reset the solver's replay array
+        solver.replayArray = []
     }
 }
 
@@ -245,6 +249,9 @@ const endGame = () => {
     // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
     currentGame.active = false;
 
+    // Display the showReplay() button
+    document.getElementById("replayButt").setAttribute("class", "btn")
+
     // Stop the timer
     currentGame.timerStop()
 }
@@ -282,4 +289,8 @@ const winGame = () => {
         // Stop the timer
         currentGame.timerStop()
     }
+}
+
+const showReplay = () => {
+    // set up UI to show replay with text
 }

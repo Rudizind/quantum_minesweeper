@@ -2,10 +2,13 @@ let solver = {
     // will return with Boolean - if true, means square can be resolved; 
     // if false, means square cannot be resolved, therefore change() is called. 
     test: (targetTile) => {
+        // reset the replay array 
+        solver.replayArray = []
 
         // chosenConfig will be what is returned at the end of the function
         let chosenConfig
 
+        // get the board dimensions
         let boardwidth = currentGame.boardSize == 'xl' ? 30 :
             currentGame.boardSize == 'l' ? 20 :
             currentGame.boardSize == 'm' ? 13 :
@@ -217,9 +220,27 @@ let solver = {
                     // then all remaining spaces must be mines. 
                     if ((tile.mineCount - flagNeighbours.length) == unknownNeighbours.length) {
                         // Display a flag in the tile
-                        unknownNeighbours.forEach(square => console.log(newBoard[square.y - 1][square.x - 1]))
+
+                        unknownNeighbours.forEach(square => {   
+                            // need to make a new object to contain information for if
+                            // the player loses and wishes to view the solver's solution
+                            let replayObj = {
+                                sourceTile: {
+                                    x: tile.x,
+                                    y: tile.y
+                                },
+                                actionTile: {
+                                    x: square.x,
+                                    y: square.y
+                                },
+                                actionTaken: "addFlag",
+                                reason: "simpleFlag"
+                            }
+                            solver.replayArray.push(replayObj)
+                        })
                         console.log(`simple found that the above tiles contain a mine`)
                         unknownNeighbours.forEach(square => newBoard[square.y - 1][square.x - 1].isFlagged = true)
+
 
                         foundNewInfo = true;
                     }
@@ -690,5 +711,6 @@ let solver = {
             endGame()
             return;
         }
-    }
+    },
+    replayArray: []
 }
