@@ -759,12 +759,51 @@ let solver = {
     replayArray: [],
     endBoardState: [],
     errorTile: null,
+    currentMove: -1,
     changeMove: (direction) => {
-        // set chosen tile to be red (showing which one they actually guessed)
+        // reset the onclick and opacity of left arrow if moving from lowest option
+        if (solver.currentMove == -1) {
+            document.getElementById("leftArrow").style.opacity = "1.0"
+            document.getElementById("leftArrow").setAttribute("onclick", "solver.changeMove(-1)")
+        }
+
+        // ensure the direction is a number and not a string
+        direction = Number(direction)
+
+        // reset the onclick and opacity of right arrow if moving from highest option
+        if (solver.currentMove == solver.replayArray.length - 1) {
+            document.getElementById("rightArrow").style.opacity = "1.0"
+            document.getElementById("rightArrow").setAttribute("onclick", "solver.changeMove(1)")
+        }
+
+        // get the guess from the replayArray corresponding with the appropriate index
+        let guess = solver.replayArray[solver.currentMove + direction]
+
+        // change the current index
+        solver.currentMove += direction
+
+        // remove the onclick and reduce opacity of left arrow if as far left as poss
+        if (solver.currentMove == -1) {
+            document.getElementById("leftArrow").style.opacity = "0.5"
+            document.getElementById("leftArrow").setAttribute("onclick", "")
+        }
+
+        // remove the onclick and reduce opacity of right arrow if as far right as poss
+        if (solver.currentMove == solver.replayArray.length - 1) {
+            document.getElementById("rightArrow").style.opacity = "0.5"
+            document.getElementById("rightArrow").setAttribute("onclick", "")
+        }
+
+
+        console.log(guess)
+        console.log(direction)
+        console.log(solver.currentMove)
+
         // remove event listener from left if on first guess
         // remove event listener from right if on last guess
         // add event listeners back in when you tick back down or up
-        // take the tile being guessed and the source tile (if applicable) and highlight them in the display
+        // take the tile being guessed and the source tile (if applicable)
+        // and highlight them in the display
         // change text above board to reflect the reason for each guess
     }
 }
