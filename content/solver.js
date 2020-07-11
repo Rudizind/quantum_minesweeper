@@ -767,20 +767,25 @@ let solver = {
             document.getElementById("leftArrow").setAttribute("onclick", "solver.changeMove(-1)")
         }
 
-        // ensure the direction is a number and not a string
-        direction = Number(direction)
-
         // reset the onclick and opacity of right arrow if moving from highest option
-        if (solver.currentMove == solver.replayArray.length - 1) {
+        else if (solver.currentMove == solver.replayArray.length - 1) {
             document.getElementById("rightArrow").style.opacity = "1.0"
             document.getElementById("rightArrow").setAttribute("onclick", "solver.changeMove(1)")
         }
 
-        // get the guess from the replayArray corresponding with the appropriate index
-        let guess = solver.replayArray[solver.currentMove + direction]
+        // take the oldGuess, and either ensure it stays (if moving forward)
+        // or is removed (if moving back)
+        let oldGuess = solver.replayArray[solver.currentMove]
+
+        // handle the direction param and increment/decrement the currentMove
+        // ensure the direction is a number and not a string
+        direction = Number(direction)
 
         // change the current index
         solver.currentMove += direction
+
+        // get the guess from the replayArray corresponding with the appropriate index
+        let newGuess = solver.replayArray[solver.currentMove]
 
         // remove the onclick and reduce opacity of left arrow if as far left as poss
         if (solver.currentMove == -1) {
@@ -789,19 +794,29 @@ let solver = {
         }
 
         // remove the onclick and reduce opacity of right arrow if as far right as poss
-        if (solver.currentMove == solver.replayArray.length - 1) {
+        else if (solver.currentMove == solver.replayArray.length - 1) {
             document.getElementById("rightArrow").style.opacity = "0.5"
             document.getElementById("rightArrow").setAttribute("onclick", "")
         }
 
+        // handle the oldGuess
+        if (direction == 1) {
 
-        console.log(guess)
-        console.log(direction)
-        console.log(solver.currentMove)
+        }
+        else {
 
-        // remove event listener from left if on first guess
-        // remove event listener from right if on last guess
-        // add event listeners back in when you tick back down or up
+        }
+
+        // handle the newGuess
+
+
+
+
+
+
+
+
+
         // take the tile being guessed and the source tile (if applicable)
         // and highlight them in the display
         // change text above board to reflect the reason for each guess

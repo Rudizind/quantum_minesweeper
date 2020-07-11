@@ -332,5 +332,5 @@ const showReplay = () => {
     })
 
     // show the target tile the user chose
-    solver.errorTile.style.backgroundColor = "maroon"
+    solver.errorTile.style.backgroundColor = "rgba(130, 0, 0, 0.55)"
 }
