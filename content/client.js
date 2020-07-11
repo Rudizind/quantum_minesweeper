@@ -173,6 +173,7 @@ const backHome = () => {
         document.getElementById("gameboard").setAttribute("class", "hidden")
         document.getElementById("homeButt").setAttribute("class", "hidden")
         document.getElementById("replayButt").setAttribute("class", "hidden")
+        document.getElementById("replayDisplay").setAttribute("class", "hidden")
 
         // Remove all the table rows so it can be repopulated for a next game.
         document.querySelectorAll("tr").forEach(node => {
@@ -198,6 +199,7 @@ const backHome = () => {
 
 // If the solver finds that the player could've discovered that the current square was a mine, they lose.
 const endGame = () => {
+
     // Make mines visible and colour their squares appropriately
     let mineNodes = document.querySelectorAll(".mine")
     mineNodes.forEach(node => {
@@ -292,5 +294,12 @@ const winGame = () => {
 }
 
 const showReplay = () => {
-    // set up UI to show replay with text
+    // Hide the UI for an active game
+    document.getElementById("hotbar").setAttribute("class", "hidden")
+
+    // Hide the show replay button
+    document.getElementById("replayButt").setAttribute("class", "hidden")
+
+    // Show the replay display along the top of the board
+    document.getElementById("replayDisplay").setAttribute("class", "container-fluid align-middle")
 }

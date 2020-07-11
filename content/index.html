@@ -109,12 +109,31 @@
                     <p id="scoreDisplay">Mines left: 0</script></p>
                 </div>
                 <div class="col-sm-2" style="text-align: center;">
-                    <p id="aciveGame">Active Game</p>
+                    <p id="activeGame">Active Game</p>
                 </div>
                 <div class="col-sm-2" style="text-align: center;">
                     <p id="gameTimer">Time Elapsed: 0</p>
                 </div>
                 <div class="col-sm-3"></div>
+            </div>
+        </div>
+        <div class="hidden" id="replayDisplay">
+            <div class="row align-middle">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <p id="replayText" style="text-align: center;">Game state before solver begins</p>
+                </div>
+                <div class="col-sm-3"></div>
+            </div>
+            <div class="row align-middle" style="padding-bottom: 1%;">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-2" style="text-align: center;">
+                    <button id="leftArrow" class="btn" onclick="changeMove(-1)"><</button>
+                </div>
+                <div class="col-sm-2" style="text-align: center;">
+                    <button id="rightArrow" class="btn" onclick="changeMove(1)">></button>
+                </div>
+                <div class="col-sm-4"></div>
             </div>
         </div>
         <div class="hidden" id="gameboard" style="width: 70%; text-align: center; height: 60%; margin-bottom: 2.5%;">

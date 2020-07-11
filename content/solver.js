@@ -79,6 +79,11 @@ let solver = {
             newBoard.push(newRow)
         }
 
+        // Store the end game board state temporarily, in case the player
+        // wishes to view the solver's actions
+        // note, this will be overwritten each time the solver is called (i.e. if it's unused)
+        solver.endBoardState = newBoard
+
         if (allMineNeighbours.length == 0) {
             setNeighbours(newBoard)
         }
@@ -235,19 +240,15 @@ let solver = {
                                 reason: "simpleFlag"
                             }
                             solver.replayArray.push(replayObj)
-                        })
-                        console.log(`simple found that the above tiles contain a mine`)
-                        unknownNeighbours.forEach(square => newBoard[square.y - 1][square.x - 1].isFlagged = true)
 
+                            newBoard[square.y - 1][square.x - 1].isFlagged = true
+                        })
 
                         foundNewInfo = true;
                     }
                     // heuristic two - if no. of flagged spaces around revealed tile is equal to the number in its text,
                     // then all remaining spaces must be safe.
                     else if (tile.mineCount == flagNeighbours.length && unknownNeighbours.length > 0) {
-                        unknownNeighbours.forEach(square => console.log(newBoard[square.y - 1][square.x - 1]))
-                        console.log(`simple found that the above tiles contain no mine`)
-
                         unknownNeighbours.forEach(cell => {
                             // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
                             // using the persistent storage of neighbours in allMineNeighbours for each game, 
@@ -264,6 +265,23 @@ let solver = {
                             neighbours.forEach(neighbour => { if (neighbour.isMine) { mineNeighbours++ } })
                             newBoard[cell.y - 1][cell.x - 1].mineCount = mineNeighbours;
                             newBoard[cell.y - 1][cell.x - 1].revealed = true
+
+                            // need to make a new object to contain information for if
+                            // the player loses and wishes to view the solver's solution
+                            let replayObj = {
+                                sourceTile: {
+                                    x: tile.x,
+                                    y: tile.y
+                                },
+                                actionTile: {
+                                    x: cell.x,
+                                    y: cell.y,
+                                    mineNeighbours: mineNeighbours
+                                },
+                                actionTaken: "safeClick",
+                                reason: "simpleSafe"
+                            }
+                            solver.replayArray.push(replayObj)
                         })
 
                         foundNewInfo = true;
@@ -275,7 +293,10 @@ let solver = {
             // then the player has failed and they lose
             if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged) {
                 endGame()
-                return;
+
+                // we return true here because the findSolution function will be recalled
+                // and return immediately, because the game is no longer active.
+                return true;
             } else {
                 if (foundNewInfo) {
                     testTiles = []
@@ -453,38 +474,60 @@ let solver = {
                             // if the tile must be a mine
                             if (mine == result.length) {
                                 newBoard[tile.y - 1][tile.x - 1].isFlagged = true;
-                                console.log(newBoard[tile.y - 1][tile.x - 1])
-                                console.log(`complex found that this tile was a mine`)
+                                
+                                // need to make a new object to contain information for if
+                                // the player loses and wishes to view the solver's solution
+                                let replayObj = {
+                                    actionTile: {
+                                        x: tile.x,
+                                        y: tile.y
+                                    },
+                                    actionTaken: "addFlag",
+                                    reason: "complexFlag"
+                                }
+                                solver.replayArray.push(replayObj)
                             }
                             // if the tile must be not a mine
                             else if (notMine == result.length) {
                                 newBoard[tile.y - 1][tile.x - 1].revealed = true;
-                                console.log(newBoard[tile.y - 1][tile.x - 1])
-                                console.log(`complex found that this tile was not a mine`)
+                                
+                                // This will determine the number to be assigned to mineCount.
+                                let mineNeighbours = 0;
+
+                                // we have to get the new tile's mineCount as well if it is to be 
+                                // useful for recurring the function
+                                // using the persistent storage of neighbours in allMineNeighbours for each game, 
+                                // we can easily match up the neighbours for each tile
+                                let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
+                                neighbourTiles = []
+                                neighbourMatch.neighbours.forEach(cell => {
+                                    let item = newBoard[cell.y - 1][cell.x - 1]
+                                    neighbourTiles.push(item)
+                                })
+
+                                // if tile is safe, it doesn't need to be dealt with here.
+                                // if it isn't safe, then:
+                                neighbourTiles.forEach(neighbour => {
+                                    if (neighbour.isMine) { mineNeighbours++ }
+                                })
+
+                                // finally, assign the mineCount to the tile
+                                newBoard[tile.y - 1][tile.x - 1].mineCount = mineNeighbours;
+                                
+                                // need to make a new object to contain information for if
+                                // the player loses and wishes to view the solver's solution
+                                let replayObj = {
+                                    actionTile: {
+                                        x: tile.x,
+                                        y: tile.y,
+                                        mineNeighbours: mineNeighbours
+                                    },
+                                    actionTaken: "safeClick",
+                                    reason: "complexSafe"
+                                }
+                                solver.replayArray.push(replayObj)
                             }
 
-                            // This will determine the number to be assigned to mineCount.
-                            let mineNeighbours = 0;
-
-                            // we have to get the new tile's mineCount as well if it is to be 
-                            // useful for recurring the function
-                            // using the persistent storage of neighbours in allMineNeighbours for each game, 
-                            // we can easily match up the neighbours for each tile
-                            let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
-                            neighbourTiles = []
-                            neighbourMatch.neighbours.forEach(cell => {
-                                let item = newBoard[cell.y - 1][cell.x - 1]
-                                neighbourTiles.push(item)
-                            })
-
-                            // if tile is safe, it doesn't need to be dealt with here.
-                            // if it isn't safe, then:
-                            neighbourTiles.forEach(neighbour => {
-                                if (neighbour.isMine) { mineNeighbours++ }
-                            })
-
-                            // finally, assign the mineCount to the tile
-                            newBoard[tile.y - 1][tile.x - 1].mineCount = mineNeighbours;
                         }
 
 
@@ -710,5 +753,14 @@ let solver = {
             return;
         }
     },
-    replayArray: []
+    replayArray: [],
+    endBoardState: [],
+    changeMove: (direction) => {
+        // set chosen tile to be red (showing which one they actually guessed)
+        // remove event listener from left if on first guess
+        // remove event listener from right if on last guess
+        // add event listeners back in when you tick back down or up
+        // take the tile being guessed and the source tile (if applicable) and highlight them in the display
+        // change text above board to reflect the reason for each guess
+    }
 }
