@@ -3,6 +3,9 @@ let solver = {
         // reset the replay array 
         solver.replayArray = []
 
+        // reset the errorTile for if the solver fails and the user views its process
+        solver.errorTile = targetTile
+
         // chosenConfig will be what is returned at the end of the function
         let chosenConfig
 
@@ -755,6 +758,7 @@ let solver = {
     },
     replayArray: [],
     endBoardState: [],
+    errorTile: null,
     changeMove: (direction) => {
         // set chosen tile to be red (showing which one they actually guessed)
         // remove event listener from left if on first guess
