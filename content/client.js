@@ -192,6 +192,9 @@ const backHome = () => {
         // Reset the localized currentGame object.
         currentGame = {};
 
+        // reset the mineNeighbours for the next game
+        allMineNeighbours = []
+
         // reset the solver's properties
         solver.replayArray = []
         solver.currentMove = -1
@@ -255,9 +258,6 @@ const endGame = () => {
     // Remove the mine count
     document.getElementById("scoreDisplay").innerHTML = "Mines left: :("
 
-    // reset the mineNeighbours for the next game
-    allMineNeighbours = []
-
     // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
     currentGame.active = false;
 
@@ -291,9 +291,6 @@ const winGame = () => {
 
         // Remove the mine count
         document.getElementById("scoreDisplay").innerHTML = "Mines left: 0"
-
-        // reset the mineNeighbours for the next game
-        allMineNeighbours = []
 
         // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
         currentGame.active = false;

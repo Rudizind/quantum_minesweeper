@@ -463,77 +463,67 @@ let solver = {
                         match.guessMine ? mine++ : notMine++
                     })
                     if (mine == result.length || notMine == result.length) {
-                        // if tile must contain a mine, and it's the chosen tile, the user loses
-                        if (tile.x == targetTile.getAttribute("x") &&
-                            tile.y == targetTile.getAttribute("y") && mine == result.length) {
-                            endGame()
-                            return;
-                        } else {
+                        // set changedTile to true so the function knows that it 
+                        // has been able to determine a new tile
+                        changedTile = true;
 
-                            // set changedTile to true so the function knows that it 
-                            // has been able to determine a new tile
-                            changedTile = true;
-
-                            // if the tile must be a mine
-                            if (mine == result.length) {
-                                newBoard[tile.y - 1][tile.x - 1].isFlagged = true;
-                                
-                                // need to make a new object to contain information for if
-                                // the player loses and wishes to view the solver's solution
-                                let replayObj = {
-                                    actionTile: {
-                                        x: tile.x,
-                                        y: tile.y
-                                    },
-                                    actionTaken: "addFlag",
-                                    reason: "complexFlag"
-                                }
-                                solver.replayArray.push(replayObj)
+                        // if the tile must be a mine
+                        if (mine == result.length) {
+                            newBoard[tile.y - 1][tile.x - 1].isFlagged = true;
+                            
+                            // need to make a new object to contain information for if
+                            // the player loses and wishes to view the solver's solution
+                            let replayObj = {
+                                actionTile: {
+                                    x: tile.x,
+                                    y: tile.y
+                                },
+                                actionTaken: "addFlag",
+                                reason: "complexFlag"
                             }
-                            // if the tile must be not a mine
-                            else if (notMine == result.length) {
-                                newBoard[tile.y - 1][tile.x - 1].revealed = true;
-                                
-                                // This will determine the number to be assigned to mineCount.
-                                let mineNeighbours = 0;
-
-                                // we have to get the new tile's mineCount as well if it is to be 
-                                // useful for recurring the function
-                                // using the persistent storage of neighbours in allMineNeighbours for each game, 
-                                // we can easily match up the neighbours for each tile
-                                let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
-                                neighbourTiles = []
-                                neighbourMatch.neighbours.forEach(cell => {
-                                    let item = newBoard[cell.y - 1][cell.x - 1]
-                                    neighbourTiles.push(item)
-                                })
-
-                                // if tile is safe, it doesn't need to be dealt with here.
-                                // if it isn't safe, then:
-                                neighbourTiles.forEach(neighbour => {
-                                    if (neighbour.isMine) { mineNeighbours++ }
-                                })
-
-                                // finally, assign the mineCount to the tile
-                                newBoard[tile.y - 1][tile.x - 1].mineCount = mineNeighbours;
-                                
-                                // need to make a new object to contain information for if
-                                // the player loses and wishes to view the solver's solution
-                                let replayObj = {
-                                    actionTile: {
-                                        x: tile.x,
-                                        y: tile.y,
-                                        mineNeighbours: mineNeighbours
-                                    },
-                                    actionTaken: "safeClick",
-                                    reason: "complexSafe"
-                                }
-                                solver.replayArray.push(replayObj)
-                            }
-
+                            solver.replayArray.push(replayObj)
                         }
+                        // if the tile must be not a mine
+                        else if (notMine == result.length) {
+                            newBoard[tile.y - 1][tile.x - 1].revealed = true;
+                            
+                            // This will determine the number to be assigned to mineCount.
+                            let mineNeighbours = 0;
 
+                            // we have to get the new tile's mineCount as well if it is to be 
+                            // useful for recurring the function
+                            // using the persistent storage of neighbours in allMineNeighbours for each game, 
+                            // we can easily match up the neighbours for each tile
+                            let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
+                            neighbourTiles = []
+                            neighbourMatch.neighbours.forEach(cell => {
+                                let item = newBoard[cell.y - 1][cell.x - 1]
+                                neighbourTiles.push(item)
+                            })
 
+                            // if tile is safe, it doesn't need to be dealt with here.
+                            // if it isn't safe, then:
+                            neighbourTiles.forEach(neighbour => {
+                                if (neighbour.isMine) { mineNeighbours++ }
+                            })
+
+                            // finally, assign the mineCount to the tile
+                            newBoard[tile.y - 1][tile.x - 1].mineCount = mineNeighbours;
+                            
+                            // need to make a new object to contain information for if
+                            // the player loses and wishes to view the solver's solution
+                            let replayObj = {
+                                actionTile: {
+                                    x: tile.x,
+                                    y: tile.y,
+                                    mineNeighbours: mineNeighbours
+                                },
+                                actionTaken: "safeClick",
+                                reason: "complexSafe"
+                            }
+                            solver.replayArray.push(replayObj)
+                        }
+                        
                     } else {
                         // tile == possibly mine, possibly not
                     }
@@ -543,9 +533,9 @@ let solver = {
                 // if the solver has discovered that the chosen tile should be flagged using the complex solver,
                 // then the player has failed and they lose
                 if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged) {
-                    newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1]
+                    currentGame.active = false;
                     endGame()
-                    return false;
+                    return false
                 } else {
                     if (changedTile) {
                         testTiles = []
@@ -671,7 +661,7 @@ let solver = {
                                     }
 
                                     stopLoop = true;
-                                    return chosenConfig;
+                                    return false;
                                 }
                             })
                         }
@@ -711,19 +701,17 @@ let solver = {
                             chosenMine.isMine = true
                             chosenConfig.push(chosenMine)
                         }
-                        return;
                     }
                 }
             } else {
                 // handle failure
                 console.log(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
                 if (!currentGame.active) {
-                    return;
+                    return false;
                 }
                 currentGame.active = false;
                 endGame()
                 console.log("end solver")
-                return;
             }
         }
 
@@ -737,9 +725,12 @@ let solver = {
                 findSolution()
             } else {
                 let useComplex = solveBoardProbs()
+                console.log(useComplex)
                 if (useComplex) {
+                    console.log("yeo")
                     findSolution()
                 } else {
+                    console.log("no")
                     return;
                 }
             }
@@ -802,19 +793,20 @@ let solver = {
         // get the relevant tiles for adjusting below
         let table = document.getElementById("boardTable")
 
-        // handle the oldGuess
-        if (oldGuess) {
-            if (direction == 1) {
-                let source;
+        if (direction == 1) {
+            // if going forwards, then...
+            // handle the oldGuess
+            if (oldGuess) {
                 if (oldGuess.sourceTile) {
+                    let source;
                     source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
                     source.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
                 }
-                let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
                 if (oldGuess.actionTaken == "addFlag") {
+                    let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
                     if (oldGuess.actionTile.x == solver.errorTile.getAttribute("x") && 
                         oldGuess.actionTile.y == solver.errorTile.getAttribute("y")) {
-                            action.style.backgroundColor = "rgba(255, 0, 0, 0.8)"
+                        action.style.backgroundColor = "rgba(255, 0, 0, 0.5)"
                     }
                     else {
                         // Display a flag in the square
@@ -830,62 +822,97 @@ let solver = {
                 }
                 else {
                     // mark the tile as safe
+                    let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
                     action.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+
+                    // get its mineNeighbours and add this to the tile's text
+                    if (oldGuess.actionTile.mineNeighbours > 0) {
+                        action.textContent = `${oldGuess.actionTile.mineNeighbours}`
+                    }
                 }
             }
-            else {
-                let source;
-                if (oldGuess.sourceTile) {
-                    source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
-                    source.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+            // handle the newGuess
+            if (newGuess) {
+                let source 
+                if (newGuess.sourceTile) {
+                    source = table.children[newGuess.sourceTile.y - 1].children[newGuess.sourceTile.x - 1]
+                    source.style.backgroundColor = "rgba(0, 200, 0, 1.0)"
                 }
+                let action = table.children[newGuess.actionTile.y - 1].children[newGuess.actionTile.x - 1]
+                action.style.backgroundColor = "rgba(0, 200, 0, 0.3)"
+            }
+        }
+        else {
+            // if going backwards, then...
+            if (oldGuess) {
+                // mark the source tile as revealed
+                if (oldGuess.sourceTile) {
+                    let source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
+                    source.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+                    
+                }
+                // mark the action tile as unknown
                 let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
                 action.style.backgroundColor = ""
+            }
 
-
-
-
-
-
-
-
-                // need to do a lookup here for the mineCount for the action tile
-                // need to edit the remove flags bit to work even when the tile is just highlighted
-                // need to add the text above the display as well as the tiles solved count
-
-
-
-
-
-
-
+            // handle the newGuess
+            if (newGuess) {
+                let source;
+                if (newGuess.sourceTile) {
+                    source = table.children[newGuess.sourceTile.y - 1].children[newGuess.sourceTile.x - 1]
+                    source.style.backgroundColor = "rgba(0, 200, 0, 1.0)"
+                }
+                let action = table.children[newGuess.actionTile.y - 1].children[newGuess.actionTile.x - 1]
+                action.style.backgroundColor = "rgba(0, 200, 0, 0.3)"
                 
-                if (oldGuess.actionTaken == "addFlag") {
-                    let removeFlag = action.children[1]
-                    removeFlag.parentElement.removeChild(removeFlag)
+                // remove the flag from the tile you're going back to, if one was added
+                if (newGuess.actionTaken == "addFlag") {
+                    if (newGuess.actionTile.x == solver.errorTile.getAttribute("x") &&
+                        newGuess.actionTile.y == solver.errorTile.getAttribute("y")) {
+                        // do nothing
+                    }
+                    else {
+                        let removeFlag = action.children[1]
+                        removeFlag.parentElement.removeChild(removeFlag)
+                    }
+                }
+                else {
+                    action.textContent = ""
                 }
             }
-        }
+                    
+        }   
 
-        // handle the newGuess
-        if (newGuess) {
-            let source 
-            if (newGuess.sourceTile) {
-                source = table.children[newGuess.sourceTile.y - 1].children[newGuess.sourceTile.x - 1]
-                source.style.backgroundColor = "rgba(0, 200, 0, 1.0)"
-            }
-            let action = table.children[newGuess.actionTile.y - 1].children[newGuess.actionTile.x - 1]
-            action.style.backgroundColor = "rgba(0, 200, 0, 0.3)"
-        }
-
-        console.log(oldGuess)
-        console.log(newGuess)
-
-
-
-
-        // take the tile being guessed and the source tile (if applicable)
-        // and highlight them in the display
         // change text above board to reflect the reason for each guess
+        let replayText = document.getElementById("replayText")
+
+        if (newGuess) {
+            if (newGuess.reason == "simpleFlag") {
+                replayText.innerHTML = `All of the unknown neighbours around tile (${newGuess.sourceTile.x} , `
+                    + `${newGuess.sourceTile.y}) must be mines. 
+                    Therefore tile (${newGuess.actionTile.x} , ${newGuess.actionTile.y}) must be a mine.`
+            } else if (newGuess.reason == "simpleSafe") {
+                replayText.innerHTML = `All of the unknown neighbours around tile (${newGuess.sourceTile.x} , `
+                    + `${newGuess.sourceTile.y}) must be safe. 
+                    Therefore tile (${newGuess.actionTile.x} , ${newGuess.actionTile.y}) must be safe.`
+            } else if (newGuess.reason == "complexFlag") {
+                replayText.innerHTML = `In all possible configurations of potential mines around border tiles,
+                    tile (${newGuess.actionTile.x} , ${newGuess.actionTile.y}) is always a mine.`
+            } else if (newGuess.reason == "complexSafe") {
+                replayText.innerHTML = `In all possible configurations of potential mines around border tiles,
+                    tile (${newGuess.actionTile.x} , ${newGuess.actionTile.y}) is always safe.`
+            }
+        }
+
+        // change text to reflect the tiles solved
+        let countText = document.getElementById("tilesSolved")
+        if (solver.currentMove == -1) {
+            countText.innerHTML = "Tiles Solved: 0"
+            replayText.innerHTML = "Game state before solver begins"
+        }
+        else {
+            countText.innerHTML = "Tiles Solved: " + solver.currentMove
+        }
     }
 }
