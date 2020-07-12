@@ -200,6 +200,10 @@ const backHome = () => {
         solver.currentMove = -1
         solver.endBoardState = []
         solver.errorTile = null
+
+        // reset the solver replay display
+        document.getElementById("tilesSolved").innerHTML = "Tiles Solved: 0"
+        document.getElementById("replayText").innerHTML = "Game state before solver begins"
         
         // reset the arrows for the replay
         document.getElementById("leftArrow").setAttribute("onclick", "")
