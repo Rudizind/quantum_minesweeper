@@ -841,6 +841,24 @@ let solver = {
                 }
                 let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
                 action.style.backgroundColor = ""
+
+
+
+
+
+
+
+
+                // need to do a lookup here for the mineCount for the action tile
+                // need to edit the remove flags bit to work even when the tile is just highlighted
+                // need to add the text above the display as well as the tiles solved count
+
+
+
+
+
+
+
                 
                 if (oldGuess.actionTaken == "addFlag") {
                     let removeFlag = action.children[1]
