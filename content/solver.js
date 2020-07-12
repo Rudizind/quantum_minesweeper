@@ -798,21 +798,70 @@ let solver = {
             document.getElementById("rightArrow").style.opacity = "0.5"
             document.getElementById("rightArrow").setAttribute("onclick", "")
         }
+        
+        // get the relevant tiles for adjusting below
+        let table = document.getElementById("boardTable")
 
         // handle the oldGuess
-        if (direction == 1) {
-
-        }
-        else {
-
+        if (oldGuess) {
+            if (direction == 1) {
+                let source;
+                if (oldGuess.sourceTile) {
+                    source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
+                    source.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+                }
+                let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
+                if (oldGuess.actionTaken == "addFlag") {
+                    if (oldGuess.actionTile.x == solver.errorTile.getAttribute("x") && 
+                        oldGuess.actionTile.y == solver.errorTile.getAttribute("y")) {
+                            action.style.backgroundColor = "rgba(255, 0, 0, 0.8)"
+                    }
+                    else {
+                        // Display a flag in the square
+                        let flag = document.createElement("img")
+                        flag.src = "./img/flag.png"
+                        flag.setAttribute("class", "flag")
+                        flag.style = "height: 100%; width: auto;"
+                        action.append(flag)
+                        
+                        // reset the background color
+                        action.style.backgroundColor = ""
+                    }
+                }
+                else {
+                    // mark the tile as safe
+                    action.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+                }
+            }
+            else {
+                let source;
+                if (oldGuess.sourceTile) {
+                    source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
+                    source.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+                }
+                let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
+                action.style.backgroundColor = ""
+                
+                if (oldGuess.actionTaken == "addFlag") {
+                    let removeFlag = action.children[1]
+                    removeFlag.parentElement.removeChild(removeFlag)
+                }
+            }
         }
 
         // handle the newGuess
+        if (newGuess) {
+            let source 
+            if (newGuess.sourceTile) {
+                source = table.children[newGuess.sourceTile.y - 1].children[newGuess.sourceTile.x - 1]
+                source.style.backgroundColor = "rgba(0, 200, 0, 1.0)"
+            }
+            let action = table.children[newGuess.actionTile.y - 1].children[newGuess.actionTile.x - 1]
+            action.style.backgroundColor = "rgba(0, 200, 0, 0.3)"
+        }
 
-
-
-
-
+        console.log(oldGuess)
+        console.log(newGuess)
 
 
 

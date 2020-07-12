@@ -192,8 +192,18 @@ const backHome = () => {
         // Reset the localized currentGame object.
         currentGame = {};
 
-        // reset the solver's replay array
+        // reset the solver's properties
         solver.replayArray = []
+        solver.currentMove = -1
+        solver.endBoardState = []
+        solver.errorTile = null
+        
+        // reset the arrows for the replay
+        document.getElementById("leftArrow").setAttribute("onclick", "")
+        document.getElementById("leftArrow").style.opacity = "0.5"
+        
+        document.getElementById("rightArrow").setAttribute("onclick", "solver.changeMove(1)")
+        document.getElementById("rightArrow").style.opacity = "1"
     }
 }
 
@@ -332,5 +342,9 @@ const showReplay = () => {
     })
 
     // show the target tile the user chose
-    solver.errorTile.style.backgroundColor = "rgba(130, 0, 0, 0.55)"
+    let cross = document.createElement("img")
+    cross.setAttribute("class", "cross")
+    cross.src = "./img/x.png"
+    cross.style = "height: 100%; width: auto;"
+    solver.errorTile.appendChild(cross);
 }
