@@ -247,6 +247,7 @@ let solver = {
                             newBoard[square.y - 1][square.x - 1].isFlagged = true
                         })
 
+                        console.log("here")
                         foundNewInfo = true;
                     }
                     // heuristic two - if no. of flagged spaces around revealed tile is equal to the number in its text,
@@ -256,10 +257,10 @@ let solver = {
                             // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
                             // using the persistent storage of neighbours in allMineNeighbours for each game, 
                             // we can easily match up the neighbours for each tile
-                            let neighbourMatch = allMineNeighbours.find(obj => obj.x == tile.x && obj.y == tile.y)
+                            let neighbourMatch = allMineNeighbours.find(obj => obj.x == cell.x && obj.y == cell.y)
                             neighbours = []
-                            neighbourMatch.neighbours.forEach(cell => {
-                                let item = newBoard[cell.y - 1][cell.x - 1]
+                            neighbourMatch.neighbours.forEach(neighbour => {
+                                let item = newBoard[neighbour.y - 1][neighbour.x - 1]
                                 neighbours.push(item)
                             })
 
@@ -286,7 +287,7 @@ let solver = {
                             }
                             solver.replayArray.push(replayObj)
                         })
-
+                        console.log("here")
                         foundNewInfo = true;
                     }
                 }
@@ -299,15 +300,12 @@ let solver = {
 
                 // we return true here because the findSolution function will be recalled
                 // and return immediately, because the game is no longer active.
+                console.log(foundNewInfo)
                 return true;
             } else {
-                if (foundNewInfo) {
-                    testTiles = []
-                    return true
-                } else {
-                    testTiles = []
-                    return false
-                }
+                testTiles = []
+                console.log(foundNewInfo)
+                return foundNewInfo
             }
         }
 
@@ -725,18 +723,16 @@ let solver = {
                 findSolution()
             } else {
                 let useComplex = solveBoardProbs()
-                console.log(useComplex)
                 if (useComplex) {
-                    console.log("yeo")
                     findSolution()
                 } else {
-                    console.log("no")
                     return;
                 }
             }
         }
         findSolution()
 
+        console.log(chosenConfig)
         if (chosenConfig != undefined) {
             return chosenConfig
         } else {
