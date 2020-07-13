@@ -750,7 +750,9 @@ let solver = {
         }
 
         // reset the onclick and opacity of right arrow if moving from highest option
-        else if (solver.currentMove == solver.replayArray.length - 1) {
+        // note that it moves to the length and not length - 1 because we want 
+        // an extra item at the end for the 'end of solver' case
+        else if (solver.currentMove == solver.replayArray.length) {
             document.getElementById("rightArrow").style.opacity = "1.0"
             document.getElementById("rightArrow").setAttribute("onclick", "solver.changeMove(1)")
         }
@@ -776,7 +778,7 @@ let solver = {
         }
 
         // remove the onclick and reduce opacity of right arrow if as far right as poss
-        else if (solver.currentMove == solver.replayArray.length - 1) {
+        else if (solver.currentMove == solver.replayArray.length) {
             document.getElementById("rightArrow").style.opacity = "0.5"
             document.getElementById("rightArrow").setAttribute("onclick", "")
         }
@@ -894,6 +896,10 @@ let solver = {
                 replayText.innerHTML = `In all possible configurations of potential mines around border tiles,
                     tile (${newGuess.actionTile.x} , ${newGuess.actionTile.y}) is always safe.`
             }
+        }
+        else {
+            replayText.innerHTML = `This is all that the solver deduced before deciding
+            that the chosen tile contained a mine.`
         }
 
         // change text to reflect the tiles solved
