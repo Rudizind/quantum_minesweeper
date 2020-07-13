@@ -913,3 +913,36 @@ let solver = {
         }
     }
 }
+
+// pseudo for the hint system
+
+/*
+    There will be a 'use hint' button, which will toggle a property in the currentGame object
+    to either true or false (i.e. on or off). 
+
+    Presuming that the player has pressed the hint button, then
+    they have clicked on a tile, this calls mineTest on that tile as normal. 
+
+    Here is where the hint property check will be. 
+    If the tile is deemed absolutely safe (no childNodes, basically), then the tile will show 0% in it, 
+    to represent the mine probability. 
+
+    If it contains a flag, the click won't be recognised anyway.
+
+    If, however, it is a mine in the current config, the solver will run.
+    If at any stage of the solver (easy/complex) the program determines that the chosen tile
+    must be safe or must be a mine, it will check the hint property
+    and if it's true, it will make the probability appear in the tile and end the solver.
+
+    If, however, it is some probability between 0-100% (calculated by averaging the number of times
+    it appears to be a mine from the result array from solveBoardProbs), then this probability
+    will be calculated at the end of solveBoardProbs as long as the chosen tile is in that config. 
+    This probability will then be displayed within the tile for the user to see. 
+    
+    At the end of mineTest, we will set the global hint property to false again, so that
+    once the solver has run (if it needs to) the hint system is turned off for the next click. 
+
+    We will need to temporarily store the hint tile in the global currentGame obj
+    so that, when the user makes a new choice with left click, the probability is removed as
+    the board may change after their click.
+*/
