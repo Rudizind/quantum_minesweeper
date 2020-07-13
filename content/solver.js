@@ -247,7 +247,6 @@ let solver = {
                             newBoard[square.y - 1][square.x - 1].isFlagged = true
                         })
 
-                        console.log("here")
                         foundNewInfo = true;
                     }
                     // heuristic two - if no. of flagged spaces around revealed tile is equal to the number in its text,
@@ -287,7 +286,6 @@ let solver = {
                             }
                             solver.replayArray.push(replayObj)
                         })
-                        console.log("here")
                         foundNewInfo = true;
                     }
                 }
@@ -300,11 +298,9 @@ let solver = {
 
                 // we return true here because the findSolution function will be recalled
                 // and return immediately, because the game is no longer active.
-                console.log(foundNewInfo)
                 return true;
             } else {
                 testTiles = []
-                console.log(foundNewInfo)
                 return foundNewInfo
             }
         }
@@ -732,7 +728,6 @@ let solver = {
         }
         findSolution()
 
-        console.log(chosenConfig)
         if (chosenConfig != undefined) {
             return chosenConfig
         } else {

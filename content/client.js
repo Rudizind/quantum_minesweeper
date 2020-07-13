@@ -102,7 +102,6 @@ const startGame = () => {
     // using the board size from above, calculate the number of mines in the board.
     let totalMines;
     let mineChoice = document.getElementById("mineChoice").value
-    console.log(mineChoice)
     // get the normal number of mines
     totalMines = boardSize == 'xl' ? 99 :
                  boardSize == 'l' ? 55 :
@@ -115,9 +114,7 @@ const startGame = () => {
                          mineChoice == "Normal (1.0x)" ? 1 :
                          mineChoice == "Maximum (1.3x)" ? 1.3 : 1
 
-    console.log(mineMultiplier)
     totalMines = Math.round(totalMines * mineMultiplier)
-    console.log(totalMines)
 
     // Set the starting board parameters (in global scope)
     currentGame = {

@@ -305,7 +305,6 @@ const resolveBoard = square => {
     if (changeTiles == undefined) {
         return;
     }
-    console.log(changeTiles)
     let board = document.querySelectorAll(".mineSquare")
     board.forEach(element => {
         let match = changeTiles.find(item => item.x == Number(element.getAttribute("x")) &&
