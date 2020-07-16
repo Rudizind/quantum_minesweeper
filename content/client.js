@@ -317,17 +317,7 @@ const showReplay = () => {
     allNodes.forEach(node => {
         if (node.childNodes.length > 0 && node.textContent == "") {
             // if there's a cross in the tile, remove it and put a flag back in it
-            if (node.childNodes[0].getAttribute("class") == "cross") {
-                node.removeChild(node.childNodes[0])
-
-                // Display a flag in the square
-                let flag = document.createElement("img")
-                flag.src = "./img/flag.png"
-                flag.setAttribute("class", "flag")
-                flag.style = "height: 100%; width: auto;"
-                node.append(flag)
-            }
-            else if (node.childNodes.length == 1) {
+            if (node.childNodes.length == 1) {
                 node.childNodes[0].style.display = "none"
 
                 if (node.style.backgroundColor == "orange") {

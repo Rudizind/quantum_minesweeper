@@ -35,6 +35,10 @@ const makeBoard = () => {
         currentGame.boardSize == 's' ? 7 :
         currentGame.boardSize == 'xs' ? 5 : 16
 
+    // set the size of the board
+    table.style = `height: ${(boardheight * 30) + 12}px; width: ${boardwidth * 30}px;
+        margin-left: auto; margin-right: auto;`
+
     // Populate the board
     // For now the board will be the size of a standard expert level board: 
     // (30L x 16H / 480 squares / 99 mines)
@@ -51,7 +55,7 @@ const makeBoard = () => {
                 mine.style = "height: 100%; width: auto; display: none;"
                 mine.addEventListener("mouseup", squareChoice)
                 if (currentGame.mineVision) {
-                    newCell.style.backgroundColor = "rgba(120, 120, 0, 0.3)"
+                    newCell.style.backgroundColor = "rgba(120, 20, 0, 0.3)"
                 }
                 newCell.append(mine);
             }
@@ -62,6 +66,10 @@ const makeBoard = () => {
             // y is top to bottom
             newCell.setAttribute("x", j + 1)
             newCell.setAttribute("y", i + 1)
+
+            // set the max height and width of the squares
+            newCell.style.maxHeight = "30px"
+            newCell.style.maxWidth = "30px"
 
             // Assign the default 'revealed' boolean to false for the cell. 
             newCell.revealed = false;
@@ -227,7 +235,7 @@ const mineTest = (square, click) => {
             // If empty, and left click, run the adjacency checks until an endpoint is reached. 
             else if (click == "left") {
                 // Make the chosen square 'safe'
-                square.style = "background-color: rgba(0, 0, 255, 0.3);"
+                square.style = "background-color: rgba(150, 150, 150, 1);"
                 square.revealed = true;
 
                 // Check if any mines around the chosen square
@@ -292,12 +300,27 @@ const mineTest = (square, click) => {
                         mineTest(node, "left")
                     })
                 } else {
+                    let colour = getTextColor(mineCount)
+                    square.style.color = colour
                     square.innerHTML = `${mineCount}`
                 }
 
             }
         }
     }
+}
+
+// Takes an input number between 1 and 8, and returns the corresponding colour. 
+const getTextColor = num => {
+    let colour = num == 1 ? "rgba(0, 0, 200, 1)" :
+                 num == 2 ? "rgba(0, 100, 0, 1)" :
+                 num == 3 ? "rgba(200, 0, 0, 1)" :
+                 num == 4 ? "rgba(0, 0, 120, 1)" :
+                 num == 5 ? "rgba(128, 0, 0, 1)" :
+                 num == 6 ? "rgba(64, 224, 208, 1)" :
+                 num == 7 ? "rgba(0, 0, 0, 1)" : "rgba(50, 50, 50, 1)" 
+
+    return colour
 }
 
 const resolveBoard = square => {
@@ -317,7 +340,7 @@ const resolveBoard = square => {
                 mine.src = "./img/mine.png"
                 mine.style = "height: 100%; width: auto; display: none;"
                 if (currentGame.mineVision) {
-                    element.style.backgroundColor = "rgba(120, 120, 0, 0.3)"
+                    element.style.backgroundColor = "rgba(150, 150, 150, 1)"
                 }
                 if (element.childNodes.length == 0) {
                     mine.addEventListener("mouseup", squareChoice)
@@ -338,7 +361,7 @@ const resolveBoard = square => {
         return;
     });
 
-    square.style = "background-color: rgba(0, 0, 255, 0.3);"
+    square.style = "background-color: rgba(150, 150, 150, 1);"
     square.revealed = true;
 
     // Check if any mines around the chosen square
@@ -399,6 +422,8 @@ const resolveBoard = square => {
             mineTest(node, "left")
         })
     } else {
+        let colour = getTextColor(mineCount)
+        square.style.color = colour
         square.innerHTML = `${mineCount}`
     }
 }

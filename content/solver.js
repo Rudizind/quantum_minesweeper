@@ -793,7 +793,7 @@ let solver = {
                 if (oldGuess.sourceTile) {
                     let source;
                     source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
-                    source.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+                    source.style.backgroundColor = "rgba(150, 150, 150, 1)"
                 }
                 if (oldGuess.actionTaken == "addFlag") {
                     let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
@@ -816,7 +816,7 @@ let solver = {
                 else {
                     // mark the tile as safe
                     let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
-                    action.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+                    action.style.backgroundColor = "rgba(150, 150, 150, 1)"
 
                     // get its mineNeighbours and add this to the tile's text
                     if (oldGuess.actionTile.mineNeighbours > 0) {
@@ -841,7 +841,7 @@ let solver = {
                 // mark the source tile as revealed
                 if (oldGuess.sourceTile) {
                     let source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
-                    source.style.backgroundColor = "rgba(0, 0, 255, 0.3)"
+                    source.style.backgroundColor = "rgba(150, 150, 150, 1)"
                     
                 }
                 // mark the action tile as unknown
