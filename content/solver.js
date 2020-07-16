@@ -735,7 +735,6 @@ let solver = {
                 }
             } else {
                 // handle failure
-                console.log(newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1])
                 if (!currentGame.active) {
                     return false;
                 }
