@@ -242,7 +242,16 @@ let solver = {
                                 actionTaken: "addFlag",
                                 reason: "simpleFlag"
                             }
-                            solver.replayArray.push(replayObj)
+                            if (solver.replayArray.length > 0) {
+                                let lastAdded = solver.replayArray[solver.replayArray.length - 1]
+                                if (lastAdded.actionTile.x != targetTile.getAttribute("x") ||
+                                    lastAdded.actionTile.y != targetTile.getAttribute("y")) {
+                                        solver.replayArray.push(replayObj)
+                                }
+                            }
+                            else {
+                                solver.replayArray.push(replayObj)
+                            }
 
                             newBoard[square.y - 1][square.x - 1].isFlagged = true
                         })
@@ -284,7 +293,16 @@ let solver = {
                                 actionTaken: "safeClick",
                                 reason: "simpleSafe"
                             }
-                            solver.replayArray.push(replayObj)
+                            if (solver.replayArray.length > 0) {
+                                let lastAdded = solver.replayArray[solver.replayArray.length - 1]
+                                if (lastAdded.actionTile.x != targetTile.getAttribute("x") ||
+                                    lastAdded.actionTile.y != targetTile.getAttribute("y")) {
+                                        solver.replayArray.push(replayObj)
+                                }
+                            }
+                            else {
+                                solver.replayArray.push(replayObj)
+                            }
                         })
                         foundNewInfo = true;
                     }
@@ -475,7 +493,16 @@ let solver = {
                                 actionTaken: "addFlag",
                                 reason: "complexFlag"
                             }
-                            solver.replayArray.push(replayObj)
+                            if (solver.replayArray.length > 0) {
+                                let lastAdded = solver.replayArray[solver.replayArray.length - 1]
+                                if (lastAdded.actionTile.x != targetTile.getAttribute("x") ||
+                                    lastAdded.actionTile.y != targetTile.getAttribute("y")) {
+                                        solver.replayArray.push(replayObj)
+                                }
+                            }
+                            else {
+                                solver.replayArray.push(replayObj)
+                            }
                         }
                         // if the tile must be not a mine
                         else if (notMine == result.length) {
@@ -515,7 +542,16 @@ let solver = {
                                 actionTaken: "safeClick",
                                 reason: "complexSafe"
                             }
-                            solver.replayArray.push(replayObj)
+                            if (solver.replayArray.length > 0) {
+                                let lastAdded = solver.replayArray[solver.replayArray.length - 1]
+                                if (lastAdded.actionTile.x != targetTile.getAttribute("x") ||
+                                    lastAdded.actionTile.y != targetTile.getAttribute("y")) {
+                                        solver.replayArray.push(replayObj)
+                                }
+                            }
+                            else {
+                                solver.replayArray.push(replayObj)
+                            }
                         }
                         
                     } else {
