@@ -1,7 +1,7 @@
 const assert = chai.assert;
 
 // test the currentUser object
-describe('currentUser', () => {
+describe('client.js/currentUser', () => {
     it('should have ONLY two properties, called "username" and "password"', () => {
         assert.hasAllKeys(currentUser, ["username", "password"], `currentUser 
             must only have two properties called "username" and "password"`)
@@ -14,24 +14,24 @@ describe('currentUser', () => {
     })
 })
 
-describe('allMineNeighbours', () => {
+describe('client.js/allMineNeighbours', () => {
     it('should start as an empty array', () => {
         assert.isArray(allMineNeighbours, "allMineNeighbours must be an array");
         assert.lengthOf(allMineNeighbours, 0, "allMineNeighbours should start empty");
     })
 })
 
-describe('registerUser', () => {
+describe('client.js/registerUser', () => {
     // testing this will involve setting up a test circuit on node.js
     // this is not a priority here
 })
 
-describe('loginUser', () => {
+describe('client.js/loginUser', () => {
     // testing this will involve setting up a test circuit on node.js
     // this is not a priority here
 })
 
-describe('startGame', () => {
+describe('client.js/startGame', () => {
     it('should be a function', () => {
         assert.isFunction(startGame, "startGame should be a function");
     })
@@ -40,9 +40,14 @@ describe('startGame', () => {
     // so we can have all appropriate vars returned 
     let testVars = startGame(true)
     console.log(testVars)
+
+    // test boardSizeChoice within startGame
+    describe('client.js/startGame/boardSizeChoice', () => {
+
+    })
     
     // test boardSize within startGame
-    describe('boardSize', () => {
+    describe('client.js/startGame/boardSize', () => {
         it('should start as undefined', () => {
             assert.equal(testVars.boardSize1, undefined, "boardSize should start undefined");
         })
@@ -52,7 +57,23 @@ describe('startGame', () => {
         })
     })
 
-    describe('currentGame', () => {
+    // test totalMines within startGame
+    describe('client.js/startGame/totalMines', () => {
+
+    })
+
+    // test mineChoice within startGame
+    describe('client.js/startGame/mineChoice', () => {
+
+    })
+
+    // test mineMultiplier within startGame
+    describe('client.js/startGame/mineMultiplier', () => {
+        
+    })
+
+    // test currentGame within startGame
+    describe('client.js/startGame/currentGame', () => {
         it('should start as an empty object', () => {
             assert.isObject(currentGame, "currentGame should be an object");
         })
