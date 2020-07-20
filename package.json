@@ -19,6 +19,7 @@
   "devDependencies": {
     "chai": "*",
     "chai-http": "^4.3.0",
+    "jsdom-global": "^3.0.2",
     "mocha": "*",
     "nodemon": "^2.0.4",
     "pretty-error": "^2.1.1"
