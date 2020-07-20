@@ -6,6 +6,8 @@ const { JSDOM } = jsdom;
 
 // other js imports
 const client = require("../content/client.js");
+const board = require("../content/board.js")
+const solver = require("../content/solver.js")
 
 // set the virtual DOM
 const html = new JSDOM(`<html lang="en"> 

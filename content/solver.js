@@ -949,6 +949,11 @@ let solver = {
     }
 }
 
+// if working in Node.js, then export all variables
+if (typeof __dirname !== undefined) {
+    module.exports = solver
+}
+
 // pseudo for the hint system
 
 /*
