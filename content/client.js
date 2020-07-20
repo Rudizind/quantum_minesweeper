@@ -84,30 +84,65 @@ const loginUser = () => {
 }
 
 // Start the game board and initialise the game.
-const startGame = () => {
+const startGame = (test = false) => {
+    // only runs if testing with clientTest.js
+    let testReturn = {}
     // Adjust display
-    document.getElementById("newgame").setAttribute("class", "hidden")
-    document.getElementById("gameboard").setAttribute("class", "container-fluid align-middle")
-    document.getElementById("hotbar").setAttribute("class", "container-fluid align-middle")
+    if (!test) {
+        document.getElementById("newgame").setAttribute("class", "hidden")
+        document.getElementById("gameboard").setAttribute("class", "container-fluid align-middle")
+        document.getElementById("hotbar").setAttribute("class", "container-fluid align-middle")
+    }
 
     // adjust the boardSize value according to the user's choice.
+    // add test values if called from clientTest.js
     let boardSize;
-    let boardSizeChoice = document.getElementById("boardSizeChoice").value
+    if (test) {
+        testReturn.boardSize1 = boardSize
+    }
+
+    let boardSizeChoice;
+    if (!test) {
+        boardSizeChoice = document.getElementById("boardSizeChoice").value
+    }
+    else {
+        testReturn.boardSizeChoice1 = boardSizeChoice
+        boardSizeChoice = "Medium (13 x 9)"
+        testReturn.boardSizeChoice2 = boardSizeChoice
+    }
     boardSize = boardSizeChoice == "Extra Small (5 x 5)" ? 'xs' :
                 boardSizeChoice == "Small (8 x 7)" ? 's' :
                 boardSizeChoice == "Medium (13 x 9)" ? 'm' :
                 boardSizeChoice == "Large (20 x 12)" ? 'l' :
                 boardSizeChoice == "Extra Large (30 x 16)" ? 'xl' : 'm'
+    if (test) {
+        testReturn.boardSize2 = boardSize
+    }
 
     // using the board size from above, calculate the number of mines in the board.
     let totalMines;
-    let mineChoice = document.getElementById("mineChoice").value
+    if (test) {
+        testReturn.totalMines1 = totalMines
+    }
+
+    let mineChoice
+    if (!test) {
+        mineChoice = document.getElementById("mineChoice").value
+    }
+    else {
+        testReturn.mineChoice1 = mineChoice
+        mineChoice = "Normal (1.0x)"
+    }
     // get the normal number of mines
     totalMines = boardSize == 'xl' ? 99 :
                  boardSize == 'l' ? 55 :
                  boardSize == 'm' ? 30 :
                  boardSize == 's' ? 14 :
                  boardSize == 'xs' ? 5 : 30
+    if (test) {
+        testReturn.totalMines2 = totalMines
+        testReturn.currentGame1 = currentGame
+    }
 
     // then adjust it according to the multiplier given
     let mineMultiplier = mineChoice == "Minimum (0.7x)" ? 0.7 :
@@ -116,6 +151,7 @@ const startGame = () => {
 
     totalMines = Math.round(totalMines * mineMultiplier)
 
+
     // Set the starting board parameters (in global scope)
     currentGame = {
         active: true,
@@ -123,7 +159,8 @@ const startGame = () => {
         flagsPlaced: 0,
         boardSize: boardSize,
         timerCount: 0,
-        mineVision: document.getElementById("mineVisionCheck").checked ? true : false,
+        mineVision: test ? false : document.getElementById("mineVisionCheck").checked ? 
+            true : false,
         timerStart: () => {
             this.timerCount = setInterval(tickUp, 1000)
         },
@@ -132,16 +169,29 @@ const startGame = () => {
         }
     }
 
-    document.getElementById("scoreDisplay").innerHTML = "Mines left: " + currentGame.startMines
+    if (test) {
+        testReturn.mineChoice2 = mineChoice
+        testReturn.mineMultiplier = mineMultiplier
+        testReturn.totalMines3 = totalMines
+        testReturn.currentGame2 = currentGame
+    }
 
-    // Call the makeBoard function from ./board.js
-    makeBoard()
+    if (!test) {
+        document.getElementById("scoreDisplay").innerHTML = "Mines left: " + currentGame.startMines
 
-    // Display the backHome() button
-    document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
+        // Call the makeBoard function from ./board.js
+        makeBoard()
 
-    // Start the timer
-    currentGame.timerStart()
+        // Display the backHome() button
+        document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
+
+        // Start the timer
+        currentGame.timerStart()
+    }
+    
+    if (test) {
+        return testReturn
+    }
 }
 
 // the callback function for the setInterval used above in currentGame.timerStart()
