@@ -361,6 +361,4 @@ const toggleHint = () => {
     // toggle the background colour of the button
     currentGame.hint ? document.getElementById("hintButt").style.backgroundColor = "yellow" :
         document.getElementById("hintButt").style.backgroundColor = ""
-
-    console.log(currentGame.hint)
 }

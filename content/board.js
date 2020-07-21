@@ -324,6 +324,18 @@ const getTextColor = num => {
 }
 
 const resolveBoard = square => {
+    // if a hint is currently being used, the solver will be called but 
+    if (currentGame.hint) {
+        let percentChance = solver.test(square)
+        if (percentChance == -1) {
+            square.innerHTML = `???`
+        }
+        else {
+            square.innerHTML = `${percentChance}%`
+        }
+        return;
+    }
+    // if not using hints, then the standard solver method is called
     let changeTiles = solver.test(square)
     if (changeTiles == undefined) {
         return;

@@ -3,6 +3,9 @@ let solver = {
         // reset the replay array 
         solver.replayArray = []
 
+        // initialise the percentage used by the hints
+        let percentage
+
         // reset the errorTile for if the solver fails and the user views its process
         solver.errorTile = targetTile
 
@@ -170,7 +173,7 @@ let solver = {
 
             // get the current tile's neighbour tiles for each of the border revealed tiles
             testTiles.forEach(tile => {
-                if (!currentGame.active) {
+                if (!currentGame.active || (currentGame.hint && percentage != undefined)) {
                     return;
                 }
 
@@ -254,6 +257,9 @@ let solver = {
                             }
 
                             newBoard[square.y - 1][square.x - 1].isFlagged = true
+                            if (currentGame.hint) {
+                                percentage = 100
+                            }
                         })
 
                         foundNewInfo = true;
@@ -302,6 +308,9 @@ let solver = {
                             }
                             else {
                                 solver.replayArray.push(replayObj)
+                            }
+                            if (currentGame.hint) {
+                                percentage = 0
                             }
                         })
                         foundNewInfo = true;
@@ -746,32 +755,44 @@ let solver = {
 
         // Finally, call everything
         const findSolution = () => {
-            if (!currentGame.active) {
+            if (!currentGame.active || (currentGame.hint && percentage != undefined)) {
                 return;
             }
             let useEasy = easySolve()
-            if (useEasy) {
-                findSolution()
-            } else {
-                let useComplex = solveBoardProbs()
-                if (useComplex) {
+            if (!currentGame.hint || percentage != undefined) {
+                if (useEasy) {
                     findSolution()
                 } else {
-                    return;
+                    let useComplex = solveBoardProbs()
+                    if (useComplex) {
+                        findSolution()
+                    } else {
+                        return;
+                    }
                 }
             }
         }
         findSolution()
-
-        if (chosenConfig != undefined) {
-            return chosenConfig
-        } else {
-            if (!currentGame.active) {
+        if (currentGame.hint) {
+            if (percentage != undefined) {
+                return percentage;
+            }
+            else {
+                return -1
+            }
+        }
+        else {
+            if (chosenConfig != undefined) {
+                return chosenConfig
+            } else {
+                if (!currentGame.active) {
+                    return;
+                }
+                endGame()
                 return;
             }
-            endGame()
-            return;
         }
+
     },
     replayArray: [],
     endBoardState: [],
