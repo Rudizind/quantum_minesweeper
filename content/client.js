@@ -126,6 +126,7 @@ const startGame = () => {
         mineVision: document.getElementById("mineVisionCheck").checked ? true : false,
         hintsActive: document.getElementById("hintCheck").checked ? true : false,
         hint: false,
+        currentHint: null,
         timerStart: () => {
             this.timerCount = setInterval(tickUp, 1000)
         },
@@ -359,6 +360,6 @@ const toggleHint = () => {
     currentGame.hint = !currentGame.hint
 
     // toggle the background colour of the button
-    currentGame.hint ? document.getElementById("hintButt").style.backgroundColor = "yellow" :
+    currentGame.hint ? document.getElementById("hintButt").style.backgroundColor = "orange" :
         document.getElementById("hintButt").style.backgroundColor = ""
 }

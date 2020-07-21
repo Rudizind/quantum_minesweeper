@@ -257,9 +257,6 @@ let solver = {
                             }
 
                             newBoard[square.y - 1][square.x - 1].isFlagged = true
-                            if (currentGame.hint) {
-                                percentage = 100
-                            }
                         })
 
                         foundNewInfo = true;
@@ -268,6 +265,13 @@ let solver = {
                     // then all remaining spaces must be safe.
                     else if (tile.mineCount == flagNeighbours.length && unknownNeighbours.length > 0) {
                         unknownNeighbours.forEach(cell => {
+                            // if hint mode is on:
+                            if (currentGame.hint && cell.x == targetTile.getAttribute("x") &&
+                                cell.y == targetTile.getAttribute("y")) {
+                                return percentage = 0
+                            }
+
+                            // otherwise: 
                             // we have to get the new tile's mineCount as well if it is to be useful for recurring the function
                             // using the persistent storage of neighbours in allMineNeighbours for each game, 
                             // we can easily match up the neighbours for each tile
@@ -309,9 +313,6 @@ let solver = {
                             else {
                                 solver.replayArray.push(replayObj)
                             }
-                            if (currentGame.hint) {
-                                percentage = 0
-                            }
                         })
                         foundNewInfo = true;
                     }
@@ -321,12 +322,22 @@ let solver = {
             // if the solver has discovered that the chosen tile should be flagged using the easy solver,
             // then the player has failed and they lose
             if (newBoard[targetTile.getAttribute("y") - 1][targetTile.getAttribute("x") - 1].isFlagged) {
-                endGame()
+                if (!currentGame.hint) {
+                    endGame()
+                }
+                else {
+                    return percentage = 100
+                }
 
                 // we return true here because the findSolution function will be recalled
                 // and return immediately, because the game is no longer active.
                 return true;
             } else {
+                // if using hint mode, return the percentage if there is one
+                if (currentGame.hint && percentage != undefined) {
+                    return percentage
+                }
+                // otherwise, continue
                 testTiles = []
                 return foundNewInfo
             }
@@ -490,6 +501,11 @@ let solver = {
 
                         // if the tile must be a mine
                         if (mine == result.length) {
+                            if (currentGame.hint && tile.x == targetTile.getAttribute("x") &&
+                                tile.y == targetTile.getAttribute("y")) {
+                                console.log("the easy way 2")
+                                return percentage = 100
+                            }
                             newBoard[tile.y - 1][tile.x - 1].isFlagged = true;
                             
                             // need to make a new object to contain information for if
@@ -516,6 +532,12 @@ let solver = {
                         // if the tile must be not a mine
                         else if (notMine == result.length) {
                             newBoard[tile.y - 1][tile.x - 1].revealed = true;
+                            
+                            if (currentGame.hint && tile.x == targetTile.getAttribute("x") &&
+                                tile.y == targetTile.getAttribute("y")) {
+                                console.log("the easy way 2")
+                                return percentage = 0
+                            }
                             
                             // This will determine the number to be assigned to mineCount.
                             let mineNeighbours = 0;
@@ -759,7 +781,7 @@ let solver = {
                 return;
             }
             let useEasy = easySolve()
-            if (!currentGame.hint || percentage != undefined) {
+            if (!currentGame.hint || percentage == undefined) {
                 if (useEasy) {
                     findSolution()
                 } else {

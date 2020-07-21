@@ -145,6 +145,13 @@ const squareChoice = e => {
     square = (e.target.getAttribute("class") == "mine" || e.target.getAttribute("class") == "flag") ?
         e.target.parentElement : e.target
 
+    // if a hint is currently being displayed, 
+    // remove it now as the information is no longer relevant
+    if (currentGame.currentHint != null) {
+        currentGame.currentHint.style.boxShadow = ""
+        currentGame.currentHint = null;
+    }
+
     // Only pass the event choices through the mineTest if they're a valid choice.
     if (square.getAttribute("class") == "mineSquare") {
         mineTest(square, click)
@@ -153,7 +160,7 @@ const squareChoice = e => {
 
 // Called from the click event handler squareChoice()
 const mineTest = (square, click) => {
-    if (square.revealed) {
+    if (square.revealed || (click == "right" && currentGame.hint)) {
         return;
     } else {
         // If either a mine or flag is present (or both)
@@ -234,6 +241,10 @@ const mineTest = (square, click) => {
             }
             // If empty, and left click, run the adjacency checks until an endpoint is reached. 
             else if (click == "left") {
+                if (currentGame.hint) {
+                    resolveBoard(square)
+                    return;
+                }
                 // Make the chosen square 'safe'
                 square.style = "background-color: rgba(150, 150, 150, 1);"
                 square.revealed = true;
@@ -326,13 +337,31 @@ const getTextColor = num => {
 const resolveBoard = square => {
     // if a hint is currently being used, the solver will be called but 
     if (currentGame.hint) {
+        // run the solver with hint parameter active
         let percentChance = solver.test(square)
-        if (percentChance == -1) {
-            square.innerHTML = `???`
+        console.log(percentChance)
+        console.log(square)
+        
+        // if the tile is definitely a mine, it gets a red border
+        if (percentChance == 100) {
+            square.style.boxShadow = "0px 0px 0px 5px red inset"
+            console.log("red")
         }
+        // if the tile is definitely safe, it gets a green border
+        else if (percentChance == 0) {
+            square.style.boxShadow = "0px 0px 0px 5px green inset"
+            console.log("green")
+        }
+        // if the solver isn't able to even reach that tile or can't determine if it's a mine,
+        // it gets a yellow border
         else {
-            square.innerHTML = `${percentChance}%`
+            square.style.boxShadow = "0px 0px 0px 5px yellow inset"
+            console.log("yellow")
         }
+        // keep a record of the tile currently being shown as a hint
+        currentGame.currentHint = square
+        currentGame.hint = false
+        document.getElementById("hintButt").style.backgroundColor = ""
         return;
     }
     // if not using hints, then the standard solver method is called
@@ -352,7 +381,7 @@ const resolveBoard = square => {
                 mine.src = "./img/mine.png"
                 mine.style = "height: 100%; width: auto; display: none;"
                 if (currentGame.mineVision) {
-                    element.style.backgroundColor = "rgba(150, 150, 150, 1)"
+                    element.style.backgroundColor = "rgba(120, 20, 0, 0.3)"
                 }
                 if (element.childNodes.length == 0) {
                     mine.addEventListener("mouseup", squareChoice)
