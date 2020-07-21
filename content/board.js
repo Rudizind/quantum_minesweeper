@@ -1,3 +1,12 @@
+// if in node.js environment, import modules
+const client = require('./client')
+const solver = require('./solver')
+
+// make client.js variables
+let currentGame = client.currentGame
+let allMineNeighbours = client.allMineNeighbours
+const winGame = client.winGame
+
 const makeBoard = () => {
     // Get table
     let table = document.getElementById("boardTable")

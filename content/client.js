@@ -1,3 +1,11 @@
+// if in node.js environment, import modules
+const board = require('./board')
+const solver = require('./solver')
+
+// make board.js variables
+const makeBoard = board.makeBoard
+const squareChoice = board.squareChoice
+
 // Current user details, these are sent through the HTTP requests to be parsed by the authenticate middleware.
 let currentUser = {
     username: "",

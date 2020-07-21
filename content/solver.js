@@ -1,3 +1,28 @@
+// if in node.js environment, import modules
+const client = require('./client')
+const board = require('./board')
+
+// make client.js variables
+let currentUser = client.currentUser
+let currentGame = client.currentGame
+let allMineNeighbours = client.allMineNeighbours
+const registerUser = client.registerUser
+const loginUser = client.loginUser
+const startGame = client.startGame
+const tickUp = client.tickUp
+const backHome = client.backHome
+const endGame = client.endGame
+const winGame = client.winGame
+const showReplay = client.showReplay
+
+// make board.js variables
+const makeBoard = board.makeBoard
+const setNeighbours = board.setNeighbours
+const squareChoice = board.squareChoice
+const mineTest = board.mineTest
+const getTextColor = board.getTextColor
+const resolveBoard = board.resolveBoard
+
 let solver = {
     test: (targetTile) => {
         // reset the replay array 

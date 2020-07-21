@@ -5,9 +5,9 @@ require('jsdom-global')()
 const { JSDOM } = jsdom;
 
 // other js imports
-const client = require("../content/client.js");
-const board = require("../content/board.js")
-const solver = require("../content/solver.js")
+let client = require("../content/client.js");
+let board = require("../content/board.js")
+let solver = require("../content/solver.js");
 
 // set the virtual DOM
 const html = new JSDOM(`<html lang="en"> 
@@ -15,14 +15,30 @@ const html = new JSDOM(`<html lang="en">
 global.window = html.window
 global.document = html.window.document
 
-console.log(document.getElementById("newgame").getAttribute("class"))
+// make client.js variables
+let currentUser = client.currentUser
+let currentGame = client.currentGame
+let allMineNeighbours = client.allMineNeighbours
+const registerUser = client.registerUser
+const loginUser = client.loginUser
+const startGame = client.startGame
+const tickUp = client.tickUp
+const backHome = client.backHome
+const endGame = client.endGame
+const winGame = client.winGame
+const showReplay = client.showReplay
+
+// make board.js variables
+const makeBoard = board.makeBoard
+const setNeighbours = board.setNeighbours
+const squareChoice = board.squareChoice
+const mineTest = board.mineTest
+const getTextColor = board.getTextColor
+const resolveBoard = board.resolveBoard
 
 // testing client.js
 
 describe('currentUser', () => {
-    startGame = client.startGame
-    startGame()
-    let currentUser = client.currentUser
     it('should be an object with two properties', () => {
         assert.equal(Object.keys(currentUser).length, 2, `currentUser should
             have two properties.`);
@@ -35,6 +51,13 @@ describe('currentUser', () => {
         assert.typeOf(currentUser.password, "string", "currentUser.password should be a string");
     })
 })
+
 describe('currentGame', () => {
-    it('should be an object')
+    it('should be an object', () => {
+        assert.isObject(currentGame, "currentGame should be an object");
+    })
+})
+
+describe('startGame', () => {
+    
 })

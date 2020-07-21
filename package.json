@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "devStart": "nodemon server.js",
-    "test": "mocha"
+    "test": "mocha test/test.js"
   },
   "author": "Cameron Rodgers",
   "license": "ISC",
