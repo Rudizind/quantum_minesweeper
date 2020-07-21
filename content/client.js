@@ -124,6 +124,8 @@ const startGame = () => {
         boardSize: boardSize,
         timerCount: 0,
         mineVision: document.getElementById("mineVisionCheck").checked ? true : false,
+        hintsActive: document.getElementById("hintCheck").checked ? true : false,
+        hint: false,
         timerStart: () => {
             this.timerCount = setInterval(tickUp, 1000)
         },
@@ -139,6 +141,10 @@ const startGame = () => {
 
     // Display the backHome() button
     document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
+    // if hints enabled, show the hint button
+    if (currentGame.hintsActive) {
+        document.getElementById("hintButt").setAttribute("class", "btn")
+    }
 
     // Start the timer
     currentGame.timerStart()
@@ -169,6 +175,7 @@ const backHome = () => {
         document.getElementById("hotbar").setAttribute("class", "hidden")
         document.getElementById("gameboard").setAttribute("class", "hidden")
         document.getElementById("homeButt").setAttribute("class", "hidden")
+        document.getElementById("hintButt").setAttribute("class", "hidden")
         document.getElementById("replayButt").setAttribute("class", "hidden")
         document.getElementById("replayDisplay").setAttribute("class", "hidden")
 
@@ -262,8 +269,12 @@ const endGame = () => {
     // Signify to the backHome button that the game is no longer active so it doesn't have to confirm().
     currentGame.active = false;
 
-    // Display the showReplay() button
+    // Display the showReplay() button and disable the hint button
     document.getElementById("replayButt").setAttribute("class", "btn")
+    if (currentGame.hintsActive) {
+        document.getElementById("hintButt").setAttribute("class", "hidden")
+        document.getElementById("hintButt").style.backgroundColor = ""
+    }
 
     // Stop the timer
     currentGame.timerStop()
@@ -341,4 +352,15 @@ const showReplay = () => {
     cross.src = "./img/x.png"
     cross.style = "height: 100%; width: auto;"
     solver.errorTile.appendChild(cross);
+}
+
+const toggleHint = () => {
+    // toggle currentGame.hint
+    currentGame.hint = !currentGame.hint
+
+    // toggle the background colour of the button
+    currentGame.hint ? document.getElementById("hintButt").style.backgroundColor = "yellow" :
+        document.getElementById("hintButt").style.backgroundColor = ""
+
+    console.log(currentGame.hint)
 }

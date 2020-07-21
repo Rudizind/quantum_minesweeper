@@ -95,10 +95,20 @@
             <div class="row align-middle">
                 <div class="col-sm-4"></div>
                 <div class="col-sm-2">
-                    <label>Mine Vision:</label>
+                    <label>Enable Mine Vision:</label>
                 </div>
                 <div class="col-sm-2">
                     <input type="checkbox" id="mineVisionCheck"></input>
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+            <div class="row align-middle">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-2">
+                    <label>Enable Hints:</label>
+                </div>
+                <div class="col-sm-2">
+                    <input type="checkbox" id="hintCheck"></input>
                 </div>
                 <div class="col-sm-4"></div>
             </div>
@@ -147,6 +157,8 @@
         </div>
         <div class="hidden" id="homeButt" style="text-align: center; height: 5%; margin-bottom: 2.5%;">
             <button class="btn" onclick="backHome()">Return to Menu</button>
+            <button class="hidden" id="hintButt" onclick="toggleHint()">Use Hint</button>
             <button class="hidden" id="replayButt" onclick="showReplay()">See the solver's actions</button>
+        </div>
     </body>
 </html>
