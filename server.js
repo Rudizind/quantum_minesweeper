@@ -94,4 +94,12 @@ app.post('/api/loginUser/', (req, res, next) => {
         })
 })
 
+app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
+    // take the stat update sent by the client and change the figures on couchdb
+    users.get(req.params.username)
+        .then(doc => {
+            // handle update on couchdb
+        })
+})
+
 app.listen(3000, console.log("server started"))

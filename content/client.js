@@ -127,6 +127,7 @@ const startGame = () => {
         hintsActive: document.getElementById("hintCheck").checked ? true : false,
         hint: false,
         currentHint: null,
+        viewingStats: false,
         timerStart: () => {
             this.timerCount = setInterval(tickUp, 1000)
         },
@@ -186,7 +187,9 @@ const backHome = () => {
         })
 
         // Stop the timer
-        currentGame.timerStop()
+        if (!currentGame.viewingStats) {
+            currentGame.timerStop()
+        }
 
         // Reset the timer to 0 for the next game
         document.getElementById("gameTimer").innerHTML = "Time Elapsed: 0"
@@ -362,4 +365,33 @@ const toggleHint = () => {
     // toggle the background colour of the button
     currentGame.hint ? document.getElementById("hintButt").style.backgroundColor = "orange" :
         document.getElementById("hintButt").style.backgroundColor = ""
+}
+
+const viewStats = () => {
+    document.getElementById("newgame").setAttribute("class", "hidden")
+    document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
+    currentGame.viewingStats = true
+}
+
+const updateStats = statUpdate => {
+    fetch(`/api/updateStats/${currentUser.username}`, {
+        method: 'POST',
+        headers: {
+            "accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(statUpdate)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.status + " " + response.statusText)
+        } else {
+            alert(`Logged in successfully.`)
+            return response.json()
+        }
+    })
+    .then(data => {
+        // handle returned data
+    })
+    .catch(err => alert(err))
 }
