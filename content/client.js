@@ -1,7 +1,8 @@
 // Current user details, these are sent through the HTTP requests to be parsed by the authenticate middleware.
 let currentUser = {
     username: "",
-    password: ""
+    password: "",
+    stats: {}
 }
 
 // Variable to be used when a game is active, for tracking gameboard etc.
@@ -74,6 +75,7 @@ const loginUser = () => {
             let userData = data;
             currentUser.username = userData._id
             currentUser.password = userData.password
+            currentUser.stats = userData.stats
             document.getElementById("login").setAttribute("class", "hidden")
             document.getElementById("mineVisionCheck").checked = false;
             document.getElementById("boardSizeChoice").value = "Medium (13 x 9)"
@@ -177,6 +179,7 @@ const backHome = () => {
     if (confirmed) {
         // send the server request to update the user's stats
         if (!currentGame.viewingStats) {
+            console.log("hello there")
             updateStats({ type: "game", num: 1 })
         }
 
@@ -384,40 +387,57 @@ const toggleHint = () => {
         document.getElementById("hintButt").style.backgroundColor = ""
 }
 
-const viewStats = () => {
+const viewStats = type => {
     document.getElementById("newgame").setAttribute("class", "hidden")
     document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
     currentGame.viewingStats = true
+    type == "all" ? getAllStats() : getSingleStats()
 }
 
 const getSingleStats = () => {
-    fetch(`/api/getSingleStats/${currentUser.username}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(repsonse.status + " " + response.statusText)
-            }
-            else {
-                return response.json()
-            }
-        })
-        .then(data => {
-            console.table(data)
-        })
+    fetch(`/api/getSingleStats/${currentUser.username}`, {
+        method: 'GET',
+        headers: {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "Basic " + btoa(currentUser.username + ":" + currentUser.password)
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.status + " " + response.statusText)
+        }
+        else {
+            return response.json()
+        }
+    })
+    .then(data => {
+        console.table(data)
+    })
+    .catch(err => console.log(err))
 }
 
 const getAllStats = () => {
-    fetch(`/api/getAllStats/`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.status + " " + response.statusText)
-            }
-            else {
-                return response.json()
-            }
-        })
-        .then(data => {
-            console.table(data)
-        })
+    fetch(`/api/getAllStats/`, {
+        method: 'GET',
+        headers: {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "Basic " + btoa(currentUser.username + ":" + currentUser.password)
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.status + " " + response.statusText)
+        }
+        else {
+            return response.json()
+        }
+    })
+    .then(data => {
+        data = data.rows
+        console.table(data)
+    })
 }
 
 const updateStats = statUpdate => {
@@ -425,7 +445,8 @@ const updateStats = statUpdate => {
         method: 'POST',
         headers: {
             "accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "Basic " + btoa(currentUser.username + ":" + currentUser.password)
         },
         body: JSON.stringify(statUpdate)
     })
@@ -433,7 +454,6 @@ const updateStats = statUpdate => {
         if (!response.ok) {
             throw new Error(response.status + " " + response.statusText)
         } else {
-            alert(`Logged in successfully.`)
             return response.json()
         }
     })

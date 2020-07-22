@@ -113,6 +113,7 @@ app.post('/api/loginUser/', (req, res, next) => {
 
 app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
     // take the stat update sent by the client and change the figures on couchdb
+    console.log(req.params.username)
     users.get(req.params.username)
         .then(doc => {
             // handle update on couchdb
@@ -120,43 +121,30 @@ app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
             console.log(doc)
             console.log(update)
             if (update.type == "game") {
-
+                doc.stats.gamesPlayed++
             }
             else if (update.type == "win") {
-
+                doc.stats.gamesWon++
             }
             else if (update.type == "loss") {
-
+                doc.stats.gamesLost++
             }
             else if (update.type == "save") {
-
+                doc.stats.quantumSaves++
             }
             else {
                 throw new Error('invalid request')
             }
+            users.insert(doc, doc._id)
+                .then(doc => res.json(doc))
+                .catch(err => console.log(err))
         })
         .catch(err => console.log(error))
-
-
-    events.get(req.params.run)
-    .then(doc => {
-        // Create the new array of participants, then insert it into the database
-        doc.participants.push(req.params.username)
-        events.insert(doc, doc._id)
-            .then(doc => console.log(doc))
-            .catch(err => console.log(err))
-    })
-    .then(() => {
-        events.get(req.params.run)
-            .then(doc => res.json(doc).send())
-            .catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))
 })
 
 app.get('/api/getSingleStats/:username', authenticate, (req, res, next) => {
     users.get(req.params.username)
-        .then(doc => res.json(doc.stats))
+        .then(doc => res.json(doc))
         .catch(err => console.log(err))
 })
 
