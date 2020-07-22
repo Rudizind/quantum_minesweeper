@@ -366,9 +366,16 @@ const resolveBoard = square => {
     }
     // if not using hints, then the standard solver method is called
     let changeTiles = solver.test(square)
+
+    // if the solver returns undefined, then the game is over, so just return
     if (changeTiles == undefined) {
         return;
     }
+
+    // otherwise, change the board (and update stats)
+    // stat update for times saved by solver
+    updateStats({ type: "save", num: 1 })
+
     let board = document.querySelectorAll(".mineSquare")
     board.forEach(element => {
         let match = changeTiles.find(item => item.x == Number(element.getAttribute("x")) &&

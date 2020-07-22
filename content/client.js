@@ -167,11 +167,18 @@ const backHome = () => {
     if (currentGame.active) {
         if (confirm("Are you sure you'd like to leave the game? This will be counted as a loss.")) {
             confirmed = true;
+
+            // also send the server request to update the user's stats
+            updateStats({ type: "loss", num: 1 })
         }
     } else {
         confirmed = true;
     }
     if (confirmed) {
+        // send the server request to update the user's stats
+        if (!currentGame.viewingStats) {
+            updateStats({ type: "game", num: 1 })
+        }
 
         // Hide all UI for the gameboard and HUD.
         document.getElementById("hotbar").setAttribute("class", "hidden")
@@ -224,6 +231,8 @@ const backHome = () => {
 
 // If the solver finds that the player could've discovered that the current square was a mine, they lose.
 const endGame = () => {
+    // send the server request to update the user's stats
+    updateStats({ type: "loss", num: 1 })
 
     // Make mines visible and colour their squares appropriately
     let mineNodes = document.querySelectorAll(".mine")
@@ -284,6 +293,10 @@ const endGame = () => {
     currentGame.timerStop()
 }
 
+// display the 'you won the game' screen if the user correctly identifies
+// all of the mines in the gameboard
+// note that this may be called and then not resolve - as the user must correctly
+// identify all mines - not just randomly place them.
 const winGame = () => {
     let allFlags = document.querySelectorAll(".flag")
     let winner = true;
@@ -296,6 +309,10 @@ const winGame = () => {
     })
 
     if (winner) {
+        // send the server request to update the user's stats
+        updateStats({ type: "win", num: 1 })
+
+        // perform all UI updates
         alert("Congratulations, you found all the mines!")
 
         // Remove the click event listener from all squares.
@@ -373,6 +390,36 @@ const viewStats = () => {
     currentGame.viewingStats = true
 }
 
+const getSingleStats = () => {
+    fetch(`/api/getSingleStats/${currentUser.username}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(repsonse.status + " " + response.statusText)
+            }
+            else {
+                return response.json()
+            }
+        })
+        .then(data => {
+            console.table(data)
+        })
+}
+
+const getAllStats = () => {
+    fetch(`/api/getAllStats/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.status + " " + response.statusText)
+            }
+            else {
+                return response.json()
+            }
+        })
+        .then(data => {
+            console.table(data)
+        })
+}
+
 const updateStats = statUpdate => {
     fetch(`/api/updateStats/${currentUser.username}`, {
         method: 'POST',
@@ -391,6 +438,7 @@ const updateStats = statUpdate => {
         }
     })
     .then(data => {
+        console.log(data)
         // handle returned data
     })
     .catch(err => alert(err))

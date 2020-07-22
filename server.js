@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyparser = require('body-parser');
+const basicAuth = require('basic-auth');
 
 app.use(express.static("content"))
 app.use(bodyparser.json())
@@ -28,7 +29,21 @@ let users;
                 if (err.reason == 'no_db_file') {
                     console.log('created users database');
                     my_nano.db.create('sweepers')
-                    users = my_nano.use(db_info.userDatabase), console.log('using users database')
+                    users = my_nano.use(db_info.userDatabase)
+                    // create the view for all users (used to create the leaderboard)
+                    let user_views = new Object()
+
+                    user_views.allUsers = {
+                        map: function(doc) {
+                            if (doc.password && doc._id && doc.stats) {
+                                emit(doc._id, {name: doc._id, stats: doc.stats})
+                            }
+                        }
+                    }
+
+                    users.insert({ "views": user_views }, '_design/users')
+                        .then(body => console.log('All Users view added!'))
+                        .catch(err => console.log(err))
                 } else {
                     console.log('error using users database:', err);
                 }
@@ -65,7 +80,7 @@ app.post('/api/newUser/', (req, res, next) => {
         })
         .catch(err => {
             if (err.reason == 'missing') {
-                users.insert({ _id: username, password: password })
+                users.insert({ _id: username, password: password, stats: { gamesPlayed: 0, gamesWon: 0, gamesLost: 0, quantumSaves: 0 } })
                     .then(doc => res.status(200).send("Registered successfully. Welcome to Quantum Minesweeper!"))
                     .catch(err => res.status(500).send("Error processing request. Refresh the page and try again."))
             } else {
@@ -92,6 +107,8 @@ app.post('/api/loginUser/', (req, res, next) => {
             console.log(err)
             res.status(404).send("User not found.")
         })
+
+    
 })
 
 app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
@@ -99,7 +116,54 @@ app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
     users.get(req.params.username)
         .then(doc => {
             // handle update on couchdb
+            let update = req.body
+            console.log(doc)
+            console.log(update)
+            if (update.type == "game") {
+
+            }
+            else if (update.type == "win") {
+
+            }
+            else if (update.type == "loss") {
+
+            }
+            else if (update.type == "save") {
+
+            }
+            else {
+                throw new Error('invalid request')
+            }
         })
+        .catch(err => console.log(error))
+
+
+    events.get(req.params.run)
+    .then(doc => {
+        // Create the new array of participants, then insert it into the database
+        doc.participants.push(req.params.username)
+        events.insert(doc, doc._id)
+            .then(doc => console.log(doc))
+            .catch(err => console.log(err))
+    })
+    .then(() => {
+        events.get(req.params.run)
+            .then(doc => res.json(doc).send())
+            .catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+})
+
+app.get('/api/getSingleStats/:username', authenticate, (req, res, next) => {
+    users.get(req.params.username)
+        .then(doc => res.json(doc.stats))
+        .catch(err => console.log(err))
+})
+
+app.get('/api/getAllStats/', authenticate, (req, res, next) => {
+    users.view('users', 'allUsers')
+        .then(body => res.json(body))
+        .catch(err => console.log(err))
 })
 
 app.listen(3000, console.log("server started"))
