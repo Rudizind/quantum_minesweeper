@@ -18,21 +18,21 @@
         </div>
         <div class="container-fluid align-middle" id="login" style="width: 80%; height: 20%; vertical-align: middle; text-align: center;">
             <div class="row">
-                <div style="height: 100%;" class="col-sm-2">
+                <div class="col-sm-2">
                     <p>Log in to play!</p>
                 </div>
-                <div style="height: 100%;" class="col-sm-3">
+                <div class="col-sm-3">
                     <label>Username:</label>
                     <input id="usernameBox" type="text" placeholder="Enter username here...">
                 </div>
-                <div style="height: 100%;" class="col-sm-3">
+                <div class="col-sm-3">
                     <label>Password:</label>
                     <input  id="passwordBox" type="password"  placeholder="Enter password here...">
                 </div>
-                <div style="height: 100%;" class="col-sm-2">
+                <div class="col-sm-2">
                     <button id="regButt" class="btn" onclick="registerUser()">Register</button>
                 </div>
-                <div style="height: 100%;" class="col-sm-2">
+                <div class="col-sm-2">
                     <button id="logButt" class="btn" onclick="loginUser()">Log in</button>
                 </div>
             </div>
@@ -40,43 +40,43 @@
         <div class="hidden" id="newgame" style="width: 80%; text-align: center;">
             <div class="row align-middle">
                 <div class="col-sm-3"></div>
-                <div class="col-sm-3">
-                    <p>Start a new game of Quantum Minesweeper!</p>
+                <div class="col-sm-3" style="margin: auto;">
+                    <p style="vertical-align: middle;">Start a new game of Quantum Minesweeper!</p>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-3" style="margin: auto;">
                     <button id="startGameButt" class="btn" onclick="startGame()">Start</button>
                 </div>
                 <div class="col-sm-3"></div>
             </div>
             <div class="row align-middle">
                 <div class="col-sm-2"></div>
-                <div class="col-sm-2">
-                    <p>View your Stats!</p>
+                <div class="col-sm-2" style="margin: auto;">
+                    <p style="padding-top: 8.5px;">View your Stats!</p>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-2" style="margin: auto;">
                     <button id="viewStatsButt" class="btn" onclick="viewStats('single')">Stats</button>
                 </div>
-                <div class="col-sm-2">
-                    <p>View the Leaderboard!</p>
+                <div class="col-sm-2" style="margin: auto;">
+                    <p style="padding-top: 8.5px;">View the Leaderboard!</p>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-2" style="margin: auto;">
                     <button id="viewLeaderboardButt" class="btn" onclick="viewStats('all')">Leaderboard</button>
                 </div>
                 <div class="col-sm-2"></div>
             </div>
             <div class="row align-middle" style="padding-top: 5%;">
                 <div class="col-sm-4"></div>
-                <div class="col-sm-4">
+                <div class="col-sm-4" style="margin: auto;">
                     <h5>Game Options</h5>
                 </div>
                 <div class="col-sm-4"></div>
             </div>
             <div class="row align-middle">
                 <div class="col-sm-4"></div>
-                <div class="col-sm-2">
+                <div class="col-sm-2" style="margin: auto;">
                     <label>Board Size:</label>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-2" style="margin: auto;">
                     <select id="boardSizeChoice">
                         <option>Extra Small (5 x 5)</option>
                         <option>Small (8 x 7)</option>
@@ -89,10 +89,10 @@
             </div>
             <div class="row align-middle">
                 <div class="col-sm-4"></div>
-                <div class="col-sm-2">
+                <div class="col-sm-2" style="margin: auto;">
                     <label>Number of Mines:</label>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-2" style="margin: auto;">
                     <select id ="mineChoice">
                         <option>Minimum (0.7x)</option>
                         <option>Normal (1.0x)</option>
@@ -101,19 +101,19 @@
                 </div>
                 <div class="col-sm-4"></div>
             </div>
-            <div class="row align-middle" style="padding-top: 5%;">
+            <div class="row align-middle" style="padding-top: 5%; margin: auto;">
                 <div class="col-sm-4"></div>
-                <div class="col-sm-4">
+                <div class="col-sm-4" style="margin: auto;">
                     <h5>Additional Features</h5>
                 </div>
                 <div class="col-sm-4"></div>
             </div>
             <div class="row align-middle">
                 <div class="col-sm-4"></div>
-                <div class="col-sm-2">
+                <div class="col-sm-2" style="margin: auto;">
                     <label>Enable Mine Vision:</label>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-2" style="margin: auto;">
                     <input type="checkbox" id="mineVisionCheck"></input>
                 </div>
                 <div class="col-sm-4"></div>

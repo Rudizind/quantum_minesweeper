@@ -117,21 +117,26 @@ app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
         .then(doc => {
             // handle update on couchdb
             let update = req.body
+            let newStats = Object.assign({}, doc.stats)
+
             if (update.type == "game") {
-                doc.stats.gamesPlayed++
+                newStats.gamesPlayed++
             }
             else if (update.type == "win") {
-                doc.stats.gamesWon++
+                newStats.gamesWon++
             }
             else if (update.type == "loss") {
-                doc.stats.gamesLost++
+                newStats.gamesLost++
             }
             else if (update.type == "save") {
-                doc.stats.quantumSaves++
+                newStats.quantumSaves++
             }
             else {
                 throw new Error('invalid request')
             }
+            
+            let newDoc = { stats: newStats, _rev: doc._rev }
+            doc.stats = Object.assign(doc.stats, newStats)
             users.insert(doc, doc._id)
                 .then(doc => res.json(doc))
                 .catch(err => console.log(err))

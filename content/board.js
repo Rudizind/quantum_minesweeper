@@ -36,8 +36,7 @@ const makeBoard = () => {
         currentGame.boardSize == 'xs' ? 5 : 16
 
     // set the size of the board
-    table.style = `height: ${(boardheight * 30) + 12}px; width: ${boardwidth * 30}px;
-        margin-left: auto; margin-right: auto;`
+    table.style = `height: auto; width: auto; margin-left: auto; margin-right: auto;`
 
     // Populate the board
     // For now the board will be the size of a standard expert level board: 
@@ -68,8 +67,8 @@ const makeBoard = () => {
             newCell.setAttribute("y", i + 1)
 
             // set the max height and width of the squares
-            newCell.style.maxHeight = "30px"
-            newCell.style.maxWidth = "30px"
+            newCell.style.minHeight = "30px"
+            newCell.style.minWidth = "30px"
 
             // Assign the default 'revealed' boolean to false for the cell. 
             newCell.revealed = false;
