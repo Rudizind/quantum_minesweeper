@@ -505,3 +505,23 @@ const updateStats = statUpdate => {
     })
     .catch(err => alert(err))
 }
+
+// export all variables (if in node environment)
+if (typeof __dirname != undefined) {
+    module.exports.currentUser = currentUser
+    module.exports.currentGame = currentGame
+    module.exports.allMineNeighbours = allMineNeighbours
+    module.exports.registerUser = registerUser
+    module.exports.loginUser = loginUser
+    module.exports.startGame = startGame
+    module.exports.tickUp = tickUp
+    module.exports.backHome = backHome
+    module.exports.endGame = endGame
+    module.exports.winGame = winGame
+    module.exports.showReplay = showReplay
+    module.exports.toggleHint = toggleHint
+    module.exports.viewStats = viewStats
+    module.exports.getSingleStats = getSingleStats
+    module.exports.getAllStats = getAllStats
+    module.exports.updateStats = updateStats
+}

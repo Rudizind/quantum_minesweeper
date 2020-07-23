@@ -469,3 +469,13 @@ const resolveBoard = square => {
         square.innerHTML = `${mineCount}`
     }
 }
+
+// export all variables (if in node environment)
+if (typeof __dirname != undefined) {
+    module.exports.makeBoard = makeBoard
+    module.exports.setNeighbours = setNeighbours
+    module.exports.squareChoice = squareChoice
+    module.exports.mineTest = mineTest
+    module.exports.getTextColor = getTextColor
+    module.exports.resolveBoard = resolveBoard
+}
