@@ -106,11 +106,9 @@ const startGame = () => {
                 boardSizeChoice == "Large (20 x 12)" ? 'l' :
                 boardSizeChoice == "Extra Large (30 x 16)" ? 'xl' : 'm'
 
-    if (!isBrowser()) {
-        describe('boardSize', () => {
-            it('should only allow boardSize of either xs, s, m, l or xl')
-        })
-    }
+    describe('boardSize', () => {
+        it('should only allow boardSize of either xs, s, m, l or xl')
+    })
 
     // using the board size from above, calculate the number of mines in the board.
     let totalMines;

@@ -485,11 +485,66 @@ const getAllStats = () => {
         }
     })
     .then(data => {
+        console.log(data)
         // format the response object
         data = data.rows
+
+        // get each user's win rate
+        data.forEach(user => {
+            user.value.stats.winRate = user.value.stats.gamesPlayed == 0 ? 0 :
+                Math.round((user.value.stats.gamesWon / user.value.stats.gamesPlayed) * 100)
+        })
+
+        // sort the users in order of win rate
+
+        data.sort((a, b) => {
+            return b.value.stats.winRate - a.value.stats.winRate
+        })
+
         let container = document.getElementById("statsDisplay")
         let table = document.getElementById("statsTable")
         let heading = document.getElementById("statsHeading")
+
+        container.setAttribute("class", "container-fluid align-middle")
+        heading.innerHTML = `Quantum Minesweeper Leaderboard`
+
+        // create the table heading
+        let headerRow = document.createElement("tr")
+        headerRow.setAttribute("class", "statsRow")
+        for (let i = 0; i <= 5; i++) {
+            let newCell = document.createElement("th")
+            newCell.innerHTML = i == 0 ? "Username" :
+                                i == 1 ? "Games Played" :
+                                i == 2 ? "Games Won" :
+                                i == 3 ? "Games Lost" :
+                                i == 4 ? "Win Rate" :
+                                "Times saved by Quantum Safety"
+            newCell.style = "width: 16.6666667%; text-align: center; padding-top: 10px; padding-bottom: 10px;"
+            headerRow.append(newCell)
+        }
+        headerRow.style = "border-bottom: 2px solid black;"
+        table.append(headerRow)
+
+        // for every player, make a row and populate it
+        // then append it
+
+        data.forEach(user => {
+            // create the table content
+            let newRow = document.createElement("tr")
+            newRow.setAttribute("class", "statsRow")
+            for (let i = 0; i <= 5; i++) {
+                let newCell = document.createElement("td")
+                newCell.innerHTML = i == 0 ? user.value.name :
+                                    i == 1 ? user.value.stats.gamesPlayed :
+                                    i == 2 ? user.value.stats.gamesWon :
+                                    i == 3 ? user.value.stats.gamesLost :
+                                    i == 4 ? `${user.value.stats.winRate}%` :
+                                    user.value.stats.quantumSaves
+                newCell.style = "width: 16.6666667%; text-align: center; padding-top: 10px; padding-bottom: 10px;"
+                newRow.append(newCell)
+            }
+            table.append(newRow)
+        })
     })
     .catch(err => alert(err))
 }
