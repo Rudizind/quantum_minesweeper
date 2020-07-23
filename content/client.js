@@ -182,6 +182,12 @@ const backHome = () => {
             console.log("hello there")
             updateStats({ type: "game", num: 1 })
         }
+        else {
+            document.getElementById("statsDisplay").setAttribute("class", "hidden")
+            let rows = document.querySelectorAll(".statsRow")
+            rows.forEach(row => row.parentElement.removeChild(row))
+            document.getElementById("statsHeading").innerHTML = ""
+        }
 
         // Hide all UI for the gameboard and HUD.
         document.getElementById("hotbar").setAttribute("class", "hidden")
@@ -412,7 +418,41 @@ const getSingleStats = () => {
         }
     })
     .then(data => {
-        console.table(data)
+        let container = document.getElementById("statsDisplay")
+        let table = document.getElementById("statsTable")
+        let heading = document.getElementById("statsHeading")
+
+        container.setAttribute("class", "container-fluid align-middle")
+        heading.innerHTML = `${currentUser.username}'s Quantum Minesweeper stats`
+        
+        // create the table heading
+        let headerRow = document.createElement("tr")
+        headerRow.setAttribute("class", "statsRow")
+        for (let i = 0; i <= 3; i++) {
+            let newCell = document.createElement("th")
+            newCell.innerHTML = i == 0 ? "Games Played" :
+                                i == 1 ? "Games Won" :
+                                i == 2 ? "Games Lost" :
+                                "Times saved by Quantum Safety"
+            newCell.style = "width: 25%; text-align: center; padding-top: 10px; padding-bottom: 10px;"
+            headerRow.append(newCell)
+        }
+        headerRow.style = "border-bottom: 2px solid black;"
+        table.append(headerRow)
+
+        // create the table content
+        let newRow = document.createElement("tr")
+        newRow.setAttribute("class", "statsRow")
+        for (let i = 0; i <= 3; i++) {
+            let newCell = document.createElement("td")
+            newCell.innerHTML = i == 0 ? data.stats.gamesPlayed :
+                                i == 1 ? data.stats.gamesWon :
+                                i == 2 ? data.stats.gamesLost :
+                                data.stats.quantumSaves
+            newCell.style = "width: 25%; text-align: center; padding-top: 10px; padding-bottom: 10px;"
+            newRow.append(newCell)
+        }
+        table.append(newRow)
     })
     .catch(err => console.log(err))
 }
@@ -435,8 +475,11 @@ const getAllStats = () => {
         }
     })
     .then(data => {
+        // format the response object
         data = data.rows
-        console.table(data)
+        let container = document.getElementById("statsDisplay")
+        let table = document.getElementById("statsTable")
+        let heading = document.getElementById("statsHeading")
     })
 }
 
