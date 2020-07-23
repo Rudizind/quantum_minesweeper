@@ -503,7 +503,6 @@ let solver = {
                         if (mine == result.length) {
                             if (currentGame.hint && tile.x == targetTile.getAttribute("x") &&
                                 tile.y == targetTile.getAttribute("y")) {
-                                console.log("the easy way 2")
                                 return percentage = 100
                             }
                             newBoard[tile.y - 1][tile.x - 1].isFlagged = true;
@@ -535,7 +534,6 @@ let solver = {
                             
                             if (currentGame.hint && tile.x == targetTile.getAttribute("x") &&
                                 tile.y == targetTile.getAttribute("y")) {
-                                console.log("the easy way 2")
                                 return percentage = 0
                             }
                             

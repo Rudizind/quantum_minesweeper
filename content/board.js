@@ -339,24 +339,19 @@ const resolveBoard = square => {
     if (currentGame.hint) {
         // run the solver with hint parameter active
         let percentChance = solver.test(square)
-        console.log(percentChance)
-        console.log(square)
         
         // if the tile is definitely a mine, it gets a red border
         if (percentChance == 100) {
             square.style.boxShadow = "0px 0px 0px 5px red inset"
-            console.log("red")
         }
         // if the tile is definitely safe, it gets a green border
         else if (percentChance == 0) {
             square.style.boxShadow = "0px 0px 0px 5px green inset"
-            console.log("green")
         }
         // if the solver isn't able to even reach that tile or can't determine if it's a mine,
         // it gets a yellow border
         else {
             square.style.boxShadow = "0px 0px 0px 5px yellow inset"
-            console.log("yellow")
         }
         // keep a record of the tile currently being shown as a hint
         currentGame.currentHint = square

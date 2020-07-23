@@ -113,13 +113,10 @@ app.post('/api/loginUser/', (req, res, next) => {
 
 app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
     // take the stat update sent by the client and change the figures on couchdb
-    console.log(req.params.username)
     users.get(req.params.username)
         .then(doc => {
             // handle update on couchdb
             let update = req.body
-            console.log(doc)
-            console.log(update)
             if (update.type == "game") {
                 doc.stats.gamesPlayed++
             }

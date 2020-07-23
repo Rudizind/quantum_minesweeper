@@ -179,7 +179,6 @@ const backHome = () => {
     if (confirmed) {
         // send the server request to update the user's stats
         if (!currentGame.viewingStats) {
-            console.log("hello there")
             updateStats({ type: "game", num: 1 })
         }
         else {
@@ -454,7 +453,7 @@ const getSingleStats = () => {
         }
         table.append(newRow)
     })
-    .catch(err => console.log(err))
+    .catch(err => alert(err))
 }
 
 const getAllStats = () => {
@@ -481,6 +480,7 @@ const getAllStats = () => {
         let table = document.getElementById("statsTable")
         let heading = document.getElementById("statsHeading")
     })
+    .catch(err => alert(err))
 }
 
 const updateStats = statUpdate => {
@@ -501,7 +501,6 @@ const updateStats = statUpdate => {
         }
     })
     .then(data => {
-        console.log(data)
         // handle returned data
     })
     .catch(err => alert(err))
