@@ -26,7 +26,9 @@ let users;
         my_nano.db.get('sweepers')
             .then(body => users = my_nano.use(db_info.userDatabase), console.log('using users database'))
             .catch(err => {
-                if (err.reason == 'no_db_file') {
+                // Either of these two error messages are possible in different versions of node.js
+                // so we test for either of them to widen access
+                if (err.reason == 'no_db_file' || err.reason == 'Database does not exist.') {
                     console.log('created users database');
                     my_nano.db.create('sweepers')
                     users = my_nano.use(db_info.userDatabase)
