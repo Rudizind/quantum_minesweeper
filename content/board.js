@@ -471,7 +471,7 @@ const resolveBoard = square => {
 }
 
 // export all variables (if in node environment)
-if (typeof __dirname != undefined) {
+if (!isBrowser()) {
     module.exports.makeBoard = makeBoard
     module.exports.setNeighbours = setNeighbours
     module.exports.squareChoice = squareChoice

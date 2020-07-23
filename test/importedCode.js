@@ -1,3 +1,8 @@
+// a short test for whether the code is being run through node or browser
+const isBrowser = () => {
+    return this === window ? true : false
+}
+
 // Current user details, these are sent through the HTTP requests to be parsed by the authenticate middleware.
 let currentUser = {
     username: "",
@@ -100,6 +105,12 @@ const startGame = () => {
                 boardSizeChoice == "Medium (13 x 9)" ? 'm' :
                 boardSizeChoice == "Large (20 x 12)" ? 'l' :
                 boardSizeChoice == "Extra Large (30 x 16)" ? 'xl' : 'm'
+
+    if (!isBrowser()) {
+        describe('boardSize', () => {
+            it('should only allow boardSize of either xs, s, m, l or xl')
+        })
+    }
 
     // using the board size from above, calculate the number of mines in the board.
     let totalMines;
@@ -507,7 +518,8 @@ const updateStats = statUpdate => {
 }
 
 // export all variables (if in node environment)
-if (typeof __dirname != undefined) {
+if (!isBrowser()) {
+    module.exports.isBrowser = isBrowser
     module.exports.currentUser = currentUser
     module.exports.currentGame = currentGame
     module.exports.allMineNeighbours = allMineNeighbours
@@ -525,7 +537,6 @@ if (typeof __dirname != undefined) {
     module.exports.getAllStats = getAllStats
     module.exports.updateStats = updateStats
 }
-
 const makeBoard = () => {
     // Get table
     let table = document.getElementById("boardTable")
@@ -999,7 +1010,7 @@ const resolveBoard = square => {
 }
 
 // export all variables (if in node environment)
-if (typeof __dirname != undefined) {
+if (!isBrowser()) {
     module.exports.makeBoard = makeBoard
     module.exports.setNeighbours = setNeighbours
     module.exports.squareChoice = squareChoice
@@ -1007,7 +1018,6 @@ if (typeof __dirname != undefined) {
     module.exports.getTextColor = getTextColor
     module.exports.resolveBoard = resolveBoard
 }
-
 let solver = {
     test: (targetTile) => {
         // reset the replay array 
@@ -2001,6 +2011,6 @@ let solver = {
 }
 
 // export all variables (if in node environment)
-if (typeof __dirname != undefined) {
+if (!isBrowser()) {
     module.exports.solver = solver
 }

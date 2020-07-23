@@ -1,3 +1,8 @@
+// a short test for whether the code is being run through node or browser
+const isBrowser = () => {
+    return this === window ? true : false
+}
+
 // Current user details, these are sent through the HTTP requests to be parsed by the authenticate middleware.
 let currentUser = {
     username: "",
@@ -100,6 +105,12 @@ const startGame = () => {
                 boardSizeChoice == "Medium (13 x 9)" ? 'm' :
                 boardSizeChoice == "Large (20 x 12)" ? 'l' :
                 boardSizeChoice == "Extra Large (30 x 16)" ? 'xl' : 'm'
+
+    if (!isBrowser()) {
+        describe('boardSize', () => {
+            it('should only allow boardSize of either xs, s, m, l or xl')
+        })
+    }
 
     // using the board size from above, calculate the number of mines in the board.
     let totalMines;
@@ -507,7 +518,8 @@ const updateStats = statUpdate => {
 }
 
 // export all variables (if in node environment)
-if (typeof __dirname != undefined) {
+if (!isBrowser()) {
+    module.exports.isBrowser = isBrowser
     module.exports.currentUser = currentUser
     module.exports.currentGame = currentGame
     module.exports.allMineNeighbours = allMineNeighbours

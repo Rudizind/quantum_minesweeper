@@ -991,6 +991,6 @@ let solver = {
 }
 
 // export all variables (if in node environment)
-if (typeof __dirname != undefined) {
+if (!isBrowser()) {
     module.exports.solver = solver
 }

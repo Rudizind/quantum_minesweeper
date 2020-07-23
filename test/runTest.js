@@ -67,7 +67,8 @@ describe('currentGame', () => {
         assert.isObject(currentGame, "currentGame should be an object");
     })
 })
+console.log(document.getElementById("statsTable").children.length)
 
 describe('startGame', () => {
-
+    startGame()
 })
