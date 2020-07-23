@@ -55,7 +55,7 @@ const makeBoard = () => {
                 mine.style = "height: 100%; width: auto; display: none;"
                 mine.addEventListener("mouseup", squareChoice)
                 if (currentGame.mineVision) {
-                    newCell.style.backgroundColor = "rgba(120, 20, 0, 0.3)"
+                    newCell.style.backgroundColor = "rgba(200, 20, 0, 0.6)"
                 }
                 newCell.append(mine);
             }
@@ -383,7 +383,7 @@ const resolveBoard = square => {
                 mine.src = "./img/mine.png"
                 mine.style = "height: 100%; width: auto; display: none;"
                 if (currentGame.mineVision) {
-                    element.style.backgroundColor = "rgba(120, 20, 0, 0.3)"
+                    element.style.backgroundColor = "rgba(200, 20, 0, 0.6)"
                 }
                 if (element.childNodes.length == 0) {
                     mine.addEventListener("mouseup", squareChoice)
