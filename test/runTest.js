@@ -7,7 +7,7 @@ const { JSDOM } = jsdom;
 
 // this delay allows all files to load before any testing is carried out.
 // it also makes the tests readable as they're being done which is interesting.
-beforeEach(done => setTimeout(done, 500));
+beforeEach(done => setTimeout(done, 100));
 
 // initialise imports variable
 let importJS
@@ -110,5 +110,10 @@ describe('currentGame', () => {
 
 // call startGame to test this function
 describe('startGame', () => {
-    // startGame()
+    it('should be a function', () => {
+        assert.isFunction(startGame, "startGame should be a function");
+    })
+    it('should fulfil all unit tests within the startGame function', () => {
+        startGame()
+    })
 })

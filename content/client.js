@@ -114,13 +114,14 @@ const startGame = () => {
                 boardSizeChoice == "Large (20 x 12)" ? 'l' :
                 boardSizeChoice == "Extra Large (30 x 16)" ? 'xl' : 'm'
 
+    // mocha/chai test for initial boardSize (both in browser and in node)
     if (isBrowser) {
         let sizes = ["xs", "s", "m", "l", "xl"]
         assert.oneOf(boardSize, sizes, 
             `boardSize should be only one of the designated 5 sizes`)
     }
     else {
-        describe('startGame', () => {
+        describe('boardSize', () => {
             it('should only be one of the five designated sizes', () => {   
                 let sizes = ["xs", "s", "m", "l", "xl"]
                 assert.oneOf(boardSize, sizes, 
@@ -139,10 +140,42 @@ const startGame = () => {
                  boardSize == 's' ? 14 :
                  boardSize == 'xs' ? 5 : 30
 
+    // mocha/chai test for initial totalMines (both in browser and in node)
+    if (isBrowser) {
+        let mineCounts = [99, 55, 30, 14, 5]
+        assert.oneOf(totalMines, mineCounts, 
+            `totalMines should only equal one of the five chosen counts`)
+    }
+    else {
+        describe('totalMines', () => {
+            it('should only be one of the five designated counts', () => {   
+                let mineCounts = [99, 55, 30, 14, 5]
+                assert.oneOf(totalMines, mineCounts, 
+                    `totalMines should only equal one of the five chosen counts`)
+            })
+        })
+    }
+
     // then adjust it according to the multiplier given
     let mineMultiplier = mineChoice == "Minimum (0.7x)" ? 0.7 :
                          mineChoice == "Normal (1.0x)" ? 1 :
                          mineChoice == "Maximum (1.3x)" ? 1.3 : 1
+
+    // mocha/chai test for initial boardSize (both in browser and in node)
+    if (isBrowser) {
+        let multipliers = [0.7, 1, 1.3]
+        assert.oneOf(mineMultiplier, multipliers, 
+            `mineMultiplier should only be one of the three chosen numbers`)
+    }
+    else {
+        describe('mineMultiplier', () => {
+            it('should only be one of the three designated numbers', () => {   
+                let multipliers = [0.7, 1, 1.3]
+                assert.oneOf(mineMultiplier, multipliers, 
+                    `mineMultiplier should only be one of the three chosen numbers`)
+            })
+        })
+    }
 
     totalMines = Math.round(totalMines * mineMultiplier)
 
