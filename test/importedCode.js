@@ -115,7 +115,7 @@ const startGame = () => {
                 boardSizeChoice == "Extra Large (30 x 16)" ? 'xl' : 'm'
 
     // mocha/chai test for initial boardSize (both in browser and in node)
-    if (isBrowser) {
+    if (isBrowser()) {
         let sizes = ["xs", "s", "m", "l", "xl"]
         assert.oneOf(boardSize, sizes, 
             `boardSize should be only one of the designated 5 sizes`)
@@ -132,7 +132,6 @@ const startGame = () => {
 
     // using the board size from above, calculate the number of mines in the board.
     let totalMines;
-    let mineChoice = document.getElementById("mineChoice").value
     // get the normal number of mines
     totalMines = boardSize == 'xl' ? 99 :
                  boardSize == 'l' ? 55 :
@@ -141,7 +140,7 @@ const startGame = () => {
                  boardSize == 'xs' ? 5 : 30
 
     // mocha/chai test for initial totalMines (both in browser and in node)
-    if (isBrowser) {
+    if (isBrowser()) {
         let mineCounts = [99, 55, 30, 14, 5]
         assert.oneOf(totalMines, mineCounts, 
             `totalMines should only equal one of the five chosen counts`)
@@ -157,13 +156,13 @@ const startGame = () => {
     }
 
     // then adjust it according to the multiplier given
+    let mineChoice = document.getElementById("mineChoice").value
     let mineMultiplier = mineChoice == "Minimum (0.7x)" ? 0.7 :
                          mineChoice == "Normal (1.0x)" ? 1 :
                          mineChoice == "Maximum (1.3x)" ? 1.3 : 1
-    mineMultiplier = 2
 
-    // mocha/chai test for initial boardSize (both in browser and in node)
-    if (isBrowser) {
+    // mocha/chai test for mineMultiplier (both in browser and in node)
+    if (isBrowser()) {
         let multipliers = [0.7, 1, 1.3]
         assert.oneOf(mineMultiplier, multipliers, 
             `mineMultiplier should only be one of the three chosen numbers`)
@@ -178,12 +177,27 @@ const startGame = () => {
         })
     }
 
-    totalMines = Math.round(totalMines * mineMultiplier)
+    // find the final number of mines
+    let endMines = Math.round(totalMines * mineMultiplier)
+    
+    // mocha/chai test for endMines (both in browser and in node)
+    if (isBrowser()) {
+        assert.equal(endMines, Math.round(totalMines * mineMultiplier),
+            `totalMines should equal totalMines * the multiplier`)
+    }
+    else {
+        describe('endMines', () => {
+            it('should equal the totalMines * the multiplier', () => {   
+                assert.equal(endMines, Math.round(totalMines * mineMultiplier),
+                    `endMines should equal totalMines * mineMultiplier`)
+            })
+        })
+    }
 
     // Set the starting board parameters (in global scope)
     currentGame = {
         active: true,
-        startMines: totalMines,
+        startMines: endMines,
         flagsPlaced: 0,
         boardSize: boardSize,
         timerCount: 0,
@@ -198,6 +212,22 @@ const startGame = () => {
         timerStop: () => {
             window.clearInterval(this.timerCount)
         }
+    }
+
+    // mocha/chai test for currentGame in startGame() (both in browser and in node)
+    if (isBrowser()) {
+        // it should have the appopriate number of properties
+        assert.equal(Object.keys(currentGame).length, 12, "currentGame should have 12 properties");
+
+        // extensive testing would ensure all properties have the appropriate type and so on
+        // but for this project we will not waste time doing these tests now
+    }
+    else {
+        describe('currentGame', () => {
+            it('should have 12 properties', () => {   
+                assert.equal(Object.keys(currentGame).length, 12, "currentGame should have 12 properties");
+            })
+        })
     }
 
     document.getElementById("scoreDisplay").innerHTML = "Mines left: " + currentGame.startMines
@@ -229,11 +259,16 @@ const backHome = () => {
     // If a game is over, because of the default value, the user isn't asked to confirm.
     let confirmed = false;
     if (currentGame.active) {
-        if (confirm("Are you sure you'd like to leave the game? This will be counted as a loss.")) {
+        if (isBrowser()) {
+            if (confirm("Are you sure you'd like to leave the game? This will be counted as a loss.")) {
+                confirmed = true;
+    
+                // also send the server request to update the user's stats
+                updateStats({ type: "loss", num: 1 })
+            }
+        }
+        else {
             confirmed = true;
-
-            // also send the server request to update the user's stats
-            updateStats({ type: "loss", num: 1 })
         }
     } else {
         confirmed = true;
@@ -241,7 +276,9 @@ const backHome = () => {
     if (confirmed) {
         // send the server request to update the user's stats
         if (!currentGame.viewingStats) {
-            updateStats({ type: "game", num: 1 })
+            if (isBrowser()) {
+                updateStats({ type: "game", num: 1 })
+            }
         }
         else {
             document.getElementById("statsDisplay").setAttribute("class", "hidden")
@@ -257,6 +294,41 @@ const backHome = () => {
         document.getElementById("hintButt").setAttribute("class", "hidden")
         document.getElementById("replayButt").setAttribute("class", "hidden")
         document.getElementById("replayDisplay").setAttribute("class", "hidden")
+
+        // mocha/chai test for UI hidden changes (both in browser and in node)
+        if (isBrowser()) {
+            // all the below items class should be set to hidden. 
+            assert.equal(document.getElementById("hotbar").getAttribute("class"), "hidden",
+                `hotbar's class should be set to hidden`)
+            assert.equal(document.getElementById("gameboard").getAttribute("class"), "hidden",
+                `gameboard's class should be set to hidden`)
+            assert.equal(document.getElementById("homeButt").getAttribute("class"), "hidden",
+                `homeButt's class should be set to hidden`)
+            assert.equal(document.getElementById("hintButt").getAttribute("class"), "hidden",
+                `hintButt's class should be set to hidden`)
+            assert.equal(document.getElementById("replayButt").getAttribute("class"), "hidden",
+                `replayButt's class should be set to hidden`)
+            assert.equal(document.getElementById("replayDisplay").getAttribute("class"), "hidden",
+                `replayDisplay's class should be set to hidden`)
+        }
+        else {
+            describe('UI set to hidden', () => {
+                it('should set various elements class to hidden', () => {   
+                    // make all the classes for these elements hidden
+                    assert.equal(document.getElementById("hotbar").getAttribute("class"), "hidden",
+                    `hotbar's class should be set to hidden`)
+                    assert.equal(document.getElementById("gameboard").getAttribute("class"), "hidden",
+                        `gameboard's class should be set to hidden`)
+                    assert.equal(document.getElementById("homeButt").getAttribute("class"), "hidden",
+                        `homeButt's class should be set to hidden`)
+                    assert.equal(document.getElementById("hintButt").getAttribute("class"), "hidden",
+                        `hintButt's class should be set to hidden`)
+                    // replayButt not tested as it is changed elsewhere
+                    assert.equal(document.getElementById("replayDisplay").getAttribute("class"), "hidden",
+                        `replayDisplay's class should be set to hidden`)
+                })
+            })
+        }
 
         // Remove all the table rows so it can be repopulated for a next game.
         document.querySelectorAll("tr").forEach(node => {
@@ -275,7 +347,9 @@ const backHome = () => {
         document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
 
         // Reset the localized currentGame object.
-        currentGame = {};
+        if (isBrowser()) {
+            currentGame = {};
+        }
 
         // reset the mineNeighbours for the next game
         allMineNeighbours = []
@@ -302,7 +376,9 @@ const backHome = () => {
 // If the solver finds that the player could've discovered that the current square was a mine, they lose.
 const endGame = () => {
     // send the server request to update the user's stats
-    updateStats({ type: "loss", num: 1 })
+    if (isBrowser()) {
+        updateStats({ type: "loss", num: 1 })
+    }
 
     // Make mines visible and colour their squares appropriately
     let mineNodes = document.querySelectorAll(".mine")
@@ -321,6 +397,38 @@ const endGame = () => {
         // Remove the event listener from mines
         node.removeEventListener("mouseup", squareChoice)
     })
+
+    // mocha/chai test mineNodes colour in endGame() (both in browser and in node)
+    if (isBrowser()) {
+        mineNodes.forEach(node => {
+            // it should add the appropriate colours to nodes as above
+            if (node.parentElement.childNodes.length == 2) {
+                assert.equal(node.parentElement.style.backgroundColor, "orange", 
+                    "correctly guessed nodes should turn orange");
+            }
+            else {
+                assert.equal(node.parentElement.style.backgroundColor, "red", 
+                    "nodes with only mines should turn red");
+            }
+        })
+    }
+    else {
+        describe('mineNodes colour', () => {
+            it('should turn all mineNodes either orange or red correctly', () => {   
+                mineNodes.forEach(node => {
+                    // it should add the appropriate colours to nodes as above
+                    if (node.parentElement.childNodes.length == 2) {
+                        assert.equal(node.parentElement.style.backgroundColor, "orange", 
+                            "correctly guessed nodes should turn orange");
+                    }
+                    else {
+                        assert.equal(node.parentElement.style.backgroundColor, "red", 
+                            "nodes with only mines should turn red");
+                    }
+                })
+            })
+        })
+    }
 
     // Remove flags and replace them with crosses if they were wrong guesses at mines
     let flagNodes = document.querySelectorAll(".flag")
