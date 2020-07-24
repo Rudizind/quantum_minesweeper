@@ -55,7 +55,7 @@ const registerUser = () => {
                         alert(`Registered successfully. You may now log in.`)
                     }
                 })
-                .catch(err => alert(err))
+                .catch(err => console.error(err))
         })()
 }
 
@@ -95,7 +95,7 @@ const loginUser = () => {
             document.getElementById("mineChoice").value = "Normal (1.0x)"
             document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
         })
-        .catch(err => alert(err))
+        .catch(err => console.error(err))
 }
 
 // Start the game board and initialise the game.
@@ -254,6 +254,9 @@ const tickUp = () => {
 
 // Send the user back to the home page which has startGame button. 
 const backHome = () => {
+    // the updates to be sent which will be filled in below:
+    let updates = []
+
     // By default, confirmed will be true. If a game is ended by a user leaving early, 
     // then they'll be asked to confirm first that they wish to do so.
     // If a game is over, because of the default value, the user isn't asked to confirm.
@@ -264,7 +267,7 @@ const backHome = () => {
                 confirmed = true;
     
                 // also send the server request to update the user's stats
-                updateStats({ type: "loss", num: 1 })
+                updates.push({ type: "loss", num: 1, id: Math.round(Math.random() * 99999999999999) })
             }
         }
         else {
@@ -276,9 +279,7 @@ const backHome = () => {
     if (confirmed) {
         // send the server request to update the user's stats
         if (!currentGame.viewingStats) {
-            if (isBrowser()) {
-                updateStats({ type: "game", num: 1 })
-            }
+            updates.push({ type: "game", num: 1, id: Math.round(Math.random() * 99999999999999) })
         }
         else {
             document.getElementById("statsDisplay").setAttribute("class", "hidden")
@@ -370,15 +371,21 @@ const backHome = () => {
         
         document.getElementById("rightArrow").setAttribute("onclick", "solver.changeMove(1)")
         document.getElementById("rightArrow").style.opacity = "1"
+
+        // send the updates to the server
+        if (isBrowser()) {
+            updateStats(updates)
+        }
     }
 }
 
 // If the solver finds that the player could've discovered that the current square was a mine, they lose.
 const endGame = () => {
+    // the updates to be sent which will be filled in below:
+    let updates = []
+
     // send the server request to update the user's stats
-    if (isBrowser()) {
-        updateStats({ type: "loss", num: 1 })
-    }
+    updates.push({ type: "loss", num: 1, id: Math.round(Math.random() * 99999999999999) })
 
     // Make mines visible and colour their squares appropriately
     let mineNodes = document.querySelectorAll(".mine")
@@ -469,6 +476,11 @@ const endGame = () => {
 
     // Stop the timer
     currentGame.timerStop()
+
+    // send the updates
+    if (isBrowser()) {
+        updateStats(updates)
+    }
 }
 
 // display the 'you won the game' screen if the user correctly identifies
@@ -476,6 +488,9 @@ const endGame = () => {
 // note that this may be called and then not resolve - as the user must correctly
 // identify all mines - not just randomly place them.
 const winGame = () => {
+    // the updates to be sent which will be filled in below:
+    let updates = []
+
     let allFlags = document.querySelectorAll(".flag")
     let winner = true;
     allFlags.forEach(flag => {
@@ -488,10 +503,9 @@ const winGame = () => {
 
     if (winner) {
         // send the server request to update the user's stats
-        updateStats({ type: "win", num: 1 })
+        updates.push({ type: "win", num: 1, id: Math.round(Math.random() * 99999999999999) })
 
-        // perform all UI updates
-        alert("Congratulations, you found all the mines!")
+        alert("Congratulations, you cleared all the mines!")
 
         // Remove the click event listener from all squares.
         let allSquares = document.querySelectorAll(".mineSquare")
@@ -508,6 +522,10 @@ const winGame = () => {
 
         // Stop the timer
         currentGame.timerStop()
+
+        if (isBrowser()) {
+            updateStats(updates)
+        }
     }
 }
 
@@ -623,7 +641,7 @@ const getSingleStats = () => {
         }
         table.append(newRow)
     })
-    .catch(err => alert(err))
+    .catch(err => console.error(err))
 }
 
 const getAllStats = () => {
@@ -644,7 +662,6 @@ const getAllStats = () => {
         }
     })
     .then(data => {
-        console.log(data)
         // format the response object
         data = data.rows
 
@@ -705,30 +722,29 @@ const getAllStats = () => {
             table.append(newRow)
         })
     })
-    .catch(err => alert(err))
+    .catch(err => console.error(err))
 }
 
 const updateStats = statUpdate => {
-    fetch(`/api/updateStats/${currentUser.username}`, {
-        method: 'POST',
-        headers: {
-            "accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": "Basic " + btoa(currentUser.username + ":" + currentUser.password)
-        },
-        body: JSON.stringify(statUpdate)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(response.status + " " + response.statusText)
-        } else {
-            return response.json()
-        }
-    })
-    .then(data => {
-        // handle returned data
-    })
-    .catch(err => alert(err))
+    if (statUpdate.length > 0) {
+        fetch(`/api/updateStats/${currentUser.username}`, {
+            method: 'POST',
+            headers: {
+                "accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": "Basic " + btoa(currentUser.username + ":" + currentUser.password)
+            },
+            body: JSON.stringify(statUpdate)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.status + " " + response.statusText)
+            } else {
+                return response.json()
+            }
+        })
+        .catch(err => console.error(err))
+    }
 }
 
 // export all variables (if in node environment)

@@ -368,7 +368,9 @@ const resolveBoard = square => {
 
     // otherwise, change the board (and update stats)
     // stat update for times saved by solver
-    updateStats({ type: "save", num: 1 })
+    if (isBrowser()) {
+        updateStats([{ type: "save", num: 1, id: Math.round(Math.random() * 99999999999999) }])
+    }
 
     let board = document.querySelectorAll(".mineSquare")
     board.forEach(element => {

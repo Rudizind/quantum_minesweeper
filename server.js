@@ -19,6 +19,9 @@ const nano = require('nano')
 // Connection to couchdb is held here.
 let my_nano = nano(`http://${db_info.username}:${db_info.password}@${db_info.url}`)
 
+// holds ids of all updates to stats sent to the server. Necessary because of duplicate requests
+let allUpdates = []
+
 // Initialise the users database connection. If it doesn't exist, it's created then used. Otherwise it's just used.
 let users;
 (function () {
@@ -121,29 +124,39 @@ app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
             let update = req.body
             let newStats = Object.assign({}, doc.stats)
 
-            if (update.type == "game") {
-                newStats.gamesPlayed++
+            if (update.length > 0) {
+                update.forEach(item => {
+                    if (!allUpdates.includes(item.id)) {
+                        // add the id to the list
+                        allUpdates.push(item.id)
+
+                        // update the stats
+                        if (item.type == "game") {
+                            newStats.gamesPlayed++
+                        }
+                        else if (item.type == "win") {
+                            newStats.gamesWon++
+                        }
+                        else if (item.type == "loss") {
+                            newStats.gamesLost++
+                        }
+                        else if (item.type == "save") {
+                            newStats.quantumSaves++
+                        }
+                        else {
+                            throw new Error('invalid request')
+                        }
+                    }
+                })
             }
-            else if (update.type == "win") {
-                newStats.gamesWon++
-            }
-            else if (update.type == "loss") {
-                newStats.gamesLost++
-            }
-            else if (update.type == "save") {
-                newStats.quantumSaves++
-            }
-            else {
-                throw new Error('invalid request')
-            }
-            
+
             let newDoc = { stats: newStats, _rev: doc._rev }
-            doc.stats = Object.assign(doc.stats, newStats)
+            doc = Object.assign(doc, newDoc)
             users.insert(doc, doc._id)
-                .then(doc => res.json(doc))
+                .then(doc => console.log(doc))
                 .catch(err => console.log(err))
         })
-        .catch(err => console.log(error))
+        .catch(err => console.log(err))
 })
 
 app.get('/api/getSingleStats/:username', authenticate, (req, res, next) => {

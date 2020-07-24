@@ -769,7 +769,6 @@ let solver = {
                 }
                 currentGame.active = false;
                 endGame()
-                console.log("end solver")
             }
         }
 
