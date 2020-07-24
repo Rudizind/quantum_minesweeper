@@ -5,11 +5,12 @@ const concat = require('concat')
 require('jsdom-global')()
 const { JSDOM } = jsdom;
 
-// concatenate the current version of the JS from content.js
-concat(["./content/client.js", "./content/board.js", "./content/solver.js"], "./test/importedCode.js")
+// this delay allows all files to load before any testing is carried out.
+// it also makes the tests readable as they're being done which is interesting.
+beforeEach(done => setTimeout(done, 500));
 
-// js imports
-let importJS = require("./importedCode.js");
+// initialise imports variable
+let importJS
 
 // set the virtual DOM
 const html = new JSDOM(`<html lang="en"> 
@@ -17,30 +18,69 @@ const html = new JSDOM(`<html lang="en">
 global.window = html.window
 global.document = html.window.document
 
-// make import.js variables
-let currentUser = importJS.currentUser
-let currentGame = importJS.currentGame
-let allMineNeighbours = importJS.allMineNeighbours
-const registerUser = importJS.registerUser
-const loginUser = importJS.loginUser
-const startGame = importJS.startGame
-const tickUp = importJS.tickUp
-const backHome = importJS.backHome
-const endGame = importJS.endGame
-const winGame = importJS.winGame
-const showReplay = importJS.showReplay
-const toggleHint = importJS.toggleHint
-const viewStats = importJS.viewStats
-const getSingleStats = importJS.getSingleStats
-const getAllStats = importJS.getAllStats
-const updateStats = importJS.updateStats
-const makeBoard = importJS.makeBoard
-const setNeighbours = importJS.setNeighbours
-const squareChoice = importJS.squareChoice
-const mineTest = importJS.mineTest
-const getTextColor = importJS.getTextColor
-const resolveBoard = importJS.resolveBoard
-const solver = importJS.solver
+// concatenate the current version of the JS from content.js
+concat(["./content/client.js", "./content/board.js", "./content/solver.js"], "./test/importedCode.js")
+    .then(result => importJS = fetchImports())
+    .then(result => assignVars())
+    .catch(err => console.log(err))
+
+const fetchImports = () => {
+    // import the code from importedCode.js
+    let returnObj = require("./importedCode.js")
+    return returnObj
+}
+
+// vars to be imported
+let currentUser
+let currentGame
+let allMineNeighbours
+let registerUser
+let loginUser
+let startGame
+let tickUp
+let backHome
+let endGame
+let winGame
+let showReplay
+let toggleHint
+let viewStats
+let getSingleStats
+let getAllStats
+let updateStats
+let makeBoard
+let setNeighbours
+let squareChoice
+let mineTest
+let getTextColor
+let resolveBoard
+let solver
+
+// import.js variables
+const assignVars = () => {
+    currentUser = importJS.currentUser
+    currentGame = importJS.currentGame
+    allMineNeighbours = importJS.allMineNeighbours
+    registerUser = importJS.registerUser
+    loginUser = importJS.loginUser
+    startGame = importJS.startGame
+    tickUp = importJS.tickUp
+    backHome = importJS.backHome
+    endGame = importJS.endGame
+    winGame = importJS.winGame
+    showReplay = importJS.showReplay
+    toggleHint = importJS.toggleHint
+    viewStats = importJS.viewStats
+    getSingleStats = importJS.getSingleStats
+    getAllStats = importJS.getAllStats
+    updateStats = importJS.updateStats
+    makeBoard = importJS.makeBoard
+    setNeighbours = importJS.setNeighbours
+    squareChoice = importJS.squareChoice
+    mineTest = importJS.mineTest
+    getTextColor = importJS.getTextColor
+    resolveBoard = importJS.resolveBoard
+    solver = importJS.solver
+}
 
 // note that for this project there will be no testing of server.js, 
 // though this would be necessary in a deployment setting
@@ -67,7 +107,8 @@ describe('currentGame', () => {
         assert.isObject(currentGame, "currentGame should be an object");
     })
 })
-console.log(document.getElementById("statsTable").children.length)
 
 // call startGame to test this function
-startGame()
+describe('startGame', () => {
+    // startGame()
+})

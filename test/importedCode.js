@@ -5,11 +5,9 @@ const isBrowser = () => {
 let assert
 
 if (!isBrowser()) {
-    console.log("nosir")
     assert = require('chai').assert
 }
 else {
-    console.log("yessir")
     assert = chai.assert
 }
 
