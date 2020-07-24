@@ -69,6 +69,5 @@ describe('currentGame', () => {
 })
 console.log(document.getElementById("statsTable").children.length)
 
-describe('startGame', () => {
-    startGame()
-})
+// call startGame to test this function
+startGame()

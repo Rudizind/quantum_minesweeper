@@ -2,6 +2,16 @@
 const isBrowser = () => {
     return this === window ? true : false
 }
+let assert
+
+if (!isBrowser()) {
+    console.log("nosir")
+    assert = require('chai').assert
+}
+else {
+    console.log("yessir")
+    assert = chai.assert
+}
 
 // Current user details, these are sent through the HTTP requests to be parsed by the authenticate middleware.
 let currentUser = {
@@ -106,9 +116,18 @@ const startGame = () => {
                 boardSizeChoice == "Large (20 x 12)" ? 'l' :
                 boardSizeChoice == "Extra Large (30 x 16)" ? 'xl' : 'm'
 
-    if (!isBrowser()) {
-        describe('boardSize', () => {
-            it('should only allow boardSize of either xs, s, m, l or xl')
+    if (isBrowser) {
+        let sizes = ["xs", "s", "m", "l", "xl"]
+        assert.oneOf(boardSize, sizes, 
+            `boardSize should be only one of the designated 5 sizes`)
+    }
+    else {
+        describe('startGame', () => {
+            it('should only be one of the five designated sizes', () => {   
+                let sizes = ["xs", "s", "m", "l", "xl"]
+                assert.oneOf(boardSize, sizes, 
+                    `boardSize should be only one of the designated 5 sizes`)
+            })
         })
     }
 
