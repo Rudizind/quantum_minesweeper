@@ -55,7 +55,7 @@ const registerUser = () => {
                         alert(`Registered successfully. You may now log in.`)
                     }
                 })
-                .catch(err => alert(err))
+                .catch(err => console.error(err))
         })()
 }
 
@@ -95,7 +95,7 @@ const loginUser = () => {
             document.getElementById("mineChoice").value = "Normal (1.0x)"
             document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
         })
-        .catch(err => alert(err))
+        .catch(err => console.error(err))
 }
 
 // Start the game board and initialise the game.
@@ -267,7 +267,7 @@ const backHome = () => {
                 confirmed = true;
     
                 // also send the server request to update the user's stats
-                updates.push({ type: "loss", num: 1 })
+                updates.push({ type: "loss", num: 1, id: Math.round(Math.random() * 99999999999999) })
             }
         }
         else {
@@ -279,7 +279,7 @@ const backHome = () => {
     if (confirmed) {
         // send the server request to update the user's stats
         if (!currentGame.viewingStats) {
-            updates.push({ type: "game", num: 1 })
+            updates.push({ type: "game", num: 1, id: Math.round(Math.random() * 99999999999999) })
         }
         else {
             document.getElementById("statsDisplay").setAttribute("class", "hidden")
@@ -385,7 +385,7 @@ const endGame = () => {
     let updates = []
 
     // send the server request to update the user's stats
-    updates.push({ type: "loss", num: 1 })
+    updates.push({ type: "loss", num: 1, id: Math.round(Math.random() * 99999999999999) })
 
     // Make mines visible and colour their squares appropriately
     let mineNodes = document.querySelectorAll(".mine")
@@ -503,10 +503,9 @@ const winGame = () => {
 
     if (winner) {
         // send the server request to update the user's stats
-        updates.push({ type: "win", num: 1 })
+        updates.push({ type: "win", num: 1, id: Math.round(Math.random() * 99999999999999) })
 
-        // perform all UI updates
-        alert("Congratulations, you found all the mines!")
+        alert("Congratulations, you cleared all the mines!")
 
         // Remove the click event listener from all squares.
         let allSquares = document.querySelectorAll(".mineSquare")
@@ -523,9 +522,10 @@ const winGame = () => {
 
         // Stop the timer
         currentGame.timerStop()
-    }
-    if (isBrowser()) {
-        updateStats(updates)
+
+        if (isBrowser()) {
+            updateStats(updates)
+        }
     }
 }
 
@@ -641,7 +641,7 @@ const getSingleStats = () => {
         }
         table.append(newRow)
     })
-    .catch(err => alert(err))
+    .catch(err => console.error(err))
 }
 
 const getAllStats = () => {
@@ -722,7 +722,7 @@ const getAllStats = () => {
             table.append(newRow)
         })
     })
-    .catch(err => alert(err))
+    .catch(err => console.error(err))
 }
 
 const updateStats = statUpdate => {
@@ -743,7 +743,7 @@ const updateStats = statUpdate => {
                 return response.json()
             }
         })
-        .catch(err => alert(err))
+        .catch(err => console.error(err))
     }
 }
 
@@ -1138,8 +1138,7 @@ const resolveBoard = square => {
     // otherwise, change the board (and update stats)
     // stat update for times saved by solver
     if (isBrowser()) {
-        console.log("here")
-        updateStats([{ type: "save", num: 1 }])
+        updateStats([{ type: "save", num: 1, id: Math.round(Math.random() * 99999999999999) }])
     }
 
     let board = document.querySelectorAll(".mineSquare")
