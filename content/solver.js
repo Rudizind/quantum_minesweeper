@@ -94,6 +94,97 @@ let solver = {
             setNeighbours(newBoard)
         }
 
+        // mocha/chai test for setNeighbours
+        if (isBrowser()) {
+            let numTiles = currentGame.boardSize == 'xl' ? 480 :
+                currentGame.boardSize == 'l' ? 240 :
+                currentGame.boardSize == 'm' ? 117 :
+                currentGame.boardSize == 's' ? 56 :
+                currentGame.boardSize == 'xs' ? 25 : 117
+            assert.equal(allMineNeighbours.length, numTiles, `setNeighbours should set
+                allMineNeighbours to equal the number of total tiles`);
+
+            // Determine the dimensions of the board depending on the boardSize
+            let boardwidth = currentGame.boardSize == 'xl' ? 30 :
+                currentGame.boardSize == 'l' ? 20 :
+                currentGame.boardSize == 'm' ? 13 :
+                currentGame.boardSize == 's' ? 8 :
+                currentGame.boardSize == 'xs' ? 5 : 30
+            let boardheight = currentGame.boardSize == 'xl' ? 16 :
+                currentGame.boardSize == 'l' ? 12 :
+                currentGame.boardSize == 'm' ? 9 :
+                currentGame.boardSize == 's' ? 7 :
+                currentGame.boardSize == 'xs' ? 5 : 16
+            allMineNeighbours.forEach(tile => {
+                const neighbourCount = () => {
+                    if (tile.x == 1 || tile.x == boardwidth) {
+                        if (tile.y == 1 || tile.y == boardheight) {
+                            return 3
+                        }
+                        else {
+                            return 5
+                        }
+                    }
+                    else if (tile.y == 1 || tile.y == boardwidth) {
+                        return 5
+                    }
+                    else {
+                        return 8
+                    }
+                }
+                let calculatedNeighbours = neighbourCount()
+                assert.equal(tile.neighbours.length, calculatedNeighbours,
+                    `the neighbours should match the tile's position on the board`);
+            })
+        }
+        else {
+            describe('setNeighbours', () => {
+                it('should have no. of entries equal to totalTiles', () => {
+                    let numTiles = currentGame.boardSize == 'xl' ? 480 :
+                        currentGame.boardSize == 'l' ? 240 :
+                        currentGame.boardSize == 'm' ? 117 :
+                        currentGame.boardSize == 's' ? 56 :
+                        currentGame.boardSize == 'xs' ? 25 : 117
+                    assert.equal(allMineNeighbours.length, numTiles, `setNeighbours should set
+                        allMineNeighbours to equal the number of total tiles`);
+                })
+                it('should have each entry contain the appropriate number of neighbours', () => {
+                    // Determine the dimensions of the board depending on the boardSize
+                    let boardwidth = currentGame.boardSize == 'xl' ? 30 :
+                        currentGame.boardSize == 'l' ? 20 :
+                        currentGame.boardSize == 'm' ? 13 :
+                        currentGame.boardSize == 's' ? 8 :
+                        currentGame.boardSize == 'xs' ? 5 : 30
+                    let boardheight = currentGame.boardSize == 'xl' ? 16 :
+                        currentGame.boardSize == 'l' ? 12 :
+                        currentGame.boardSize == 'm' ? 9 :
+                        currentGame.boardSize == 's' ? 7 :
+                        currentGame.boardSize == 'xs' ? 5 : 16
+                    allMineNeighbours.forEach(tile => {
+                        const neighbourCount = () => {
+                            if (tile.x == 1 || tile.x == boardwidth) {
+                                if (tile.y == 1 || tile.y == boardheight) {
+                                    return 3
+                                }
+                                else {
+                                    return 5
+                                }
+                            }
+                            else if (tile.y == 1 || tile.y == boardwidth) {
+                                return 5
+                            }
+                            else {
+                                return 8
+                            }
+                        }
+                        let calculatedNeighbours = neighbourCount()
+                        assert.equal(tile.neighbours.length, calculatedNeighbours,
+                            `the neighbours should match the tile's position on the board`);
+                    })
+                })
+            })
+        }
+
         // this is the array of testTiles, which is every revealed tile
         let testTiles = []
 

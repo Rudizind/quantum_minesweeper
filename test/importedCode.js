@@ -370,34 +370,37 @@ const backHome = () => {
 
         // reset the mineNeighbours for the next game
         allMineNeighbours = []
+        let neighbourLength = allMineNeighbours.length
 
         // reset the solver's properties
         solver.replayArray = []
         solver.currentMove = -1
         solver.endBoardState = []
+        let endBoardLength = solver.endBoardState.length
         solver.errorTile = null
+        let nullVar = solver.errorTile == null ? null : undefined
 
         if (isBrowser()) {
             assert.isArray(allMineNeighbours, "allMineNeighbours should be an array");
-            assert.equal(allMineNeighbours.length, 0, "allMineNeighbours should be empty")
+            assert.equal(neighbourLength, 0, "allMineNeighbours should be empty")
             assert.isArray(solver.replayArray, "replayArray should be an array")
             assert.equal(solver.replayArray.length, 0, "replayArray should be empty");
             assert.equal(solver.currentMove, -1, "currentMove should be set to -1");
             assert.isArray(solver.endBoardState, "endBoardState should be an array");
-            assert.equal(solver.endBoardState.length, 0, "endBoardState should be empty");
-            assert.isNull(solver.errorTile, "errorTile should be set to null");
+            assert.equal(endBoardLength, 0, "endBoardState should be empty");
+            assert.isNull(nullVar, "errorTile should be set to null");
         }
         else {
             describe('backHome var resets', () => {
                 it('should have all vars set to default values', () => {
                     assert.isArray(allMineNeighbours, "allMineNeighbours should be an array");
-                    assert.equal(allMineNeighbours.length, 0, "allMineNeighbours should be empty")
+                    assert.equal(neighbourLength, 0, "allMineNeighbours should be empty")
                     assert.isArray(solver.replayArray, "replayArray should be an array")
                     assert.equal(solver.replayArray.length, 0, "replayArray should be empty");
                     assert.equal(solver.currentMove, -1, "currentMove should be set to -1");
                     assert.isArray(solver.endBoardState, "endBoardState should be an array");
-                    assert.equal(solver.endBoardState.length, 0, "endBoardState should be empty");
-                    assert.isNull(solver.errorTile, "errorTile should be set to null");
+                    assert.equal(endBoardLength, 0, "endBoardState should be empty");
+                    assert.isNull(nullVar, "errorTile should be set to null");
                 })
             })
         }
@@ -930,6 +933,46 @@ const makeBoard = () => {
         chooseNum()
     }
 
+    if (isBrowser()) {  
+        // test totalTiles
+        let counts = [25, 56, 117, 240, 480]
+        assert.oneOf(totalTiles, counts, 
+            `totalTiles should be only one of the designated 5 counts`)
+
+        // test mineSquares
+        assert.equal(mineSquares.length, currentGame.startMines, `there should only 
+            be mines equal to the designated start mines`);
+
+        const checkIfArrayIsUnique = myArray => {
+            return myArray.length === new Set(myArray).size;
+        }
+        assert.isTrue(checkIfArrayIsUnique(mineSquares), `mineSquares should only contain
+            unique elements`)
+    }
+    else {
+        describe('totalTiles', () => {
+            it('should only be one of the five designated counts', () => {   
+                let counts = [25, 56, 117, 240, 480]
+                assert.oneOf(totalTiles, counts, 
+                    `totalTiles should be only one of the designated 5 counts`)
+            })
+        })
+
+        describe('mineSquares', () => {
+            it('should only contain mines equal to the designated starting mines', () => {
+                assert.equal(mineSquares.length, currentGame.startMines, `there should only 
+                    be mines equal to the designated start mines`);
+            })
+            it('should contain only unique elements', () => {
+                const checkIfArrayIsUnique = myArray => {
+                    return myArray.length === new Set(myArray).size;
+                }
+                assert.isTrue(checkIfArrayIsUnique(mineSquares), `mineSquares should only contain
+                    unique elements`)
+            })
+        })
+    }
+
     mineSquares.sort((a, b) => a - b)
 
     // Initialise the cell count (for matching chosen numbers in mineSquares array above)
@@ -947,6 +990,33 @@ const makeBoard = () => {
         currentGame.boardSize == 's' ? 7 :
         currentGame.boardSize == 'xs' ? 5 : 16
 
+    if (isBrowser()) {
+        let widths = [5, 8, 13, 20, 30]
+        assert.oneOf(boardwidth, widths, `boardwidth should only be one of the five
+            designated widths`)
+
+        let heights = [5, 7, 9, 12, 16]
+        assert.oneOf(boardheight, heights, `boardheight should only be one of the five
+            designated heights`)
+    }
+    else {
+        describe('boardwidth', () => {
+            it('should only be one of the five designated widths', () => {
+                let widths = [5, 8, 13, 20, 30]
+                assert.oneOf(boardwidth, widths, `boardwidth should only be one of the five
+                    designated widths`)
+            })
+        })
+
+        describe('boardheight', () => {
+            it('should only be one of the five designated heights', () => {
+                let heights = [5, 7, 9, 12, 16]
+                assert.oneOf(boardheight, heights, `boardheight should only be one of the five
+                    designated heights`)
+            })
+        })
+    }
+    
     // set the size of the board
     table.style = `height: auto; width: auto; margin-left: auto; margin-right: auto;`
 
@@ -1072,7 +1142,7 @@ const squareChoice = e => {
 // Called from the click event handler squareChoice()
 const mineTest = (square, click) => {
     if (square.revealed || (click == "right" && currentGame.hint)) {
-        return;
+        return false;
     } else {
         // If either a mine or flag is present (or both)
         if (square.childNodes.length > 0) {
@@ -1487,6 +1557,97 @@ let solver = {
 
         if (allMineNeighbours.length == 0) {
             setNeighbours(newBoard)
+        }
+
+        // mocha/chai test for setNeighbours
+        if (isBrowser()) {
+            let numTiles = currentGame.boardSize == 'xl' ? 480 :
+                currentGame.boardSize == 'l' ? 240 :
+                currentGame.boardSize == 'm' ? 117 :
+                currentGame.boardSize == 's' ? 56 :
+                currentGame.boardSize == 'xs' ? 25 : 117
+            assert.equal(allMineNeighbours.length, numTiles, `setNeighbours should set
+                allMineNeighbours to equal the number of total tiles`);
+
+            // Determine the dimensions of the board depending on the boardSize
+            let boardwidth = currentGame.boardSize == 'xl' ? 30 :
+                currentGame.boardSize == 'l' ? 20 :
+                currentGame.boardSize == 'm' ? 13 :
+                currentGame.boardSize == 's' ? 8 :
+                currentGame.boardSize == 'xs' ? 5 : 30
+            let boardheight = currentGame.boardSize == 'xl' ? 16 :
+                currentGame.boardSize == 'l' ? 12 :
+                currentGame.boardSize == 'm' ? 9 :
+                currentGame.boardSize == 's' ? 7 :
+                currentGame.boardSize == 'xs' ? 5 : 16
+            allMineNeighbours.forEach(tile => {
+                const neighbourCount = () => {
+                    if (tile.x == 1 || tile.x == boardwidth) {
+                        if (tile.y == 1 || tile.y == boardheight) {
+                            return 3
+                        }
+                        else {
+                            return 5
+                        }
+                    }
+                    else if (tile.y == 1 || tile.y == boardwidth) {
+                        return 5
+                    }
+                    else {
+                        return 8
+                    }
+                }
+                let calculatedNeighbours = neighbourCount()
+                assert.equal(tile.neighbours.length, calculatedNeighbours,
+                    `the neighbours should match the tile's position on the board`);
+            })
+        }
+        else {
+            describe('setNeighbours', () => {
+                it('should have no. of entries equal to totalTiles', () => {
+                    let numTiles = currentGame.boardSize == 'xl' ? 480 :
+                        currentGame.boardSize == 'l' ? 240 :
+                        currentGame.boardSize == 'm' ? 117 :
+                        currentGame.boardSize == 's' ? 56 :
+                        currentGame.boardSize == 'xs' ? 25 : 117
+                    assert.equal(allMineNeighbours.length, numTiles, `setNeighbours should set
+                        allMineNeighbours to equal the number of total tiles`);
+                })
+                it('should have each entry contain the appropriate number of neighbours', () => {
+                    // Determine the dimensions of the board depending on the boardSize
+                    let boardwidth = currentGame.boardSize == 'xl' ? 30 :
+                        currentGame.boardSize == 'l' ? 20 :
+                        currentGame.boardSize == 'm' ? 13 :
+                        currentGame.boardSize == 's' ? 8 :
+                        currentGame.boardSize == 'xs' ? 5 : 30
+                    let boardheight = currentGame.boardSize == 'xl' ? 16 :
+                        currentGame.boardSize == 'l' ? 12 :
+                        currentGame.boardSize == 'm' ? 9 :
+                        currentGame.boardSize == 's' ? 7 :
+                        currentGame.boardSize == 'xs' ? 5 : 16
+                    allMineNeighbours.forEach(tile => {
+                        const neighbourCount = () => {
+                            if (tile.x == 1 || tile.x == boardwidth) {
+                                if (tile.y == 1 || tile.y == boardheight) {
+                                    return 3
+                                }
+                                else {
+                                    return 5
+                                }
+                            }
+                            else if (tile.y == 1 || tile.y == boardwidth) {
+                                return 5
+                            }
+                            else {
+                                return 8
+                            }
+                        }
+                        let calculatedNeighbours = neighbourCount()
+                        assert.equal(tile.neighbours.length, calculatedNeighbours,
+                            `the neighbours should match the tile's position on the board`);
+                    })
+                })
+            })
         }
 
         // this is the array of testTiles, which is every revealed tile

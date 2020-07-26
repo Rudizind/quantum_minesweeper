@@ -46,11 +46,8 @@ let startGame
 let backHome
 let endGame
 let winGame
-let showReplay
-let toggleHint
 let makeBoard
 let setNeighbours
-let squareChoice
 let mineTest
 let getTextColor
 let resolveBoard
@@ -65,11 +62,8 @@ const assignVars = () => {
     backHome = importJS.backHome
     endGame = importJS.endGame
     winGame = importJS.winGame
-    showReplay = importJS.showReplay
-    toggleHint = importJS.toggleHint
     makeBoard = importJS.makeBoard
     setNeighbours = importJS.setNeighbours
-    squareChoice = importJS.squareChoice
     mineTest = importJS.mineTest
     getTextColor = importJS.getTextColor
     resolveBoard = importJS.resolveBoard
@@ -162,3 +156,52 @@ describe('winGame', () => {
 // end of client.js testing (not testing anything with HTTP requests)
 
 // start of board.js testing
+
+describe('makeBoard', () => {
+    it('should be a function', () => {
+        assert.isFunction(makeBoard, "makeBoard should be a function");
+    })
+    it('should fulfil all unit tests within the makeBoard function', () => {
+        currentGame.boardSize = 'xl'
+        currentGame.startMines = 99
+    })
+})
+
+describe('setNeighbours', () => {
+    it('should be a function', () => {
+        assert.isFunction(setNeighbours, "setNeighbours should be a function");
+    })
+    it('should fulfil all unit tests within the setNeighbours function', () => {
+        currentGame.boardSize = "xl"
+        currentGame.startMines = 99
+        makeBoard()
+        let foundMine = document.querySelector(".mine")
+        let mineSquare = foundMine.parentElement
+        solver.test(mineSquare)
+    })
+})
+
+describe('mineTest', () => {
+    it('should be a function', () => {
+        assert.isFunction(mineTest, "mineTest should be a function");
+    })
+    it(`should return undefined if given a tile that is revealed or using hints 
+        and you right click`, () => {
+        currentGame.boardSize = "xl"
+        currentGame.startMines = 99
+        makeBoard()
+        let allTiles = document.querySelectorAll(".mineSquare")
+        let chosenTile
+        allTiles.forEach(tile => {
+            if (chosenTile != undefined) {
+                if (tile.childNodes.length == 0) {
+                    chosenTile = tile;
+                }
+            }
+        })
+
+        chosenTile.setAttribute("revealed", "true")
+        assert.isFalse(mineTest(tile, "left"), `mineTest should return undefined
+            if you left click a revealed tile`)
+    })
+})

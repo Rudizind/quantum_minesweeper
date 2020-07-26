@@ -370,34 +370,37 @@ const backHome = () => {
 
         // reset the mineNeighbours for the next game
         allMineNeighbours = []
+        let neighbourLength = allMineNeighbours.length
 
         // reset the solver's properties
         solver.replayArray = []
         solver.currentMove = -1
         solver.endBoardState = []
+        let endBoardLength = solver.endBoardState.length
         solver.errorTile = null
+        let nullVar = solver.errorTile == null ? null : undefined
 
         if (isBrowser()) {
             assert.isArray(allMineNeighbours, "allMineNeighbours should be an array");
-            assert.equal(allMineNeighbours.length, 0, "allMineNeighbours should be empty")
+            assert.equal(neighbourLength, 0, "allMineNeighbours should be empty")
             assert.isArray(solver.replayArray, "replayArray should be an array")
             assert.equal(solver.replayArray.length, 0, "replayArray should be empty");
             assert.equal(solver.currentMove, -1, "currentMove should be set to -1");
             assert.isArray(solver.endBoardState, "endBoardState should be an array");
-            assert.equal(solver.endBoardState.length, 0, "endBoardState should be empty");
-            assert.isNull(solver.errorTile, "errorTile should be set to null");
+            assert.equal(endBoardLength, 0, "endBoardState should be empty");
+            assert.isNull(nullVar, "errorTile should be set to null");
         }
         else {
             describe('backHome var resets', () => {
                 it('should have all vars set to default values', () => {
                     assert.isArray(allMineNeighbours, "allMineNeighbours should be an array");
-                    assert.equal(allMineNeighbours.length, 0, "allMineNeighbours should be empty")
+                    assert.equal(neighbourLength, 0, "allMineNeighbours should be empty")
                     assert.isArray(solver.replayArray, "replayArray should be an array")
                     assert.equal(solver.replayArray.length, 0, "replayArray should be empty");
                     assert.equal(solver.currentMove, -1, "currentMove should be set to -1");
                     assert.isArray(solver.endBoardState, "endBoardState should be an array");
-                    assert.equal(solver.endBoardState.length, 0, "endBoardState should be empty");
-                    assert.isNull(solver.errorTile, "errorTile should be set to null");
+                    assert.equal(endBoardLength, 0, "endBoardState should be empty");
+                    assert.isNull(nullVar, "errorTile should be set to null");
                 })
             })
         }

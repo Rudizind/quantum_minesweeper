@@ -18,6 +18,46 @@ const makeBoard = () => {
         chooseNum()
     }
 
+    if (isBrowser()) {  
+        // test totalTiles
+        let counts = [25, 56, 117, 240, 480]
+        assert.oneOf(totalTiles, counts, 
+            `totalTiles should be only one of the designated 5 counts`)
+
+        // test mineSquares
+        assert.equal(mineSquares.length, currentGame.startMines, `there should only 
+            be mines equal to the designated start mines`);
+
+        const checkIfArrayIsUnique = myArray => {
+            return myArray.length === new Set(myArray).size;
+        }
+        assert.isTrue(checkIfArrayIsUnique(mineSquares), `mineSquares should only contain
+            unique elements`)
+    }
+    else {
+        describe('totalTiles', () => {
+            it('should only be one of the five designated counts', () => {   
+                let counts = [25, 56, 117, 240, 480]
+                assert.oneOf(totalTiles, counts, 
+                    `totalTiles should be only one of the designated 5 counts`)
+            })
+        })
+
+        describe('mineSquares', () => {
+            it('should only contain mines equal to the designated starting mines', () => {
+                assert.equal(mineSquares.length, currentGame.startMines, `there should only 
+                    be mines equal to the designated start mines`);
+            })
+            it('should contain only unique elements', () => {
+                const checkIfArrayIsUnique = myArray => {
+                    return myArray.length === new Set(myArray).size;
+                }
+                assert.isTrue(checkIfArrayIsUnique(mineSquares), `mineSquares should only contain
+                    unique elements`)
+            })
+        })
+    }
+
     mineSquares.sort((a, b) => a - b)
 
     // Initialise the cell count (for matching chosen numbers in mineSquares array above)
@@ -35,6 +75,33 @@ const makeBoard = () => {
         currentGame.boardSize == 's' ? 7 :
         currentGame.boardSize == 'xs' ? 5 : 16
 
+    if (isBrowser()) {
+        let widths = [5, 8, 13, 20, 30]
+        assert.oneOf(boardwidth, widths, `boardwidth should only be one of the five
+            designated widths`)
+
+        let heights = [5, 7, 9, 12, 16]
+        assert.oneOf(boardheight, heights, `boardheight should only be one of the five
+            designated heights`)
+    }
+    else {
+        describe('boardwidth', () => {
+            it('should only be one of the five designated widths', () => {
+                let widths = [5, 8, 13, 20, 30]
+                assert.oneOf(boardwidth, widths, `boardwidth should only be one of the five
+                    designated widths`)
+            })
+        })
+
+        describe('boardheight', () => {
+            it('should only be one of the five designated heights', () => {
+                let heights = [5, 7, 9, 12, 16]
+                assert.oneOf(boardheight, heights, `boardheight should only be one of the five
+                    designated heights`)
+            })
+        })
+    }
+    
     // set the size of the board
     table.style = `height: auto; width: auto; margin-left: auto; margin-right: auto;`
 
@@ -160,7 +227,7 @@ const squareChoice = e => {
 // Called from the click event handler squareChoice()
 const mineTest = (square, click) => {
     if (square.revealed || (click == "right" && currentGame.hint)) {
-        return;
+        return false;
     } else {
         // If either a mine or flag is present (or both)
         if (square.childNodes.length > 0) {
