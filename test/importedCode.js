@@ -578,6 +578,52 @@ const winGame = () => {
         }
     })
 
+    if (isBrowser()) {
+        if (winner) {
+            let checkFlags = document.querySelectorAll(".flag")
+            assert.equal(checkFlags.length, currentGame.startMines, 
+                `the number of flags should match the number of startMines`)
+            
+            checkFlags.forEach(flag => {
+                assert.equal(flag.parentElement.childNodes.length, 2,
+                    `all flags should be covering a mine (i.e. correctly placed)`);
+            })
+        }
+        else {
+            assert.notEqual(checkFlags.length, currentGame.startMines, 
+                `the number of flags should not match the number of startMines`)
+        }
+    }
+    else {
+        describe('allFlagsCheck', () => {
+            let checkFlags = document.querySelectorAll(".flag")
+            it('should only count as a win if no. of flags = no. of startMines', () => {
+                if (winner) {
+                    assert.equal(checkFlags.length, currentGame.startMines, 
+                        `the number of flags should match the number of startMines`)
+                }
+                else {
+                    assert.notEqual(checkFlags.length, currentGame.startMines, 
+                        `the number of flags should not match the number of startMines`)
+                }
+            })
+            it('should only count as a win if all flags are correctly placed', () => {
+                let allOk = true;
+                checkFlags.forEach(flag => {
+                    if (!flag.parentElement.childNodes.length == 2) {
+                        allOk = false;
+                    }
+                })
+                if (winner) {
+                    assert.isTrue(allOk, "all flags should be correct to win");
+                }
+                else {
+                    assert.isFalse(allOk, "if at least one flag is wrong, you shouldn't win");
+                }
+            })
+        })
+    }
+
     if (winner) {
         if (isBrowser()) {
             // send the server request to update the user's stats
@@ -592,6 +638,24 @@ const winGame = () => {
             node.removeEventListener("mouseup", squareChoice)
             node.style.backgroundColor = "rgba(0, 255, 0, 0.3)"
         })
+
+        // mocha/chai test that all nodes have been turned green
+        if (isBrowser()) {
+            allSquares.forEach(square => {
+                assert.equal(square.style.backgroundColor, "rgba(0, 255, 0, 0.3)", 
+                    `is you win, all nodes should turn green`);
+            })
+        }
+        else {
+            describe('all tiles green', () => {
+                it('should turn all tiles green if you win the game', () => {
+                    allSquares.forEach(square => {
+                        assert.equal(square.style.backgroundColor, "rgba(0, 255, 0, 0.3)", 
+                            `is you win, all nodes should turn green`);
+                    })
+                })
+            })
+        }
 
         // Remove the mine count
         document.getElementById("scoreDisplay").innerHTML = "Mines left: 0"
