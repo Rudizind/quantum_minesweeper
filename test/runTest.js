@@ -114,7 +114,10 @@ describe('startGame', () => {
     })
 })
 describe('backHome', () => {
-    it('should do all it is supposed to do', () => {
+    it('should be a function', () => {
+        assert.isFunction(backHome, "backHome should be a function");
+    })
+    it('should fulfil all unit tests within the backHome function', () => {
         backHome()
     })
 })
@@ -125,5 +128,14 @@ describe('endGame', () => {
     })
     it('should fulfil all unit tests within the endGame function', () => {
         endGame()
+    })
+})
+
+describe('winGame', () => {
+    it('should be a function', () => {
+        assert.isFunction(winGame, "winGame should be a function");
+    })
+    it('should fulfil all unit tests within the endGame function', () => {
+        winGame()
     })
 })

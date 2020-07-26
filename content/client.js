@@ -313,6 +313,7 @@ const backHome = () => {
                 `replayDisplay's class should be set to hidden`)
         }
         else {
+            let replayButtCOPY = document.getElementById("replayButt").getAttribute("class")
             describe('UI set to hidden', () => {
                 it('should set various elements class to hidden', () => {   
                     // make all the classes for these elements hidden
@@ -324,7 +325,8 @@ const backHome = () => {
                         `homeButt's class should be set to hidden`)
                     assert.equal(document.getElementById("hintButt").getAttribute("class"), "hidden",
                         `hintButt's class should be set to hidden`)
-                    // replayButt not tested as it is changed elsewhere
+                    assert.equal(replayButtCOPY, "hidden",
+                        `replayButt's class should be set to hidden`)
                     assert.equal(document.getElementById("replayDisplay").getAttribute("class"), "hidden",
                         `replayDisplay's class should be set to hidden`)
                 })
@@ -335,6 +337,20 @@ const backHome = () => {
         document.querySelectorAll("tr").forEach(node => {
             node.parentElement.removeChild(node)
         })
+
+        // mocha/chai tests for whether all table rows have been removed
+        if (isBrowser()) {
+            let allRows = document.querySelectorAll("tr")
+            assert.equal(allRows.length, 0, "There should be no tr elements remaining");
+        }
+        else {
+            describe('table rows of gameboard', () => {
+                it('should all be removed', () => {
+                    let allRows = document.querySelectorAll("tr")
+                    assert.equal(allRows.length, 0, "There should be no tr elements remaining");
+                })
+            })
+        }
 
         // Stop the timer
         if (!currentGame.viewingStats) {
@@ -360,6 +376,31 @@ const backHome = () => {
         solver.currentMove = -1
         solver.endBoardState = []
         solver.errorTile = null
+
+        if (isBrowser()) {
+            assert.isArray(allMineNeighbours, "allMineNeighbours should be an array");
+            assert.equal(allMineNeighbours.length, 0, "allMineNeighbours should be empty")
+            assert.isArray(solver.replayArray, "replayArray should be an array")
+            assert.equal(solver.replayArray.length, 0, "replayArray should be empty");
+            assert.equal(solver.currentMove, -1, "currentMove should be set to -1");
+            assert.isArray(solver.endBoardState, "endBoardState should be an array");
+            assert.equal(solver.endBoardState.length, 0, "endBoardState should be empty");
+            assert.isNull(solver.errorTile, "errorTile should be set to null");
+        }
+        else {
+            describe('backHome var resets', () => {
+                it('should have all vars set to default values', () => {
+                    assert.isArray(allMineNeighbours, "allMineNeighbours should be an array");
+                    assert.equal(allMineNeighbours.length, 0, "allMineNeighbours should be empty")
+                    assert.isArray(solver.replayArray, "replayArray should be an array")
+                    assert.equal(solver.replayArray.length, 0, "replayArray should be empty");
+                    assert.equal(solver.currentMove, -1, "currentMove should be set to -1");
+                    assert.isArray(solver.endBoardState, "endBoardState should be an array");
+                    assert.equal(solver.endBoardState.length, 0, "endBoardState should be empty");
+                    assert.isNull(solver.errorTile, "errorTile should be set to null");
+                })
+            })
+        }
 
         // reset the solver replay display
         document.getElementById("tilesSolved").innerHTML = "Tiles Solved: 0"
@@ -455,6 +496,42 @@ const endGame = () => {
         parent.style.backgroundColor = "orange"
     })
 
+    if (isBrowser()) {
+        flagNodes.forEach(node => {
+            assert.equal(node.parentElement.style.backgroundColor, "orange",
+                `All former flagNodes should have an orange background`);
+
+            if (node.parentElement.childNodes.length != 2) {
+                assert.equal(node.parentElement.childNodes[0].getAttribute("class"),
+                    "cross", "former wrongly guessed flags should contain crosses");
+            }
+        })
+        let remainingFlags = document.querySelectorAll(".flag")
+        assert.equal(remainingFlags.length, 0, "There should be no remaining flags");
+    }
+    else {
+        describe('flagNodes', () => {
+            it('should all have an orange background', () => {
+                flagNodes.forEach(node => {
+                    assert.equal(node.parentElement.style.backgroundColor, "orange",
+                        `All former flagNodes should have an orange background`);
+                })
+            })
+            it('should have a cross in wrongly placed flags', () => {
+                flagNodes.forEach(node => {
+                    if (node.parentElement.childNodes.length != 2) {
+                        assert.equal(node.parentElement.childNodes[0].getAttribute("class"),
+                            "cross", "former wrongly guessed flags should contain crosses");
+                    }
+                })
+            })
+            it('should have no remaining flags', () => {
+                let remainingFlags = document.querySelectorAll(".flag")
+                assert.equal(remainingFlags.length, 0, "There should be no remaining flags");
+            })
+        })
+    }
+
     // Remove the click event listener from all squares.
     let allSquares = document.querySelectorAll(".mineSquare")
     allSquares.forEach(node => {
@@ -502,10 +579,12 @@ const winGame = () => {
     })
 
     if (winner) {
-        // send the server request to update the user's stats
-        updates.push({ type: "win", num: 1, id: Math.round(Math.random() * 99999999999999) })
+        if (isBrowser()) {
+            // send the server request to update the user's stats
+            updates.push({ type: "win", num: 1, id: Math.round(Math.random() * 99999999999999) })
 
-        alert("Congratulations, you cleared all the mines!")
+            alert("Congratulations, you cleared all the mines!")
+        }
 
         // Remove the click event listener from all squares.
         let allSquares = document.querySelectorAll(".mineSquare")
