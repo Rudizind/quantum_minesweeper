@@ -264,7 +264,61 @@ describe('mineTest', () => {
         mineTest(safeSquare, "left")
         mineTest(safeSquare, "right")
         // mineTest(mineSquare, "left") - this option is left out for now
-            // because it will be handled in solver testing
+        // because it will be handled in solver testing
         mineTest(mineSquare, "right")
+    })
+})
+
+describe('getTextColor', () => {
+    it('should be a function', () => {
+        assert.isFunction(getTextColor, `getTextColor should be a function`);
+    })
+    it('should return a colour when given a number between 1 and 8', () => {
+        assert.equal((getTextColor(1)).slice(0, 4), "rgba", `getTextColor should return
+            a color in the rgba scale`);
+        assert.equal((getTextColor(2)).slice(0, 4), "rgba", `getTextColor should return
+            a color in the rgba scale`);
+        assert.equal((getTextColor(3)).slice(0, 4), "rgba", `getTextColor should return
+        a color in the rgba scale`);
+        assert.equal((getTextColor(4)).slice(0, 4), "rgba", `getTextColor should return
+        a color in the rgba scale`);
+        assert.equal((getTextColor(5)).slice(0, 4), "rgba", `getTextColor should return
+        a color in the rgba scale`);
+        assert.equal((getTextColor(6)).slice(0, 4), "rgba", `getTextColor should return
+        a color in the rgba scale`);
+        assert.equal((getTextColor(7)).slice(0, 4), "rgba", `getTextColor should return
+        a color in the rgba scale`);
+        assert.equal((getTextColor(8)).slice(0, 4), "rgba", `getTextColor should return
+        a color in the rgba scale`);
+    })
+    it('should return null if given an input other than numbers 1-8', () => {
+        assert.isNull(getTextColor(0), `numerical input outwith 1-8 should return
+            null`);
+        assert.isNull(getTextColor(817238129), `numerical input outwith 1-8 should
+            return null`)
+        assert.isNull(getTextColor("a"), `string input should return null`);
+        assert.isNull(getTextColor([]), `array input should return null`);
+        assert.isNull(getTextColor({}), "object input should return null")
+        assert.isNull(getTextColor(undefined), "undefined input should return null");
+        assert.isNull(getTextColor(null), "null input should return null");
+    })
+})
+
+describe('resolveBoard', () => {
+    it('should be a function', () => {
+        assert.isFunction(resolveBoard, `resolveBoard should be a function`);
+    })
+    it('should fulfil all unit tests within the resolveBoard function', () => {
+        currentGame.boardSize = "xl"
+        currentGame.startMines = 99
+        currentGame.hint = false;
+        makeBoard()
+        let mine = document.querySelector(".mine")
+        mineSquare = mine.parentElement
+        let result = resolveBoard(mineSquare)
+        if (currentGame.active == false) {
+            assert.isUndefined(result, `if the game is over, the result of
+                resolveBoard should be undefined`);
+        }
     })
 })

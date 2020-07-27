@@ -444,7 +444,8 @@ const getTextColor = num => {
                  num == 4 ? "rgba(0, 0, 120, 1)" :
                  num == 5 ? "rgba(128, 0, 0, 1)" :
                  num == 6 ? "rgba(64, 224, 208, 1)" :
-                 num == 7 ? "rgba(0, 0, 0, 1)" : "rgba(50, 50, 50, 1)" 
+                 num == 7 ? "rgba(0, 0, 0, 1)" : 
+                 num == 8 ? "rgba(50, 50, 50, 1)" : null
 
     return colour
 }
