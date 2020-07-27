@@ -125,7 +125,7 @@ let solver = {
                             return 5
                         }
                     }
-                    else if (tile.y == 1 || tile.y == boardwidth) {
+                    else if (tile.y == 1 || tile.y == boardheight) {
                         return 5
                     }
                     else {

@@ -315,10 +315,6 @@ describe('resolveBoard', () => {
         makeBoard()
         let mine = document.querySelector(".mine")
         mineSquare = mine.parentElement
-        let result = resolveBoard(mineSquare)
-        if (currentGame.active == false) {
-            assert.isUndefined(result, `if the game is over, the result of
-                resolveBoard should be undefined`);
-        }
+        resolveBoard(mineSquare)
     })
 })
