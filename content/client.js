@@ -497,37 +497,38 @@ const endGame = () => {
 
         parent.removeChild(node)
         parent.style.backgroundColor = "orange"
-    })
-
-    if (isBrowser()) {
-        flagNodes.forEach(node => {
-            assert.equal(node.parentElement.style.backgroundColor, "orange",
+        
+        if (isBrowser()) {
+            assert.equal(parent.style.backgroundColor, "orange",
                 `All former flagNodes should have an orange background`);
 
-            if (node.parentElement.childNodes.length != 2) {
-                assert.equal(node.parentElement.childNodes[0].getAttribute("class"),
+            if (parent.childNodes.length != 2) {
+                assert.equal(parent.childNodes[0].getAttribute("class"),
                     "cross", "former wrongly guessed flags should contain crosses");
             }
-        })
-        let remainingFlags = document.querySelectorAll(".flag")
-        assert.equal(remainingFlags.length, 0, "There should be no remaining flags");
-    }
-    else {
-        describe('flagNodes', () => {
-            it('should all have an orange background', () => {
-                flagNodes.forEach(node => {
-                    assert.equal(node.parentElement.style.backgroundColor, "orange",
+        }
+        else {
+            describe('flagNodes', () => {
+                it('should all have an orange background', () => {
+                    assert.equal(parent.style.backgroundColor, "orange",
                         `All former flagNodes should have an orange background`);
                 })
-            })
-            it('should have a cross in wrongly placed flags', () => {
-                flagNodes.forEach(node => {
-                    if (node.parentElement.childNodes.length != 2) {
-                        assert.equal(node.parentElement.childNodes[0].getAttribute("class"),
+                it('should have a cross in wrongly placed flags', () => {
+                    if (parent.childNodes.length != 2) {
+                        assert.equal(parent.childNodes[0].getAttribute("class"),
                             "cross", "former wrongly guessed flags should contain crosses");
                     }
                 })
             })
+        }
+    })
+
+    if (isBrowser()) {
+        let remainingFlags = document.querySelectorAll(".flag")
+        assert.equal(remainingFlags.length, 0, "There should be no remaining flags");
+    }
+    else {
+        describe('remaining flags on board', () => {
             it('should have no remaining flags', () => {
                 let remainingFlags = document.querySelectorAll(".flag")
                 assert.equal(remainingFlags.length, 0, "There should be no remaining flags");

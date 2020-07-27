@@ -497,37 +497,38 @@ const endGame = () => {
 
         parent.removeChild(node)
         parent.style.backgroundColor = "orange"
-    })
-
-    if (isBrowser()) {
-        flagNodes.forEach(node => {
-            assert.equal(node.parentElement.style.backgroundColor, "orange",
+        
+        if (isBrowser()) {
+            assert.equal(parent.style.backgroundColor, "orange",
                 `All former flagNodes should have an orange background`);
 
-            if (node.parentElement.childNodes.length != 2) {
-                assert.equal(node.parentElement.childNodes[0].getAttribute("class"),
+            if (parent.childNodes.length != 2) {
+                assert.equal(parent.childNodes[0].getAttribute("class"),
                     "cross", "former wrongly guessed flags should contain crosses");
             }
-        })
-        let remainingFlags = document.querySelectorAll(".flag")
-        assert.equal(remainingFlags.length, 0, "There should be no remaining flags");
-    }
-    else {
-        describe('flagNodes', () => {
-            it('should all have an orange background', () => {
-                flagNodes.forEach(node => {
-                    assert.equal(node.parentElement.style.backgroundColor, "orange",
+        }
+        else {
+            describe('flagNodes', () => {
+                it('should all have an orange background', () => {
+                    assert.equal(parent.style.backgroundColor, "orange",
                         `All former flagNodes should have an orange background`);
                 })
-            })
-            it('should have a cross in wrongly placed flags', () => {
-                flagNodes.forEach(node => {
-                    if (node.parentElement.childNodes.length != 2) {
-                        assert.equal(node.parentElement.childNodes[0].getAttribute("class"),
+                it('should have a cross in wrongly placed flags', () => {
+                    if (parent.childNodes.length != 2) {
+                        assert.equal(parent.childNodes[0].getAttribute("class"),
                             "cross", "former wrongly guessed flags should contain crosses");
                     }
                 })
             })
+        }
+    })
+
+    if (isBrowser()) {
+        let remainingFlags = document.querySelectorAll(".flag")
+        assert.equal(remainingFlags.length, 0, "There should be no remaining flags");
+    }
+    else {
+        describe('remaining flags on board', () => {
             it('should have no remaining flags', () => {
                 let remainingFlags = document.querySelectorAll(".flag")
                 assert.equal(remainingFlags.length, 0, "There should be no remaining flags");
@@ -1261,7 +1262,7 @@ const mineTest = (square, click) => {
                     return;
                 }
                 // Make the chosen square 'safe'
-                square.style = "background-color: rgba(150, 150, 150, 1);"
+                square.style = "background-color: rgb(150, 150, 150);"
                 square.revealed = true;
 
                 if (isBrowser()) {
@@ -1395,15 +1396,19 @@ const resolveBoard = square => {
 
     // if the solver returns undefined, then the game is over, so just return
     if (changeTiles == undefined) {
-        console.log("welp")
         return;
     }
+
+    console.log(changeTiles)
 
     // otherwise, change the board (and update stats)
     // stat update for times saved by solver
     if (isBrowser()) {
         updateStats([{ type: "save", num: 1, id: Math.round(Math.random() * 99999999999999) }])
     }
+
+    let allFlags = document.querySelectorAll('.flag')
+    let startFlagCount = allFlags.length
 
     let board = document.querySelectorAll(".mineSquare")
     board.forEach(element => {
@@ -1428,7 +1433,7 @@ const resolveBoard = square => {
                 // mocha/chai tests for board manipulation here
                 if(isBrowser()) {
                     if (currentGame.mineVision) {
-                        assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6", 
+                        assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
                             "if mineVision is active, any new mine tiles should change colour");
                     }
                     assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
@@ -1438,7 +1443,7 @@ const resolveBoard = square => {
                     describe('board changes after solver concludes', () => {
                         it('should change the mine tiles colour if mineVision is active', () => {
                             if (currentGame.mineVision) {
-                                assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6", 
+                                assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
                                     "if mineVision is active, any new mine tiles should change colour");
                             }
                         })
@@ -1452,23 +1457,24 @@ const resolveBoard = square => {
                 let mineRemove = element.childNodes[0]
                 element.removeChild(mineRemove)
                 element.style.backgroundColor = ""
-            }
+                
 
-            if (isBrowser()) {
-                assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
-                    for new safe nodes`);
-                assert.equal(element.style.backgroundColor, "", `the tile's background colour should
-                    be set back to the default`)
-            }
-            else {
-                it('should have removed any mines for new safe nodes', () => {    
+                if (isBrowser()) {
                     assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
                         for new safe nodes`);
-                })
-                it('should set the background color back to "" for new safe nodes', () => {
                     assert.equal(element.style.backgroundColor, "", `the tile's background colour should
                         be set back to the default`)
-                })
+                }
+                else {
+                    it('should have removed any mines for new safe nodes', () => {    
+                        assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
+                            for new safe nodes`);
+                    })
+                    it('should set the background color back to "" for new safe nodes', () => {
+                        assert.equal(element.style.backgroundColor, "", `the tile's background colour should
+                            be set back to the default`)
+                    })
+                }
             }
         }
         else {
@@ -1477,8 +1483,54 @@ const resolveBoard = square => {
         return;
     });
 
-    square.style = "background-color: rgba(150, 150, 150, 1);"
+    if (isBrowser()) {
+        let allMines = document.querySelectorAll(".mine")
+        assert.equal(allMines.length, currentGame.startMines, `the number of mines in the board should
+            never exceed the number of starting mines in the game`);
+    }
+    else {
+        describe('mineCount after solver resolution', () => {
+            it('should never exceed the number of startMines for the game', () => {
+                let allMines = document.querySelectorAll(".mine")
+                assert.equal(allMines.length, currentGame.startMines, `the number of mines in the board should
+                    never exceed the number of starting mines in the game`);
+            })
+        })
+    }
+
+    square.style = "background-color: rgb(150, 150, 150);"
     square.revealed = true;
+
+    if (isBrowser()) {
+        assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `it should set the 
+            tile's background color to grey.`);
+        assert.isTrue(square.revealed, `square.revealed should be set to true`);
+
+        // also test the flagCount at this point
+        let newFlagCount = document.querySelectorAll(".flag").length
+        assert.equal(startFlagCount, newFlagCount, `the number of flags should not change
+            after the solver has run`);
+    }
+    else {
+        describe('UI changes to targetTile', () => {
+            it(`should set the tile's background color to grey`, () => {
+                assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `it should set the 
+                    tile's background color to grey.`);
+            })
+            it(`should set tile.revealed to true`, () => {
+                assert.isTrue(square.revealed, `square.revealed should be set to true`);
+            })
+        })
+
+        // also test the flagCount at this point
+        describe('post-solver flag check', () => {
+            it('should have the same mine count as before the solver ran', () => {
+                let newFlagCount = document.querySelectorAll(".flag").length
+                assert.equal(startFlagCount, newFlagCount, `the number of flags should not change
+                    after the solver has run`);
+            })
+        })
+    }
 
     // Check if any mines around the chosen square
     // Nest for loops to test all 8 squares around
@@ -1606,7 +1658,34 @@ let solver = {
                     guessNotMine: false
                 }
 
-                // if the node has a mine or a flag in it
+                if (isBrowser()) {
+                    assert.equal(Object.keys(newObj).length, 8, `newObj should 
+                        have 8 properties`);
+                    assert.equal(newObj.x, Number(element.getAttribute("x")),
+                        `newObj.x should be equal to the current tile's x value`);
+                    assert.isNumber(newObj.x, `newObj.x should be a number`);
+                    assert.equal(newObj.y, Number(element.getAttribute("y")),
+                        `newObj.y should be equal to the current tile's y value`);
+                    assert.isNumber(newObj.y, `newObj.y should be a number`);
+                }
+                else {
+                    describe('newObj - solver.test', () => {
+                        it('should have 8 properties', () => {
+                            assert.equal(Object.keys(newObj).length, 8, `newObj should 
+                                have 8 properties`);
+                        })
+                        it('should have correct x and y values as numbers', () => {
+                            assert.equal(newObj.x, Number(element.getAttribute("x")),
+                                `newObj.x should be equal to the current tile's x value`);
+                            assert.isNumber(newObj.x, `newObj.x should be a number`);
+                            assert.equal(newObj.y, Number(element.getAttribute("y")),
+                                `newObj.y should be equal to the current tile's y value`);
+                            assert.isNumber(newObj.y, `newObj.y should be a number`);
+                        })
+                    })
+                }
+
+                // if the node has a mine or a flag in it (or has been revealed)
                 if (element.childNodes.length > 0 || element.textContent == "") {
                     // if it's a safe square
                     if (element.revealed) {
@@ -1629,6 +1708,73 @@ let solver = {
                             newObj.isFlagged = true;
                         }
                     }
+                }
+
+                if (isBrowser()) {
+                    if (element.revealed) {
+                        assert.isTrue(newObj.revealed, `newObj.revealed should be true
+                            if element.revealed is true`);
+                        if (element.textContent != "") {
+                            assert.equal(newObj.mineCount, Number(element.textContent), 
+                                `newObj.mineCount should be equal to element.textContent
+                                if appropriate`);
+                        }
+                    }
+                    else if (element.childNodes.length == 1) {
+                        if (element.childNodes[0].getAttribute("class" == "mine")) {
+                            assert.isTrue(newObj.isMine, `newObj.isMine should be true
+                                if element contains a mine img`);
+                        }
+                        if (element.childNodes[0].getAttribute("class") == "flag") {
+                            assert.isTrue(newObj.isFlagged, `newObj.isFlagged should be true
+                                if element contains a flag img`);
+                        }
+                    }
+                    else if (element.childNodes.length == 2) {
+                        if (element.childNodes[0].getAttribute("class") == "mine" &&
+                            element.childNodes[1].getAttribute("class") == "flag") {
+                                assert.isTrue(newObj.isMine, `newObj.isMine should be true
+                                if element contains a mine img`);
+
+                                assert.isTrue(newObj.isFlagged, `newObj.isFlagged should be true
+                                if element contains a flag img`);
+                            }
+                    }
+                }
+                else {
+                    describe('edits to newObj', () => {
+                        it('should set all Boolean properties to true if appropriate', () => {
+                            if (element.revealed) {
+                                assert.isTrue(newObj.revealed, `newObj.revealed should be true
+                                    if element.revealed is true`);
+                                if (element.textContent != "") {
+                                    assert.equal(newObj.mineCount, Number(element.textContent), 
+                                        `newObj.mineCount should be equal to element.textContent
+                                        if appropriate`);
+                                }
+                            }
+                            else if (element.childNodes.length == 1) {
+                                if (element.childNodes[0].getAttribute("class" == "mine")) {
+                                    assert.isTrue(newObj.isMine, `newObj.isMine should be true
+                                        if element contains a mine img`);
+                                }
+                                if (element.childNodes[0].getAttribute("class") == "flag") {
+                                    assert.isTrue(newObj.isFlagged, `newObj.isFlagged should be true
+                                        if element contains a flag img`);
+                                }
+                            }
+                            else if (element.childNodes.length == 2) {
+                                if (element.childNodes[0].getAttribute("class") == "mine" &&
+                                    element.childNodes[1].getAttribute("class") == "flag") {
+                                        assert.isTrue(newObj.isMine, `newObj.isMine should be true
+                                        if element contains a mine img`);
+        
+                                        assert.isTrue(newObj.isFlagged, `newObj.isFlagged should be true
+                                        if element contains a flag img`);
+                                    }
+                            }
+                        })
+                    })
                 }
                 // push the object to the row
                 newRow.push(newObj)
@@ -1680,7 +1826,7 @@ let solver = {
                             return 5
                         }
                     }
-                    else if (tile.y == 1 || tile.y == boardwidth) {
+                    else if (tile.y == 1 || tile.y == boardheight) {
                         return 5
                     }
                     else {
@@ -1865,6 +2011,21 @@ let solver = {
                         }
                     }
                 })
+
+                let totalAssigned = safeNeighbours.length +
+                    flagNeighbours.length + unknownNeighbours.length
+                if (isBrowser()) {
+                    assert.equal(totalAssigned, neighbourTiles.length, `The total of safe,
+                        flagged and unknown neighbours should equal the number of neighbours`);
+                }
+                else {
+                    describe('neighbourTile assignments', () => {
+                        it('should equal the number of neighbours', () => {
+                            assert.equal(totalAssigned, neighbourTiles.length, `The total of safe,
+                                flagged and unknown neighbours should equal the number of neighbours`);
+                        })
+                    })
+                }
 
                 // a catch all for when a tile is completely safe:
                 if (unknownNeighbours.length == 0) {
@@ -2304,7 +2465,18 @@ let solver = {
                                     let oldMines = array.filter(item => item.isMine)
 
                                     if (newMines.length < oldMines.length || oldMines.length < newMines.length) {
-
+                                        if (isBrowser()) { 
+                                            assert.notEqual(newMines.length, oldMines.length, `the number of old mines
+                                                should not be the same as the number of new mines here`);
+                                        }
+                                        else {
+                                            describe('number of new config mines', () => {
+                                                it('should not be equal to the number of old mines', () => {
+                                                    assert.notEqual(newMines.length, oldMines.length, `the number of old mines
+                                                        should not be the same as the number of new mines here`);
+                                                })
+                                            })
+                                        }
                                         // get a random tile that is neither revealed to the player 
                                         // nor neighbours any of those tiles
                                         // need to refresh the ararys now that the target tile is revealed
@@ -2362,6 +2534,20 @@ let solver = {
                                             }
                                         } else {
                                             // do nothing
+                                        }
+                                    }
+                                    else {
+                                        if (isBrowser()) { 
+                                            assert.equal(newMines.length, oldMines.length, `the number of old mines
+                                                should be the same as the number of new mines here`);
+                                        }
+                                        else {
+                                            describe('number of new config mines', () => {
+                                                it('should be equal to the number of old mines', () => {
+                                                    assert.equal(newMines.length, oldMines.length, `the number of old mines
+                                                        should be the same as the number of new mines here`);
+                                                })
+                                            })
                                         }
                                     }
 
@@ -2514,7 +2700,7 @@ let solver = {
                 if (oldGuess.sourceTile) {
                     let source;
                     source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
-                    source.style.backgroundColor = "rgba(150, 150, 150, 1)"
+                    source.style.backgroundColor = "rgb(150, 150, 150)"
                 }
                 if (oldGuess.actionTaken == "addFlag") {
                     let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
@@ -2537,7 +2723,7 @@ let solver = {
                 else {
                     // mark the tile as safe
                     let action = table.children[oldGuess.actionTile.y - 1].children[oldGuess.actionTile.x - 1]
-                    action.style.backgroundColor = "rgba(150, 150, 150, 1)"
+                    action.style.backgroundColor = "rgb(150, 150, 150)"
 
                     // get its mineNeighbours and add this to the tile's text
                     if (oldGuess.actionTile.mineNeighbours > 0) {
@@ -2562,7 +2748,7 @@ let solver = {
                 // mark the source tile as revealed
                 if (oldGuess.sourceTile) {
                     let source = table.children[oldGuess.sourceTile.y - 1].children[oldGuess.sourceTile.x - 1]
-                    source.style.backgroundColor = "rgba(150, 150, 150, 1)"
+                    source.style.backgroundColor = "rgb(150, 150, 150)"
                     
                 }
                 // mark the action tile as unknown

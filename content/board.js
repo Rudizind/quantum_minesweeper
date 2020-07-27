@@ -346,7 +346,7 @@ const mineTest = (square, click) => {
                     return;
                 }
                 // Make the chosen square 'safe'
-                square.style = "background-color: rgba(150, 150, 150, 1);"
+                square.style = "background-color: rgb(150, 150, 150);"
                 square.revealed = true;
 
                 if (isBrowser()) {
@@ -480,15 +480,19 @@ const resolveBoard = square => {
 
     // if the solver returns undefined, then the game is over, so just return
     if (changeTiles == undefined) {
-        console.log("welp")
         return;
     }
+
+    console.log(changeTiles)
 
     // otherwise, change the board (and update stats)
     // stat update for times saved by solver
     if (isBrowser()) {
         updateStats([{ type: "save", num: 1, id: Math.round(Math.random() * 99999999999999) }])
     }
+
+    let allFlags = document.querySelectorAll('.flag')
+    let startFlagCount = allFlags.length
 
     let board = document.querySelectorAll(".mineSquare")
     board.forEach(element => {
@@ -513,7 +517,7 @@ const resolveBoard = square => {
                 // mocha/chai tests for board manipulation here
                 if(isBrowser()) {
                     if (currentGame.mineVision) {
-                        assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6", 
+                        assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
                             "if mineVision is active, any new mine tiles should change colour");
                     }
                     assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
@@ -523,7 +527,7 @@ const resolveBoard = square => {
                     describe('board changes after solver concludes', () => {
                         it('should change the mine tiles colour if mineVision is active', () => {
                             if (currentGame.mineVision) {
-                                assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6", 
+                                assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
                                     "if mineVision is active, any new mine tiles should change colour");
                             }
                         })
@@ -563,8 +567,54 @@ const resolveBoard = square => {
         return;
     });
 
-    square.style = "background-color: rgba(150, 150, 150, 1);"
+    if (isBrowser()) {
+        let allMines = document.querySelectorAll(".mine")
+        assert.equal(allMines.length, currentGame.startMines, `the number of mines in the board should
+            never exceed the number of starting mines in the game`);
+    }
+    else {
+        describe('mineCount after solver resolution', () => {
+            it('should never exceed the number of startMines for the game', () => {
+                let allMines = document.querySelectorAll(".mine")
+                assert.equal(allMines.length, currentGame.startMines, `the number of mines in the board should
+                    never exceed the number of starting mines in the game`);
+            })
+        })
+    }
+
+    square.style = "background-color: rgb(150, 150, 150);"
     square.revealed = true;
+
+    if (isBrowser()) {
+        assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `it should set the 
+            tile's background color to grey.`);
+        assert.isTrue(square.revealed, `square.revealed should be set to true`);
+
+        // also test the flagCount at this point
+        let newFlagCount = document.querySelectorAll(".flag").length
+        assert.equal(startFlagCount, newFlagCount, `the number of flags should not change
+            after the solver has run`);
+    }
+    else {
+        describe('UI changes to targetTile', () => {
+            it(`should set the tile's background color to grey`, () => {
+                assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `it should set the 
+                    tile's background color to grey.`);
+            })
+            it(`should set tile.revealed to true`, () => {
+                assert.isTrue(square.revealed, `square.revealed should be set to true`);
+            })
+        })
+
+        // also test the flagCount at this point
+        describe('post-solver flag check', () => {
+            it('should have the same mine count as before the solver ran', () => {
+                let newFlagCount = document.querySelectorAll(".flag").length
+                assert.equal(startFlagCount, newFlagCount, `the number of flags should not change
+                    after the solver has run`);
+            })
+        })
+    }
 
     // Check if any mines around the chosen square
     // Nest for loops to test all 8 squares around

@@ -7,7 +7,7 @@ const { JSDOM } = jsdom;
 
 // this delay allows all files to load before any testing is carried out.
 // it also makes the tests readable as they're being done which is interesting.
-beforeEach(done => setTimeout(done, 150));
+beforeEach(done => setTimeout(done, 5));
 
 // this resets the HTML so we can test multiple functions in the same suite
 // otherwise the results of the functions can get confused by each other
@@ -164,6 +164,7 @@ describe('makeBoard', () => {
     it('should fulfil all unit tests within the makeBoard function', () => {
         currentGame.boardSize = 'xl'
         currentGame.startMines = 99
+        makeBoard()
     })
 })
 
@@ -316,5 +317,66 @@ describe('resolveBoard', () => {
         let mine = document.querySelector(".mine")
         mineSquare = mine.parentElement
         resolveBoard(mineSquare)
+        solver.errorTile = null
+    })
+})
+
+describe('solver', () => {
+    it('should be an object', () => {
+        assert.isObject(solver, `solver should be an object`);
+    })
+
+    it('should have 6 properties', () => {
+        assert.equal(Object.keys(solver).length, 6, `the solver should have 6 properties`);
+    })
+    
+    describe('solver.test', () => {
+        it('should be a function', () => {
+            assert.isFunction(solver.test, `solver.test should be a function`);
+        })
+        it('should fulfil all unit tests within solver.test', () => {
+            currentGame.boardSize = "xl"
+            currentGame.startMines = 99
+            currentGame.hint = false;
+            makeBoard()
+            let mine = document.querySelector(".mine")
+            mineSquare = mine.parentElement
+            solver.test(mineSquare)
+            solver.errorTile = null
+        })
+    })
+
+    describe('solver.replayArray', () => {
+        it('should be an array', () => {
+            assert.isArray(solver.replayArray, `solver.replayArray should be an array`);
+        })
+    })
+
+    describe('solver.endBoardState', () => {
+        it('should be an array', () => {
+            assert.isArray(solver.endBoardState, `solver.endBoardState should be an array`);
+        })
+    })
+
+    describe('solver.errorTile', () => {
+        it('should be null', () => {
+            assert.isNull(solver.errorTile, `solver.errorTile should be null`);
+        })
+    })
+
+    describe('solver.currentMove', () => {
+        it('should be -1', () => {
+            assert.equal(solver.currentMove, -1, `solver.currentMove should be -1`);
+        })
+    })
+
+    describe('solver.changeMove', () => {
+        it('should be a function', () => {
+            assert.isFunction(solver.changeMove, `solver.changeMove should be a function`);
+        })
+        it('should fulfil all unit tests within solver.changeMove', () => {
+            solver.changeMove(1)
+            solver.currentMove = -1
+        })
     })
 })
