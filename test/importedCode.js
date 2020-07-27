@@ -1150,7 +1150,7 @@ const mineTest = (square, click) => {
             if (click == "left") {
                 // If there's a flag in the square, do nothing.
                 if (square.childNodes.length == 2) {
-                    return;
+                    return false;
                 }
                 // Otherwise, they've made a mistake and might have lost the game. 
                 // The solver from solver.js will run, and find out whether 
@@ -1191,6 +1191,23 @@ const mineTest = (square, click) => {
                     flag.style = "height: 100%; width: auto;"
                     square.append(flag)
 
+                    if (isBrowser()) {
+                        assert.equal(square.childNodes.length, 2, `there should be two
+                            childNodes present - a mine and a flag`);
+                        assert.equal(square.childNodes[1].getAttribute("class"), "flag",
+                            `the second childNode should be a flag`)
+                    }
+                    else {
+                        describe('mineTest(tile, "right") - 1', () => {
+                            it('should append a flag to the tile', () => {
+                                assert.equal(square.childNodes.length, 2, `there should be two
+                                    childNodes present - a mine and a flag`);
+                                assert.equal(square.childNodes[1].getAttribute("class"), "flag",
+                                    `the second childNode should be a flag`)
+                            })
+                        })
+                    }
+
                     // end game test
                     if (currentGame.flagsPlaced == currentGame.startMines) {
                         winGame()
@@ -1216,6 +1233,23 @@ const mineTest = (square, click) => {
                 flag.style = "height: 100%; width: auto;"
                 square.append(flag)
 
+                if (isBrowser()) {
+                    assert.equal(square.childNodes.length, 1, `there should be one
+                        childNode present`);
+                    assert.equal(square.childNodes[0].getAttribute("class"), "flag",
+                        `the childNode should be a flag`)
+                }
+                else {
+                    describe('mineTest(tile, "right") - 2', () => {
+                        it('should append a flag to the tile', () => {
+                            assert.equal(square.childNodes.length, 1, `there should be one
+                                childNode present`);
+                            assert.equal(square.childNodes[0].getAttribute("class"), "flag",
+                                `the childNode should be a flag`)
+                        })
+                    })
+                }
+
                 // Set remaining mines in UI
                 document.getElementById("scoreDisplay").innerHTML = "Mines left: " +
                     (currentGame.startMines - currentGame.flagsPlaced)
@@ -1230,6 +1264,23 @@ const mineTest = (square, click) => {
                 square.style = "background-color: rgba(150, 150, 150, 1);"
                 square.revealed = true;
 
+                if (isBrowser()) {
+                    assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `The tile's
+                        background color should be set to rgb(150, 150, 150)`);
+                    assert.isTrue(square.revealed, `square.revealed should be set to true`);
+                }
+                else {
+                    describe('mineTest(tile, "left" - safe tile', () => {
+                        it(`should set the tile's background color to rgb(150, 150, 150)`, () => {
+                            assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `The tile's
+                                background color should be set to rgb(150, 150, 150)`);
+                        })
+                        it('should set tile.revealed to true', () => {
+                            assert.isTrue(square.revealed, `square.revealed should be set to true`);
+                        })
+                    })
+                }
+
                 // Check if any mines around the chosen square
                 // Nest for loops to test all 8 squares around
                 let mineCount = 0
@@ -1238,7 +1289,6 @@ const mineTest = (square, click) => {
 
                 // array for storing chosen square's up to 8 neighbour squares
                 let squareNeighbours = [];
-
 
                 let table = document.getElementById("boardTable")
                 table.childNodes.forEach(row => {
