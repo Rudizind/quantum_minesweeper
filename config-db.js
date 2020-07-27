@@ -1,7 +1,7 @@
 (function () {
-    const dbURL = "localhost:2222"
-    const username = "crr3"
-    const password = "Rfp3tbHP"
+    const dbURL = "localhost:2222" // *EDIT HERE*
+    const username = "crr3" // *EDIT HERE*
+    const password = "Rfp3tbHP" // *EDIT HERE*
     var db_info = {
         url: dbURL,
         username: username,
