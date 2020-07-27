@@ -123,7 +123,16 @@
                 <div class="col-sm-2" style="margin: auto;">
                     <input type="checkbox" id="mineVisionCheck"></input>
                 </div>
-                <div class="col-sm-4"></div>
+                <div class="col-sm-1">
+                    <div class="tooltipShow">?
+                        <span class="tooltiptext">
+                            Mine Vision lets you see the inner workings of Quantum Minesweeper. All mines are marked out
+                            by their darker colour with this option, and when the quantum safety feature kicks in you get 
+                            to see how the program has transformed the game board!
+                        </span>
+                    </div>
+                </div>
+                <div class="col-sm-3"></div>
             </div>
             <div class="row align-middle">
                 <div class="col-sm-4"></div>
@@ -133,7 +142,21 @@
                 <div class="col-sm-2">
                     <input type="checkbox" id="hintCheck"></input>
                 </div>
-                <div class="col-sm-4"></div>
+                <div class="col-sm-1">
+                    <div class="tooltipShow">?
+                        <span class="tooltiptext">
+                            Hints can help you out if you're stuck at a particular point in the game. When you use a hint, your 
+                            chosen tile will receive one of these three border colors:</br>
+                            - <span style="color: green;">Green:</span> Chosen tile is safe to click.
+                                Definitely not a mine.</br>
+                            - <span style="color: yellow;">Yellow:</span> Chosen tile is safe to click.
+                                Might be a mine. Quantum safety will kick in.</br>
+                            - <span style="color: red;">Red:</span> Chosen tile is NOT safe to click.
+                                Definitely a mine. <strong>Will result in game loss</strong>.
+                        </span>
+                    </div>
+                </div>
+                <div class="col-sm-3"></div>
             </div>
         </div>
         <div class="hidden" id="hotbar">

@@ -49,3 +49,46 @@ button:focus {
     transition-property: all;
     cursor: pointer;
 }
+
+/* Tooltip container */
+.tooltipShow {
+    position: relative;
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: 20px;
+    background-color: rgb(38, 46, 83); 
+    color: white;
+    height: 20px;
+    width: 20px;
+}
+  
+/* Tooltip text */
+.tooltipShow .tooltiptext {
+    visibility: hidden;
+    width: 350px;
+    height: auto;
+    background-color: rgb(38, 46, 83); 
+    border: 1px solid black;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+   
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+  
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltipShow:hover .tooltiptext {
+    visibility: visible;
+}
+
+.tooltipShow .tooltiptext {
+    opacity: 0.3;
+    transition: opacity 0.5s;
+}
+  
+.tooltipShow:hover .tooltiptext {
+    opacity: 1;
+}
