@@ -1,14 +1,29 @@
 # quantum_minesweeper
 
+/* PRINCIPLES OF MINESWEEPER */
+
 Ever been playing Minesweeper and gotten frustrated that your game has come down to a pure guess? Often a game's conclusion comes down to luck - a 50/50 chance. If you're not familiar with the rules of Minesweeper, they can be found here: https://en.wikipedia.org/wiki/Minesweeper_(video_game).
 
 This version of Minesweeper - 'Quantum Minesweeper' - aims to remove this frustration. Many versions of this game provide a 'safety' feature that ensures the user's first click cannot be a mine. Here, we extend this concept to every click of a tile in the game. That said, there are three possible course of action the game will take when a user chooses a square:
 
 (1) When a user clicks on a tile containing a mine, if it is guaranteed to be a mine in the current board state (i.e. in every possible configuration of mine and non-mine squares around the current 'revealed' tiles, that tile contains a mine in 100% of cases), the user loses. 
-(2) When the user clicks on a tile containing a mine, if it is not guaranteed to be a mine in the current board state (i.e. in every possible configuration of mine and non-mine squares around the current 'revealed' tiles, that tile contains a mine in somewhere between 0% and 100% of cases (exclusive)), then the quantum safety feature activates and will attempt to resolve the board in such a way that the chosen square is not a mine given current known and deducible information. See below.
+(2) When the user clicks on a tile containing a mine, if it is not guaranteed to be a mine in the current board state (i.e. in every possible configuration of mine and non-mine squares around the current 'revealed' tiles, that tile contains a mine in somewhere between 0% and 100% of cases (exclusive)), then the quantum safety feature activates and will attempt to resolve the board in such a way that the chosen square is not a mine given current known and deducible information. See quantum safety/solver section below.
 (3) When the user clicks on a tile NOT containing a mine, the square is revealed. If its 8 neighbours do not contain a mine (i.e. its mineCount number is 0), it performs a depth-first recursion over each square w and its children and so on until all appropriate squares have been revealed. This step is no different to standard Minesweeper.
 
-/* more info to follow here about step 2 and the solver/resolving the board state /*
+/* QUANTUM SAFETY/SOLVER */
+
+Enter Quantum Minesweeper. When a player clicks on a mine, the solver checks if the player could have determined through other moves (or deduction directly for that tile) that their chosen tile contained a mine. It does this in several steps. Firstly, it solves whatever tiles it can on the board using two basic heuristics for Minesweeper until it can no longer do so. These heuristics are: (1) if a tile's number is equal to the number of flags currently placed in the 8 neighbours of that tile, then all remaining unknown neighbour tiles must be safe tiles, and can be marked as revealed; and (2) if a tile's number is equal to the number of flags currently placed in the 8 neighbours of that tile ADDED TO the number of unrevealed neighbours, then each of those unrevealed neighbours must all contain mines, and can be flagged. 
+
+Using these two heuristics, simple game boards such as 5x5 with 5 mines can be solved relatively consistently. However, when we begin looking at larger game boards and mine counts, these heuristics prove insufficient by themselves. Once no more information can be found using these heuristics, therefore, the solver moves to the second step of its solution: the probability-based algorithm. This algorithm determines any information that a human could deduce by cleverly calculating possible configurations of mines in a given set of border tiles around a known are on the game board.
+
+// further explanation here pls
+
+
+
+
+
+
+
 
 /* HOW TO RUN QUANTUM MINESWEEPER */
 
