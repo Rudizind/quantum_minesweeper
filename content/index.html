@@ -120,7 +120,7 @@
                 <div class="col-sm-2" style="margin: auto;">
                     <label>Enable Mine Vision:</label>
                 </div>
-                <div class="col-sm-2" style="margin: auto;">
+                <div class="col-sm-1" style="margin: auto;">
                     <input type="checkbox" id="mineVisionCheck"></input>
                 </div>
                 <div class="col-sm-1">
@@ -132,14 +132,14 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-sm-3"></div>
+                <div class="col-sm-4"></div>
             </div>
             <div class="row align-middle">
                 <div class="col-sm-4"></div>
                 <div class="col-sm-2">
                     <label>Enable Hints:</label>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-1">
                     <input type="checkbox" id="hintCheck"></input>
                 </div>
                 <div class="col-sm-1">
@@ -156,8 +156,55 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-sm-3"></div>
+                <div class="col-sm-4"></div>
             </div>
+            <div class="row align-middle" style="padding-top: 5%;">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4">
+                    <button class="btn" onclick="showAboutInfo()">About Quantum Minesweeper</button>
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+        </div>
+        <div class="hidden" id="aboutInfo">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8" style="margin: auto;">
+                <h3>About Quantum Minesweeper</h3>
+                <p id="aboutText">
+                    /* PRINCIPLES OF QUANTUM MINESWEEPER */
+
+                    Ever been playing Minesweeper and gotten frustrated that your game has come down to a pure guess? Often a game's conclusion comes down to luck - a 50/50 chance. If you're not familiar with the rules of Minesweeper, they can be found here: https://en.wikipedia.org/wiki/Minesweeper_(video_game).
+
+                    This version of Minesweeper - 'Quantum Minesweeper' - aims to remove this frustration. Many versions of this game provide a 'safety' feature that ensures the user's first click cannot be a mine. Here, we extend this concept to every click of a tile in the game. That said, there are three possible course of action the game will take when a user chooses a square:
+
+                    (1) When a user clicks on a tile containing a mine, if it is guaranteed to be a mine in the current board state (i.e. in every possible configuration of mine and non-mine squares around the current 'revealed' tiles, that tile contains a mine in 100% of cases), the user loses. 
+                    (2) When the user clicks on a tile containing a mine, if it is not guaranteed to be a mine in the current board state (i.e. in every possible configuration of mine and non-mine squares around the current 'revealed' tiles, that tile contains a mine in somewhere between 0% and 100% of cases (exclusive)), then the quantum safety feature activates and will attempt to resolve the board in such a way that the chosen square is not a mine given current known and deducible information. See quantum safety/solver section below.
+                    (3) When the user clicks on a tile NOT containing a mine, the square is revealed. If its 8 neighbours do not contain a mine (i.e. its mineCount number is 0), it performs a depth-first recursion over each square w and its children and so on until all appropriate squares have been revealed. This step is no different to standard Minesweeper.
+
+
+
+                    /* QUANTUM SAFETY/SOLVER */
+
+                    TL;DR: If a player clicks on a tile that contains a mine, if the solver determines that that tile does not *absolutely* contain a mine given current known and deducible information, then the game board will resolve in such a way that that tile is revealed and does NOT contain a mine.
+
+                    Enter Quantum Minesweeper. When a player clicks on a mine, the solver checks if the player could have determined through other moves (or deduction directly for that tile) that their chosen tile contained a mine. It does this in several steps. Firstly, it solves whatever tiles it can on the board using two basic heuristics for Minesweeper until it can no longer do so. These heuristics are: (1) if a tile's number is equal to the number of flags currently placed in the 8 neighbours of that tile, then all remaining unknown neighbour tiles must be safe tiles, and can be marked as revealed; and (2) if a tile's number is equal to the number of flags currently placed in the 8 neighbours of that tile ADDED TO the number of unrevealed neighbours, then each of those unrevealed neighbours must all contain mines, and can be flagged. 
+
+                    Using these two heuristics, simple game boards such as 5x5 with 5 mines can be solved relatively consistently. However, when we begin looking at larger game boards and mine counts, these heuristics prove insufficient by themselves. Once no more information can be found using these heuristics, therefore, the solver moves to the second step of its solution: the probability-based algorithm. This algorithm determines any information that a human could deduce by cleverly calculating possible configurations of mines in a given set of border tiles around a known are on the game board.
+
+                    The solver recursively checks combinations of 'mine' and 'not-mine' in each border tile until it finds that the current combination doesn't work (which cuts off the search and continues with the next branch), or until the number of 'mine/not-mine' guesses passes the OK check and is equal to the number of unrevealed border tiles presented to it. It continues to do this to find as many combinations as possible of mines that feasibly could work in the current board state. Once it has concluded and has its list of combinations (a 2D array), it then checks each tile's guess within each of the possible combinations. It uses the logic that, if a tile has been guessed as a mine in every working combination, then it must contain a mine and can be flagged as such; similarly, if a tile has been guessed safe in every working combination, then it must be safe and can be made revealed. With this new information, the solver begins again using the heuristics mentioned above. This cycle continues until either part of the solver reaches the player's chosen tile and decides that it contains a mine, or until no more information can be deduced (meaning that the player could not have determined that their tile contained a mine).
+
+                    When it comes to the player's chosen tile, if the solver has been called it means that there is some probability of that tile containing a mine (so there is no chance of it returning absolutely safe). The only way the solver will render any chosen tile as 'uncertain' is if it has no new information when it concludes the probability-based solver and stops. At this stage, the mines on the actual gameboard are reshuffled in one of two ways: (1) if the player's chosen tile has not been uncovered yet (i.e. it is not included in the last round of unrevealed border tiles by the solver), then its mine is removed and placed somewhere else on the board that is also unrevealed to the player at this stage; or (2) if the player's chosen tile IS included in the last round of unrevealed border tiles by the probability-based solver, and it hasn't been determined to absolutely contain a mine, then the program will make 'true' one of the possible configurations returned within its calculations. Specifically, it will make true a configuration of mines around those border tiles that renders the player's chosen tile as NOT containing a mine, therefore making their click safe. If this changing of border tiles results in a mine count less than or greater than the starting mine count, then the solver also looks for tiles undiscovered by the player and adds (or takes away) mines as appropriate.
+
+                    Once the mines have been reshuffled according to the logic above, the game continues and the player can make another click on the game board.
+
+                    /* SOLVER REPLAY */
+
+                    So... you lost the game. Maybe you know how you lost, and that's cool. Sometimes, though, a player may find that they've lost the game but don't understand why - and that's why a solver replay feature has been implemented within the Quantum Minesweeper game.
+
+                    When you lose a game of Quantum Minesweeper, the game is basically telling you - "you could've figured out that there was a mine here." The solver stores the actions it took to decide that your chosen tile contained a mine, and you can view them yourself when a game ends by clicking the "See the solver's actions" button at the bottom of the gameboard. This will give you a step-by-step walkthrough of each move taken by the solver, and the reason behind that decision. With this you can see how the solver cleared various (sometimes many!) tiles on the board in order to reach your chosen tile and decide that it contained a mine. The display includes a 'move counter' which displays the order and final quantity of tiles uncovered by the solver in its solution, as well as a brief description of why that tile contained a mine/was safe.
+                </p>
+            </div>
+            <div class="col-sm-2"></div>
         </div>
         <div class="hidden" id="hotbar">
             <div class="row">

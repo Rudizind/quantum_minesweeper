@@ -914,3 +914,9 @@ if (!isBrowser()) {
     module.exports.getAllStats = getAllStats
     module.exports.updateStats = updateStats
 }
+
+const showAboutInfo = () => {
+    // Adjust display
+    document.getElementById("newgame").setAttribute("class", "hidden")
+    document.getElementById("aboutInfo").setAttribute("class", "container-fluid align-middle")
+}
