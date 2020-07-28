@@ -7,7 +7,7 @@ const { JSDOM } = jsdom;
 
 // this delay allows all files to load before any testing is carried out.
 // it also makes the tests readable as they're being done which is interesting.
-beforeEach(done => setTimeout(done, 5));
+beforeEach(done => setTimeout(done, 10));
 
 // this resets the HTML so we can test multiple functions in the same suite
 // otherwise the results of the functions can get confused by each other

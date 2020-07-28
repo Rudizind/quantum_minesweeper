@@ -1,6 +1,6 @@
 # quantum_minesweeper
 
-/* PRINCIPLES OF MINESWEEPER */
+/* PRINCIPLES OF QUANTUM MINESWEEPER */
 
 Ever been playing Minesweeper and gotten frustrated that your game has come down to a pure guess? Often a game's conclusion comes down to luck - a 50/50 chance. If you're not familiar with the rules of Minesweeper, they can be found here: https://en.wikipedia.org/wiki/Minesweeper_(video_game).
 
