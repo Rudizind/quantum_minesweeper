@@ -506,23 +506,12 @@ const endGame = () => {
         if (isBrowser()) {
             assert.equal(parent.style.backgroundColor, "orange",
                 `All former flagNodes should have an orange background`);
-
-            if (parent.childNodes.length != 2) {
-                assert.equal(parent.childNodes[0].getAttribute("class"),
-                    "cross", "former wrongly guessed flags should contain crosses");
-            }
         }
         else {
             describe('flagNodes', () => {
                 it('should all have an orange background', () => {
                     assert.equal(parent.style.backgroundColor, "orange",
                         `All former flagNodes should have an orange background`);
-                })
-                it('should have a cross in wrongly placed flags', () => {
-                    if (parent.childNodes.length != 2) {
-                        assert.equal(parent.childNodes[0].getAttribute("class"),
-                            "cross", "former wrongly guessed flags should contain crosses");
-                    }
                 })
             })
         }
@@ -899,6 +888,16 @@ const updateStats = statUpdate => {
     }
 }
 
+const showAboutInfo = () => {
+    // Adjust display
+    document.getElementById("newgame").setAttribute("class", "hidden")
+    document.getElementById("aboutInfo").setAttribute("class", "container-fluid align-middle")
+    document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
+
+    // use .viewingStats to avoid errors from the backHome function
+    currentGame.viewingStats = true;
+}
+
 // export all variables (if in node environment)
 if (!isBrowser()) {
     module.exports.isBrowser = isBrowser
@@ -918,14 +917,5 @@ if (!isBrowser()) {
     module.exports.getSingleStats = getSingleStats
     module.exports.getAllStats = getAllStats
     module.exports.updateStats = updateStats
-}
-
-const showAboutInfo = () => {
-    // Adjust display
-    document.getElementById("newgame").setAttribute("class", "hidden")
-    document.getElementById("aboutInfo").setAttribute("class", "container-fluid align-middle")
-    document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
-
-    // use .viewingStats to avoid errors from the backHome function
-    currentGame.viewingStats = true;
+    module.exports.showAboutInfo = showAboutInfo
 }
