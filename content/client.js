@@ -295,6 +295,7 @@ const backHome = () => {
         document.getElementById("hintButt").setAttribute("class", "hidden")
         document.getElementById("replayButt").setAttribute("class", "hidden")
         document.getElementById("replayDisplay").setAttribute("class", "hidden")
+        document.getElementById("aboutInfo").setAttribute("class", "hidden")
 
         // mocha/chai test for UI hidden changes (both in browser and in node)
         if (isBrowser()) {
@@ -311,6 +312,8 @@ const backHome = () => {
                 `replayButt's class should be set to hidden`)
             assert.equal(document.getElementById("replayDisplay").getAttribute("class"), "hidden",
                 `replayDisplay's class should be set to hidden`)
+            assert.equal(document.getElementById("aboutInfo").getAttribute("class"), "hidden", 
+                `aboutInfo's class should be set to hidden`);
         }
         else {
             let replayButtCOPY = document.getElementById("replayButt").getAttribute("class")
@@ -329,6 +332,8 @@ const backHome = () => {
                         `replayButt's class should be set to hidden`)
                     assert.equal(document.getElementById("replayDisplay").getAttribute("class"), "hidden",
                         `replayDisplay's class should be set to hidden`)
+                    assert.equal(document.getElementById("aboutInfo").getAttribute("class"), "hidden", 
+                        `aboutInfo's class should be set to hidden`);
                 })
             })
         }
@@ -919,4 +924,8 @@ const showAboutInfo = () => {
     // Adjust display
     document.getElementById("newgame").setAttribute("class", "hidden")
     document.getElementById("aboutInfo").setAttribute("class", "container-fluid align-middle")
+    document.getElementById("homeButt").setAttribute("class", "container-fluid align-middle")
+
+    // use .viewingStats to avoid errors from the backHome function
+    currentGame.viewingStats = true;
 }
