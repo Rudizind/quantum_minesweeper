@@ -483,8 +483,6 @@ const resolveBoard = square => {
         return;
     }
 
-    console.log(changeTiles)
-
     // otherwise, change the board (and update stats)
     // stat update for times saved by solver
     if (isBrowser()) {
@@ -500,64 +498,78 @@ const resolveBoard = square => {
             item.y == Number(element.getAttribute("y")))
         if (match != undefined) {
             if (match.isMine) {
-                let mine = document.createElement("img")
-                mine.setAttribute("class", "mine")
-                mine.src = "./img/mine.png"
-                mine.style = "height: 100%; width: auto; display: none;"
-                if (currentGame.mineVision) {
-                    element.style.backgroundColor = "rgba(200, 20, 0, 0.6)"
+                let addMine = false;
+                if (element.children.length  == 0) {
+                    addMine = true;
                 }
-                if (element.childNodes.length == 0) {
-                    mine.addEventListener("mouseup", squareChoice)
-                    element.append(mine)
+                else if (element.children[0].getAttribute("class") == "flag") {
+                    addMine = true;
                 }
-                else if (element.childNodes[0].getAttribute("class") == "flag") {
-                    element.insertBefore(mine, element.childNodes[0]) 
-                }
-                // mocha/chai tests for board manipulation here
-                if(isBrowser()) {
-                    if (currentGame.mineVision) {
-                        assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
-                            "if mineVision is active, any new mine tiles should change colour");
-                    }
-                    assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
-                        `a mine should be inserted as the first child of each new mine tile`);
-                }
-                else {
-                    describe('board changes after solver concludes', () => {
-                        it('should change the mine tiles colour if mineVision is active', () => {
-                            if (currentGame.mineVision) {
-                                assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
-                                    "if mineVision is active, any new mine tiles should change colour");
-                            }
-                        })
-                        it('should insert a mine as the first childNode of new mine nodes', () => {
-                            assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
-                                `a mine should be inserted as the first child of each new mine tile`);
-                        })
-                    })
-                }
-            } else if (!match.isMine && element.childNodes.length == 1) {
-                let mineRemove = element.childNodes[0]
-                element.removeChild(mineRemove)
-                element.style.backgroundColor = ""
                 
-
-                if (isBrowser()) {
-                    assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
-                        for new safe nodes`);
-                    assert.equal(element.style.backgroundColor, "", `the tile's background colour should
-                        be set back to the default`)
+                if (addMine) {
+                    let mine = document.createElement("img")
+                    mine.setAttribute("class", "mine")
+                    mine.src = "./img/mine.png"
+                    mine.style = "height: 100%; width: auto; display: none;"
+                    if (currentGame.mineVision) {
+                        element.style.backgroundColor = "rgba(200, 20, 0, 0.6)"
+                    }
+                    if (element.childNodes.length == 0) {
+                        mine.addEventListener("mouseup", squareChoice)
+                        element.append(mine)
+                    }
+                    else if (element.childNodes[0].getAttribute("class") == "flag") {
+                        element.insertBefore(mine, element.childNodes[0]) 
+                    }
+                    // mocha/chai tests for board manipulation here
+                    if (isBrowser()) {
+                        if (currentGame.mineVision) {
+                            assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
+                                "if mineVision is active, any new mine tiles should change colour");
+                        }
+                        assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
+                            `a mine should be inserted as the first child of each new mine tile`);
+                    }
+                    else {
+                        describe('board changes after solver concludes', () => {
+                            it('should change the mine tiles colour if mineVision is active', () => {
+                                if (currentGame.mineVision) {
+                                    assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
+                                        "if mineVision is active, any new mine tiles should change colour");
+                                }
+                            })
+                            it('should insert a mine as the first childNode of new mine nodes', () => {
+                                assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
+                                    `a mine should be inserted as the first child of each new mine tile`);
+                            })
+                        })
+                    }
                 }
-                else {
-                    it('should have removed any mines for new safe nodes', () => {    
-                        assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
-                            for new safe nodes`);
-                    })
-                    it('should set the background color back to "" for new safe nodes', () => {
-                        assert.equal(element.style.backgroundColor, "", `the tile's background colour should
-                            be set back to the default`)
-                    })
+                
+            } else if (!match.isMine) {
+                if (element.children.length > 0) {
+                    if (element.children[0].getAttribute("class") == "mine") {
+                        let mineRemove = element.children[0]
+                        element.removeChild(mineRemove)
+                        element.style.backgroundColor = ""
+        
+                        if (isBrowser()) {
+                            assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
+                                for new safe nodes`);
+                            assert.equal(element.style.backgroundColor, "", `the tile's background colour should
+                                be set back to the default`)
+                        }
+                        else {
+                            it('should have removed any mines for new safe nodes', () => {    
+                                assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
+                                    for new safe nodes`);
+                            })
+                            it('should set the background color back to "" for new safe nodes', () => {
+                                assert.equal(element.style.backgroundColor, "", `the tile's background colour should
+                                    be set back to the default`)
+                            })
+                        }
+                    }
                 }
             }
         }

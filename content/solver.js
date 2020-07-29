@@ -891,7 +891,7 @@ let solver = {
                                                     }
                                                 })
                                             })
-                                            for (let i = 0; i < oldMines.length - newMines.length; i++) {
+                                            for (let i = 0; i < (oldMines.length - newMines.length); i++) {
                                                 // get a random tile from those chosen and make it a mine, 
                                                 // then push it
                                                 let index = Math.floor(Math.random() * newMineAssign.length)
@@ -913,7 +913,7 @@ let solver = {
                                                     }
                                                 })
                                             })
-                                            for (let i = 0; i < newMines.length - oldMines.length; i++) {
+                                            for (let i = 0; i < (newMines.length - oldMines.length); i++) {
                                                 // get a random tile from those chosen and make it a mine, 
                                                 // then push it
                                                 let index = Math.floor(Math.random() * newMineAssign.length)

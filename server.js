@@ -112,8 +112,6 @@ app.post('/api/loginUser/', (req, res, next) => {
             console.log(err)
             res.status(404).send("User not found.")
         })
-
-    
 })
 
 app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
@@ -153,7 +151,7 @@ app.post('/api/updateStats/:username', authenticate, (req, res, next) => {
             let newDoc = { stats: newStats, _rev: doc._rev }
             doc = Object.assign(doc, newDoc)
             users.insert(doc, doc._id)
-                .then(doc => console.log(doc))
+                .then(doc => res.status(200).send())
                 .catch(err => console.log(err))
         })
         .catch(err => console.log(err))

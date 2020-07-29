@@ -881,9 +881,10 @@ const updateStats = statUpdate => {
             if (!response.ok) {
                 throw new Error(response.status + " " + response.statusText)
             } else {
-                return response.json()
+                return response;
             }
         })
+        .then(() => console.log("stats updated"))
         .catch(err => console.error(err))
     }
 }
