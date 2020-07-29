@@ -1121,6 +1121,7 @@ let solver = {
                     // get its mineNeighbours and add this to the tile's text
                     if (oldGuess.actionTile.mineNeighbours > 0) {
                         action.textContent = `${oldGuess.actionTile.mineNeighbours}`
+                        action.style.color = getTextColor(oldGuess.actionTile.mineNeighbours)
                     }
                 }
             }
