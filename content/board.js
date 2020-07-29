@@ -579,6 +579,70 @@ const resolveBoard = square => {
         return;
     });
 
+    const checkMineCount = () => {
+        let allMines = document.querySelectorAll(".mine")
+        if (allMines.length > currentGame.startMines) {
+            let totalDiff = allMines.length - currentGame.startMines
+            let minesToRemove = []
+            let allTiles = document.querySelectorAll(".mineSquare")
+            for (let i = 0; i < totalDiff; i++) {
+                allMines.forEach(square => {
+                    if (minesToRemove.length == totalDiff) {
+                        return;
+                    }
+                    else if (square.parentElement.childNodes.length == 1) {
+                        square = square.parentElement
+                        let squareNeighbours = []
+                        allTiles.forEach(cell => {
+                            if (
+                                // -1 / -1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                                // -1 / 0
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                    cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                                // -1 / 1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                                // 0 / -1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                                // 0 / +1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                                // +1 / -1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                                // +1 / 0
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                    cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                                // +1 / +1
+                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
+                            ) {
+                                squareNeighbours.push(cell)
+                            }
+                        })
+                        let neighbourCheck = true;
+                        squareNeighbours.forEach(item => {
+                            if (item.revealed) {
+                                neighbourCheck = false;
+                            }
+                        })
+                        if (neighbourCheck) {
+                            minesToRemove.push(square)
+                        }
+                    }
+                })
+            }
+            minesToRemove.forEach(item => {
+                let mine = item.childNodes[0]
+                item.removeChild(mine)
+            })
+        }
+    }
+    checkMineCount()
+
     if (isBrowser()) {
         let allMines = document.querySelectorAll(".mine")
         assert.equal(allMines.length, currentGame.startMines, `the number of mines in the board should
