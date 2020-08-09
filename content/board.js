@@ -18,45 +18,6 @@ const makeBoard = () => {
         chooseNum()
     }
 
-    if (isBrowser()) {  
-        // test totalTiles
-        let counts = [25, 56, 117, 240, 480]
-        assert.oneOf(totalTiles, counts, 
-            `totalTiles should be only one of the designated 5 counts`)
-
-        // test mineSquares
-        assert.equal(mineSquares.length, currentGame.startMines, `there should only 
-            be mines equal to the designated start mines`);
-
-        const checkIfArrayIsUnique = myArray => {
-            return myArray.length === new Set(myArray).size;
-        }
-        assert.isTrue(checkIfArrayIsUnique(mineSquares), `mineSquares should only contain
-            unique elements`)
-    }
-    else {
-        describe('totalTiles', () => {
-            it('should only be one of the five designated counts', () => {   
-                let counts = [25, 56, 117, 240, 480]
-                assert.oneOf(totalTiles, counts, 
-                    `totalTiles should be only one of the designated 5 counts`)
-            })
-        })
-
-        describe('mineSquares', () => {
-            it('should only contain mines equal to the designated starting mines', () => {
-                assert.equal(mineSquares.length, currentGame.startMines, `there should only 
-                    be mines equal to the designated start mines`);
-            })
-            it('should contain only unique elements', () => {
-                const checkIfArrayIsUnique = myArray => {
-                    return myArray.length === new Set(myArray).size;
-                }
-                assert.isTrue(checkIfArrayIsUnique(mineSquares), `mineSquares should only contain
-                    unique elements`)
-            })
-        })
-    }
 
     mineSquares.sort((a, b) => a - b)
 
@@ -75,32 +36,6 @@ const makeBoard = () => {
         currentGame.boardSize == 's' ? 7 :
         currentGame.boardSize == 'xs' ? 5 : 16
 
-    if (isBrowser()) {
-        let widths = [5, 8, 13, 20, 30]
-        assert.oneOf(boardwidth, widths, `boardwidth should only be one of the five
-            designated widths`)
-
-        let heights = [5, 7, 9, 12, 16]
-        assert.oneOf(boardheight, heights, `boardheight should only be one of the five
-            designated heights`)
-    }
-    else {
-        describe('boardwidth', () => {
-            it('should only be one of the five designated widths', () => {
-                let widths = [5, 8, 13, 20, 30]
-                assert.oneOf(boardwidth, widths, `boardwidth should only be one of the five
-                    designated widths`)
-            })
-        })
-
-        describe('boardheight', () => {
-            it('should only be one of the five designated heights', () => {
-                let heights = [5, 7, 9, 12, 16]
-                assert.oneOf(boardheight, heights, `boardheight should only be one of the five
-                    designated heights`)
-            })
-        })
-    }
     
     // set the size of the board
     table.style = `height: auto; width: auto; margin-left: auto; margin-right: auto;`
@@ -276,23 +211,6 @@ const mineTest = (square, click) => {
                     flag.style = "height: 100%; width: auto;"
                     square.append(flag)
 
-                    if (isBrowser()) {
-                        assert.equal(square.childNodes.length, 2, `there should be two
-                            childNodes present - a mine and a flag`);
-                        assert.equal(square.childNodes[1].getAttribute("class"), "flag",
-                            `the second childNode should be a flag`)
-                    }
-                    else {
-                        describe('mineTest(tile, "right") - 1', () => {
-                            it('should append a flag to the tile', () => {
-                                assert.equal(square.childNodes.length, 2, `there should be two
-                                    childNodes present - a mine and a flag`);
-                                assert.equal(square.childNodes[1].getAttribute("class"), "flag",
-                                    `the second childNode should be a flag`)
-                            })
-                        })
-                    }
-
                     // end game test
                     if (currentGame.flagsPlaced == currentGame.startMines) {
                         winGame()
@@ -318,23 +236,6 @@ const mineTest = (square, click) => {
                 flag.style = "height: 100%; width: auto;"
                 square.append(flag)
 
-                if (isBrowser()) {
-                    assert.equal(square.childNodes.length, 1, `there should be one
-                        childNode present`);
-                    assert.equal(square.childNodes[0].getAttribute("class"), "flag",
-                        `the childNode should be a flag`)
-                }
-                else {
-                    describe('mineTest(tile, "right") - 2', () => {
-                        it('should append a flag to the tile', () => {
-                            assert.equal(square.childNodes.length, 1, `there should be one
-                                childNode present`);
-                            assert.equal(square.childNodes[0].getAttribute("class"), "flag",
-                                `the childNode should be a flag`)
-                        })
-                    })
-                }
-
                 // Set remaining mines in UI
                 document.getElementById("scoreDisplay").innerHTML = "Mines left: " +
                     (currentGame.startMines - currentGame.flagsPlaced)
@@ -348,23 +249,6 @@ const mineTest = (square, click) => {
                 // Make the chosen square 'safe'
                 square.style = "background-color: rgb(150, 150, 150);"
                 square.revealed = true;
-
-                if (isBrowser()) {
-                    assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `The tile's
-                        background color should be set to rgb(150, 150, 150)`);
-                    assert.isTrue(square.revealed, `square.revealed should be set to true`);
-                }
-                else {
-                    describe('mineTest(tile, "left" - safe tile', () => {
-                        it(`should set the tile's background color to rgb(150, 150, 150)`, () => {
-                            assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `The tile's
-                                background color should be set to rgb(150, 150, 150)`);
-                        })
-                        it('should set tile.revealed to true', () => {
-                            assert.isTrue(square.revealed, `square.revealed should be set to true`);
-                        })
-                    })
-                }
 
                 // Check if any mines around the chosen square
                 // Nest for loops to test all 8 squares around
@@ -521,29 +405,6 @@ const resolveBoard = square => {
                     else if (element.childNodes[0].getAttribute("class") == "flag") {
                         element.insertBefore(mine, element.childNodes[0]) 
                     }
-                    // mocha/chai tests for board manipulation here
-                    if (isBrowser()) {
-                        if (currentGame.mineVision) {
-                            assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
-                                "if mineVision is active, any new mine tiles should change colour");
-                        }
-                        assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
-                            `a mine should be inserted as the first child of each new mine tile`);
-                    }
-                    else {
-                        describe('board changes after solver concludes', () => {
-                            it('should change the mine tiles colour if mineVision is active', () => {
-                                if (currentGame.mineVision) {
-                                    assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
-                                        "if mineVision is active, any new mine tiles should change colour");
-                                }
-                            })
-                            it('should insert a mine as the first childNode of new mine nodes', () => {
-                                assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
-                                    `a mine should be inserted as the first child of each new mine tile`);
-                            })
-                        })
-                    }
                 }
                 
             } else if (!match.isMine) {
@@ -553,22 +414,6 @@ const resolveBoard = square => {
                         element.removeChild(mineRemove)
                         element.style.backgroundColor = ""
         
-                        if (isBrowser()) {
-                            assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
-                                for new safe nodes`);
-                            assert.equal(element.style.backgroundColor, "", `the tile's background colour should
-                                be set back to the default`)
-                        }
-                        else {
-                            it('should have removed any mines for new safe nodes', () => {    
-                                assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
-                                    for new safe nodes`);
-                            })
-                            it('should set the background color back to "" for new safe nodes', () => {
-                                assert.equal(element.style.backgroundColor, "", `the tile's background colour should
-                                    be set back to the default`)
-                            })
-                        }
                     }
                 }
             }
@@ -643,54 +488,8 @@ const resolveBoard = square => {
     }
     checkMineCount()
 
-    if (isBrowser()) {
-        let allMines = document.querySelectorAll(".mine")
-        assert.equal(allMines.length, currentGame.startMines, `the number of mines in the board should
-            never exceed the number of starting mines in the game`);
-    }
-    else {
-        describe('mineCount after solver resolution', () => {
-            it('should never exceed the number of startMines for the game', () => {
-                let allMines = document.querySelectorAll(".mine")
-                assert.equal(allMines.length, currentGame.startMines, `the number of mines in the board should
-                    never exceed the number of starting mines in the game`);
-            })
-        })
-    }
-
     square.style = "background-color: rgb(150, 150, 150);"
     square.revealed = true;
-
-    if (isBrowser()) {
-        assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `it should set the 
-            tile's background color to grey.`);
-        assert.isTrue(square.revealed, `square.revealed should be set to true`);
-
-        // also test the flagCount at this point
-        let newFlagCount = document.querySelectorAll(".flag").length
-        assert.equal(startFlagCount, newFlagCount, `the number of flags should not change
-            after the solver has run`);
-    }
-    else {
-        describe('UI changes to targetTile', () => {
-            it(`should set the tile's background color to grey`, () => {
-                assert.equal(square.style.backgroundColor, "rgb(150, 150, 150)", `it should set the 
-                    tile's background color to grey.`);
-            })
-            it(`should set tile.revealed to true`, () => {
-                assert.isTrue(square.revealed, `square.revealed should be set to true`);
-            })
-        })
-
-        // also test the flagCount at this point
-        describe('post-solver flag check', () => {
-            it('should have the same mine count as before the solver ran', () => {
-                let newFlagCount = document.querySelectorAll(".flag").length
-                assert.equal(startFlagCount, newFlagCount, `the number of flags should not change
-                    after the solver has run`);
-            })
-        })
-    }
 
     // Check if any mines around the chosen square
     // Nest for loops to test all 8 squares around
