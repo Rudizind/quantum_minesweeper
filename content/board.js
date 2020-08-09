@@ -367,12 +367,6 @@ const resolveBoard = square => {
         return;
     }
 
-    // otherwise, change the board (and update stats)
-    // stat update for times saved by solver
-    if (isBrowser()) {
-        updateStats([{ type: "save", num: 1, id: Math.round(Math.random() * 99999999999999) }])
-    }
-
     let allFlags = document.querySelectorAll('.flag')
     let startFlagCount = allFlags.length
 

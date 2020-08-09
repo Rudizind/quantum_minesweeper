@@ -3,92 +3,11 @@ const isBrowser = () => {
     return this === window ? true : false
 }
 
-// Current user details, these are sent through the HTTP requests to be parsed by the authenticate middleware.
-let currentUser = {
-    username: "",
-    password: "",
-    stats: {}
-}
-
 // Variable to be used when a game is active, for tracking gameboard etc.
 let currentGame = {};
 
 // Persistent storage of mineTile neighbours for a game
 let allMineNeighbours = []
-
-// Register a new user by taking their details and sending them to the server 
-// to be added to the database using an HTTP POST request.
-const registerUser = () => {
-    let username = document.getElementById("usernameBox").value
-    let password = document.getElementById("passwordBox").value
-
-    // Authenticate user input for username and password, and alert errors if they aren't ok. Otherwise, proceed.
-    username.length < 8 ? alert("Your username must be at least 8 characters.") :
-        username.length > 24 ? alert("Your username must be at most 24 characters.") :
-        password.length < 8 ? alert("Your password must be at least 8 characters.") :
-        password.length > 24 ? alert("Your username must be at most 24 characters.") :
-        password == username ? alert("Your username and password must not be the same.") : (() => {
-            let userDetails = {
-                username: username,
-                password: password
-            }
-            fetch('/api/newUser/', {
-                    method: 'POST',
-                    headers: {
-                        "accept": "application/json",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(userDetails)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(response.status + " " + response.statusText)
-                    } else {
-                        alert(`Registered successfully. You may now log in.`)
-                    }
-                })
-                .catch(err => console.error(err))
-        })()
-}
-
-// Log in a user by taking their input credentials and checking them 
-// against the database using a post HTTP request.
-const loginUser = () => {
-    let username = document.getElementById("usernameBox").value
-    let password = document.getElementById("passwordBox").value
-    let userDetails = {
-        username: username,
-        password: password
-    }
-    fetch('/api/loginUser/', {
-            method: 'POST',
-            headers: {
-                "accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(userDetails)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.status + " " + response.statusText)
-            } else {
-                alert(`Logged in successfully.`)
-                return response.json()
-            }
-        })
-        .then(data => {
-            let userData = data;
-            currentUser.username = userData._id
-            currentUser.password = userData.password
-            currentUser.stats = userData.stats
-            document.getElementById("login").setAttribute("class", "hidden")
-            document.getElementById("mineVisionCheck").checked = false;
-            document.getElementById("boardSizeChoice").value = "Medium (13 x 9)"
-            document.getElementById("mineChoice").value = "Normal (1.0x)"
-            document.getElementById("newgame").setAttribute("class", "container-fluid align-middle")
-        })
-        .catch(err => console.error(err))
-}
 
 // Start the game board and initialise the game.
 const startGame = () => {
@@ -259,10 +178,6 @@ const backHome = () => {
         document.getElementById("rightArrow").setAttribute("onclick", "solver.changeMove(1)")
         document.getElementById("rightArrow").style.opacity = "1"
 
-        // send the updates to the server
-        if (isBrowser()) {
-            updateStats(updates)
-        }
     }
 }
 
@@ -334,10 +249,6 @@ const endGame = () => {
     // Stop the timer
     currentGame.timerStop()
 
-    // send the updates
-    if (isBrowser()) {
-        updateStats(updates)
-    }
 }
 
 // display the 'you won the game' screen if the user correctly identifies
@@ -382,9 +293,6 @@ const winGame = () => {
         // Stop the timer
         currentGame.timerStop()
 
-        if (isBrowser()) {
-            updateStats(updates)
-        }
     }
 }
 
@@ -615,26 +523,4 @@ const showAboutInfo = () => {
 
     // use .viewingStats to avoid errors from the backHome function
     currentGame.viewingStats = true;
-}
-
-// export all variables (if in node environment)
-if (!isBrowser()) {
-    module.exports.isBrowser = isBrowser
-    module.exports.currentUser = currentUser
-    module.exports.currentGame = currentGame
-    module.exports.allMineNeighbours = allMineNeighbours
-    module.exports.registerUser = registerUser
-    module.exports.loginUser = loginUser
-    module.exports.startGame = startGame
-    module.exports.tickUp = tickUp
-    module.exports.backHome = backHome
-    module.exports.endGame = endGame
-    module.exports.winGame = winGame
-    module.exports.showReplay = showReplay
-    module.exports.toggleHint = toggleHint
-    module.exports.viewStats = viewStats
-    module.exports.getSingleStats = getSingleStats
-    module.exports.getAllStats = getAllStats
-    module.exports.updateStats = updateStats
-    module.exports.showAboutInfo = showAboutInfo
 }
