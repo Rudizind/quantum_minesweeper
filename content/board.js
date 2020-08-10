@@ -134,8 +134,8 @@ const makeBoard = () => {
             newCell.setAttribute("y", i + 1)
 
             // set the max height and width of the squares
-            newCell.style.minHeight = "30px"
-            newCell.style.minWidth = "30px"
+            newCell.style.height = "30px"
+            newCell.style.width = "30px"
 
             // Assign the default 'revealed' boolean to false for the cell. 
             newCell.revealed = false;
@@ -273,7 +273,7 @@ const mineTest = (square, click) => {
                     let flag = document.createElement("img")
                     flag.src = "./img/flag.png"
                     flag.setAttribute("class", "flag")
-                    flag.style = "height: 100%; width: auto;"
+                    flag.style = "height: 27px; width: 27px;"
                     square.append(flag)
 
                     if (isBrowser()) {
@@ -315,7 +315,7 @@ const mineTest = (square, click) => {
                 let flag = document.createElement("img")
                 flag.src = "./img/flag.png"
                 flag.setAttribute("class", "flag")
-                flag.style = "height: 100%; width: auto;"
+                flag.style = "height: 27px; width: 27px;"
                 square.append(flag)
 
                 if (isBrowser()) {
@@ -553,13 +553,7 @@ const resolveBoard = square => {
                         element.removeChild(mineRemove)
                         element.style.backgroundColor = ""
         
-                        if (isBrowser()) {
-                            assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
-                                for new safe nodes`);
-                            assert.equal(element.style.backgroundColor, "", `the tile's background colour should
-                                be set back to the default`)
-                        }
-                        else {
+                        if (!isBrowser()) {
                             it('should have removed any mines for new safe nodes', () => {    
                                 assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
                                     for new safe nodes`);
@@ -643,12 +637,7 @@ const resolveBoard = square => {
     }
     checkMineCount()
 
-    if (isBrowser()) {
-        let allMines = document.querySelectorAll(".mine")
-        assert.equal(allMines.length, currentGame.startMines, `the number of mines in the board should
-            never exceed the number of starting mines in the game`);
-    }
-    else {
+    if (!isBrowser()) {
         describe('mineCount after solver resolution', () => {
             it('should never exceed the number of startMines for the game', () => {
                 let allMines = document.querySelectorAll(".mine")

@@ -694,7 +694,7 @@ const showReplay = () => {
                     let flag = document.createElement("img")
                     flag.src = "./img/flag.png"
                     flag.setAttribute("class", "flag")
-                    flag.style = "height: 100%; width: auto;"
+                    flag.style = "height: 27px; width: 27px;"
                     node.append(flag)
                 }
             }
