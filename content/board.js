@@ -424,60 +424,154 @@ const resolveBoard = square => {
             let totalDiff = allMines.length - currentGame.startMines
             let minesToRemove = []
             let allTiles = document.querySelectorAll(".mineSquare")
-            for (let i = 0; i < totalDiff; i++) {
-                allMines.forEach(square => {
-                    if (minesToRemove.length == totalDiff) {
-                        return;
-                    }
-                    else if (square.parentElement.childNodes.length == 1) {
-                        square = square.parentElement
-                        let squareNeighbours = []
-                        allTiles.forEach(cell => {
-                            if (
-                                // -1 / -1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
-                                // -1 / 0
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
-                                // -1 / 1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
-                                // 0 / -1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
-                                // 0 / +1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
-                                // +1 / -1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
-                                // +1 / 0
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
-                                // +1 / +1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
-                            ) {
-                                squareNeighbours.push(cell)
-                            }
-                        })
-                        let neighbourCheck = true;
-                        squareNeighbours.forEach(item => {
-                            if (item.revealed) {
-                                neighbourCheck = false;
-                            }
-                        })
-                        if (neighbourCheck) {
+            allMines.forEach(square => {
+                if (minesToRemove.length == totalDiff) {
+                    return;
+                }
+                else if (square.parentElement.children.length == 1) {
+                    square = square.parentElement
+                    let squareNeighbours = []
+                    allTiles.forEach(cell => {
+                        if (
+                            // -1 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // -1 / 0
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            // -1 / 1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            // 0 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // 0 / +1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            // +1 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // +1 / 0
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            // +1 / +1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
+                        ) {
+                            squareNeighbours.push(cell)
+                        }
+                    })
+                    let neighbourCheck = true;
+                    squareNeighbours.forEach(item => {
+                        if (item.revealed) {
+                            neighbourCheck = false;
+                        }
+                    })
+                    if (neighbourCheck) {
+                        if (!minesToRemove.includes(item => item == square)) {
                             minesToRemove.push(square)
                         }
                     }
+                }
+            })
+            
+        
+            // if the solver can't organise the mine changes in a way that works for the board, end the game
+            if (minesToRemove.length < totalDiff) {
+                endGame()
+            }
+            else {   
+                minesToRemove.forEach(item => {
+                    let mine = item.children[0]
+                    item.removeChild(mine)
                 })
             }
-            minesToRemove.forEach(item => {
-                let mine = item.childNodes[0]
-                item.removeChild(mine)
+        }
+        else if (allMines.length < currentGame.startMines) {
+            let totalDiff = currentGame.startMines - allMines.length
+            let minesToAdd = []
+            let allTiles = document.querySelectorAll(".mineSquare")
+            let safeTiles = []
+            allTiles.forEach(tile => {
+                if (tile.children.length > 0) {
+                    if (tile.children[0].getAttribute("class") == "mine") {
+                        // do nothing
+                    }
+                    else {
+                        safeTiles.push(tile)
+                    }
+                }
+                else {
+                    safeTiles.push(tile)
+                }
             })
+            safeTiles.forEach(square => {
+                if (minesToAdd.length == totalDiff) {
+                    return;
+                }
+                else {
+                    let squareNeighbours = []
+                    allTiles.forEach(cell => {
+                        if (
+                            // -1 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // -1 / 0
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            // -1 / 1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            // 0 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // 0 / +1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            // +1 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // +1 / 0
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            // +1 / +1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
+                        ) {
+                            squareNeighbours.push(cell)
+                        }
+                    })
+                    let neighbourCheck = true;
+                    squareNeighbours.forEach(item => {
+                        if (item.revealed) {
+                            neighbourCheck = false;
+                        }
+                    })
+                    if (neighbourCheck) {
+                        if (!minesToAdd.includes(item => item == square)) {
+                            minesToAdd.push(square)
+                        }
+                    }
+                }
+            })
+        
+            // if the solver can't organise the mine changes in a way that works for the board, end the game
+            if (minesToAdd.length < totalDiff) {
+                endGame()
+            }
+            else {
+                minesToAdd.forEach(item => {
+                    let mine = document.createElement("img")
+                    mine.setAttribute("class", "mine")
+                    mine.src = "./img/mine.png"
+                    mine.style = "height: 100%; width: auto; display: none;"
+                    mine.addEventListener("mouseup", squareChoice)
+                    if (currentGame.mineVision) {
+                        newCell.style.backgroundColor = "rgba(200, 20, 0, 0.6)"
+                    }
+                    item.append(mine);
+                })
+            }
         }
     }
     checkMineCount()
