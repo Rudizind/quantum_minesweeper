@@ -577,8 +577,8 @@ const winGame = () => {
     })
 
     if (isBrowser()) {
+        let checkFlags = document.querySelectorAll(".flag")
         if (winner) {
-            let checkFlags = document.querySelectorAll(".flag")
             assert.equal(checkFlags.length, currentGame.startMines, 
                 `the number of flags should match the number of startMines`)
             

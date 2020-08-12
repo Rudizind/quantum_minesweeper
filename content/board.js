@@ -230,11 +230,11 @@ const mineTest = (square, click) => {
         return false;
     } else {
         // If either a mine or flag is present (or both)
-        if (square.childNodes.length > 0) {
+        if (square.children.length > 0) {
             // If left click
             if (click == "left") {
                 // If there's a flag in the square, do nothing.
-                if (square.childNodes.length == 2) {
+                if (square.children.length == 2) {
                     return false;
                 }
                 // Otherwise, they've made a mistake and might have lost the game. 
@@ -243,26 +243,26 @@ const mineTest = (square, click) => {
                 // If it could have been avoided, the user loses. 
                 // If it was completely impossible to know without guessing, 
                 // the board will change such that the chosen square does NOT contain a mine. 
-                else if (square.childNodes[0].getAttribute("class") == "mine") {
+                else if (square.children[0].getAttribute("class") == "mine") {
                     resolveBoard(square)
                 }
             }
             // If right click
             else if (click == "right") {
                 // If mine and flag present, remove flag
-                if (square.childNodes.length == 2) {
+                if (square.children.length == 2) {
                     // increase mine count by 1
                     currentGame.flagsPlaced--
 
                     // remove the flag
-                    square.childNodes[1].parentElement.removeChild(square.childNodes[1])
+                    square.children[1].parentElement.removeChild(square.children[1])
                 }
                 // If only flag present, remove flag
-                else if (square.childNodes[0].getAttribute("class") == "flag") {
+                else if (square.children[0].getAttribute("class") == "flag") {
                     // increase mine count by 1
                     currentGame.flagsPlaced--
 
-                    square.childNodes[0].parentElement.removeChild(square.childNodes[0])
+                    square.children[0].parentElement.removeChild(square.children[0])
                 }
                 // If only mine present, add flag
                 else {
@@ -277,17 +277,17 @@ const mineTest = (square, click) => {
                     square.append(flag)
 
                     if (isBrowser()) {
-                        assert.equal(square.childNodes.length, 2, `there should be two
-                            childNodes present - a mine and a flag`);
-                        assert.equal(square.childNodes[1].getAttribute("class"), "flag",
+                        assert.equal(square.children.length, 2, `there should be two
+                            children present - a mine and a flag`);
+                        assert.equal(square.children[1].getAttribute("class"), "flag",
                             `the second childNode should be a flag`)
                     }
                     else {
                         describe('mineTest(tile, "right") - 1', () => {
                             it('should append a flag to the tile', () => {
-                                assert.equal(square.childNodes.length, 2, `there should be two
-                                    childNodes present - a mine and a flag`);
-                                assert.equal(square.childNodes[1].getAttribute("class"), "flag",
+                                assert.equal(square.children.length, 2, `there should be two
+                                    children present - a mine and a flag`);
+                                assert.equal(square.children[1].getAttribute("class"), "flag",
                                     `the second childNode should be a flag`)
                             })
                         })
@@ -319,17 +319,17 @@ const mineTest = (square, click) => {
                 square.append(flag)
 
                 if (isBrowser()) {
-                    assert.equal(square.childNodes.length, 1, `there should be one
+                    assert.equal(square.children.length, 1, `there should be one
                         childNode present`);
-                    assert.equal(square.childNodes[0].getAttribute("class"), "flag",
+                    assert.equal(square.children[0].getAttribute("class"), "flag",
                         `the childNode should be a flag`)
                 }
                 else {
                     describe('mineTest(tile, "right") - 2', () => {
                         it('should append a flag to the tile', () => {
-                            assert.equal(square.childNodes.length, 1, `there should be one
+                            assert.equal(square.children.length, 1, `there should be one
                                 childNode present`);
-                            assert.equal(square.childNodes[0].getAttribute("class"), "flag",
+                            assert.equal(square.children[0].getAttribute("class"), "flag",
                                 `the childNode should be a flag`)
                         })
                     })
@@ -408,9 +408,9 @@ const mineTest = (square, click) => {
                                 cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
                         ) {
                             squareNeighbours.push(cell)
-                            if (cell.childNodes.length != 0) {
+                            if (cell.children.length != 0) {
                                 if (cell.textContent == "") {
-                                    if (cell.childNodes[0].getAttribute("class") == "mine") {
+                                    if (cell.children[0].getAttribute("class") == "mine") {
                                         mineCount++
                                     }
                                 }
@@ -514,12 +514,12 @@ const resolveBoard = square => {
                     if (currentGame.mineVision) {
                         element.style.backgroundColor = "rgba(200, 20, 0, 0.6)"
                     }
-                    if (element.childNodes.length == 0) {
+                    if (element.children.length == 0) {
                         mine.addEventListener("mouseup", squareChoice)
                         element.append(mine)
                     }
-                    else if (element.childNodes[0].getAttribute("class") == "flag") {
-                        element.insertBefore(mine, element.childNodes[0]) 
+                    else if (element.children[0].getAttribute("class") == "flag") {
+                        element.insertBefore(mine, element.children[0]) 
                     }
                     // mocha/chai tests for board manipulation here
                     if (isBrowser()) {
@@ -527,7 +527,7 @@ const resolveBoard = square => {
                             assert.equal(element.style.backgroundColor, "rgba(200, 20, 0, 0.6)", 
                                 "if mineVision is active, any new mine tiles should change colour");
                         }
-                        assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
+                        assert.equal(element.children[0].getAttribute("class"), "mine", 
                             `a mine should be inserted as the first child of each new mine tile`);
                     }
                     else {
@@ -539,7 +539,7 @@ const resolveBoard = square => {
                                 }
                             })
                             it('should insert a mine as the first childNode of new mine nodes', () => {
-                                assert.equal(element.childNodes[0].getAttribute("class"), "mine", 
+                                assert.equal(element.children[0].getAttribute("class"), "mine", 
                                     `a mine should be inserted as the first child of each new mine tile`);
                             })
                         })
@@ -555,7 +555,7 @@ const resolveBoard = square => {
         
                         if (!isBrowser()) {
                             it('should have removed any mines for new safe nodes', () => {    
-                                assert.equal(element.childNodes.length, 0, `there should be no childNodes remaining 
+                                assert.equal(element.children.length, 0, `there should be no children remaining 
                                     for new safe nodes`);
                             })
                             it('should set the background color back to "" for new safe nodes', () => {
@@ -579,60 +579,154 @@ const resolveBoard = square => {
             let totalDiff = allMines.length - currentGame.startMines
             let minesToRemove = []
             let allTiles = document.querySelectorAll(".mineSquare")
-            for (let i = 0; i < totalDiff; i++) {
-                allMines.forEach(square => {
-                    if (minesToRemove.length == totalDiff) {
-                        return;
-                    }
-                    else if (square.parentElement.childNodes.length == 1) {
-                        square = square.parentElement
-                        let squareNeighbours = []
-                        allTiles.forEach(cell => {
-                            if (
-                                // -1 / -1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
-                                // -1 / 0
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
-                                // -1 / 1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
-                                // 0 / -1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
-                                // 0 / +1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
-                                // +1 / -1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
-                                // +1 / 0
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
-                                // +1 / +1
-                                (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
-                                    cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
-                            ) {
-                                squareNeighbours.push(cell)
-                            }
-                        })
-                        let neighbourCheck = true;
-                        squareNeighbours.forEach(item => {
-                            if (item.revealed) {
-                                neighbourCheck = false;
-                            }
-                        })
-                        if (neighbourCheck) {
+            allMines.forEach(square => {
+                if (minesToRemove.length == totalDiff) {
+                    return;
+                }
+                else if (square.parentElement.children.length == 1) {
+                    square = square.parentElement
+                    let squareNeighbours = []
+                    allTiles.forEach(cell => {
+                        if (
+                            // -1 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // -1 / 0
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            // -1 / 1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            // 0 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // 0 / +1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            // +1 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // +1 / 0
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            // +1 / +1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
+                        ) {
+                            squareNeighbours.push(cell)
+                        }
+                    })
+                    let neighbourCheck = true;
+                    squareNeighbours.forEach(item => {
+                        if (item.revealed) {
+                            neighbourCheck = false;
+                        }
+                    })
+                    if (neighbourCheck) {
+                        if (!minesToRemove.includes(item => item == square)) {
                             minesToRemove.push(square)
                         }
                     }
+                }
+            })
+            
+        
+            // if the solver can't organise the mine changes in a way that works for the board, end the game
+            if (minesToRemove.length < totalDiff) {
+                endGame()
+            }
+            else {   
+                minesToRemove.forEach(item => {
+                    let mine = item.children[0]
+                    item.removeChild(mine)
                 })
             }
-            minesToRemove.forEach(item => {
-                let mine = item.childNodes[0]
-                item.removeChild(mine)
+        }
+        else if (allMines.length < currentGame.startMines) {
+            let totalDiff = currentGame.startMines - allMines.length
+            let minesToAdd = []
+            let allTiles = document.querySelectorAll(".mineSquare")
+            let safeTiles = []
+            allTiles.forEach(tile => {
+                if (tile.children.length > 0) {
+                    if (tile.children[0].getAttribute("class") == "mine") {
+                        // do nothing
+                    }
+                    else {
+                        safeTiles.push(tile)
+                    }
+                }
+                else {
+                    safeTiles.push(tile)
+                }
             })
+            safeTiles.forEach(square => {
+                if (minesToAdd.length == totalDiff) {
+                    return;
+                }
+                else {
+                    let squareNeighbours = []
+                    allTiles.forEach(cell => {
+                        if (
+                            // -1 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // -1 / 0
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            // -1 / 1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) - 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            // 0 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // 0 / +1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1) ||
+                            // +1 / -1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) - 1) ||
+                            // +1 / 0
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y"))) ||
+                            // +1 / +1
+                            (cell.getAttribute("x") == Number(square.getAttribute("x")) + 1 &&
+                                cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
+                        ) {
+                            squareNeighbours.push(cell)
+                        }
+                    })
+                    let neighbourCheck = true;
+                    squareNeighbours.forEach(item => {
+                        if (item.revealed) {
+                            neighbourCheck = false;
+                        }
+                    })
+                    if (neighbourCheck) {
+                        if (!minesToAdd.includes(item => item == square)) {
+                            minesToAdd.push(square)
+                        }
+                    }
+                }
+            })
+        
+            // if the solver can't organise the mine changes in a way that works for the board, end the game
+            if (minesToAdd.length < totalDiff) {
+                endGame()
+            }
+            else {
+                minesToAdd.forEach(item => {
+                    let mine = document.createElement("img")
+                    mine.setAttribute("class", "mine")
+                    mine.src = "./img/mine.png"
+                    mine.style = "height: 100%; width: auto; display: none;"
+                    mine.addEventListener("mouseup", squareChoice)
+                    if (currentGame.mineVision) {
+                        newCell.style.backgroundColor = "rgba(200, 20, 0, 0.6)"
+                    }
+                    item.append(mine);
+                })
+            }
         }
     }
     checkMineCount()
@@ -721,9 +815,9 @@ const resolveBoard = square => {
                     cell.getAttribute("y") == Number(square.getAttribute("y")) + 1)
             ) {
                 squareNeighbours.push(cell)
-                if (cell.childNodes.length != 0) {
+                if (cell.children.length != 0) {
                     if (cell.textContent == "") {
-                        if (cell.childNodes[0].getAttribute("class") == "mine") {
+                        if (cell.children[0].getAttribute("class") == "mine") {
                             mineCount++
                         }
                     }
